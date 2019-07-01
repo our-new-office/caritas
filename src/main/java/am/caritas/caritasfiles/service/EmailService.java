@@ -31,6 +31,11 @@ public class EmailService {
         this.templateEngine = templateEngine;
     }
 
+    /**
+     * Send Email for Reset Password
+     * @param emailAddress String
+     * @param url String
+     */
     public void sendResetPasswordEmail(String emailAddress, String url) {
 
         Context context = new Context();
@@ -41,7 +46,11 @@ public class EmailService {
     }
 
 
-
+    /**
+     * Send Email for activating User
+     * @param emailAddress String
+     * @param url String
+     */
     @Async
     public void sendUserActivationEmail(String emailAddress, String url) {
         Context context = new Context();
@@ -52,7 +61,12 @@ public class EmailService {
     }
 
 
-
+    /**
+     * Sends Mime type email
+     * @param emailAddress String
+     * @param mailHtml String
+     * @param subject String
+     */
     void sendMimeMessage(String emailAddress, String mailHtml, String subject) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -72,7 +86,10 @@ public class EmailService {
     }
 
 
-
+    /**
+     * Sends Mail
+     * @param mail Mail
+     */
     @Async
     public void sendEmail(Mail mail) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
