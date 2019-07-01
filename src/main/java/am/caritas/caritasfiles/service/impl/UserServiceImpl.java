@@ -1,6 +1,5 @@
 package am.caritas.caritasfiles.service.impl;
 
-import am.caritas.caritasfiles.model.enums.Role;
 import am.caritas.caritasfiles.model.User;
 import am.caritas.caritasfiles.model.enums.Status;
 import am.caritas.caritasfiles.model.mail.Mail;
@@ -11,7 +10,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -56,10 +54,5 @@ public class UserServiceImpl implements UserService {
     @Override
     public void saveUser(User user) {
         userRepository.save(user);
-    }
-
-    @Override
-    public List<Role> findAllRoles() {
-        return null;
     }
 }
