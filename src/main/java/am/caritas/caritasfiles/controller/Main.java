@@ -41,16 +41,33 @@ public class Main {
         this.emailService = emailService;
     }
 
+    /**
+     * Return login page
+     * @return login page
+     */
     @GetMapping("/login")
-    public String login(ModelMap modelMap) {
+    public String login() {
+        log.info("Login page loaded");
         return "login";
     }
 
+    /**
+     * Return register page
+     * @return register page
+     */
     @GetMapping("/register")
     public String register() {
+        log.info("Register page loaded");
         return "register";
     }
 
+    /**
+     * Return login page if registration is correct or return register page again
+     * @param user User
+     * @param bindingResult BindingResult
+     * @param modelMap ModelMap
+     * @return login page if success orElse register
+     */
     @PostMapping("/register")
     @Transactional
     public String registration(@Valid User user, BindingResult bindingResult, ModelMap modelMap) {
@@ -87,9 +104,17 @@ public class Main {
         emailService.sendUserActivationEmail(user.getEmail(), baseUrl + "/activate?token=" + user.getEmailToken() + "&userId=" + user.getId());
         modelMap.addAttribute("RegisterSuccess", "Congratulations!!! User Created Successfully!!! Check Your Email for Activating  Account");
         log.info("User has been created successfully");
-        return "register";
+        return "login";
     }
 
+    /**
+     * Return activate page
+     * @param token String
+     * @param userId String
+     * @param error String
+     * @param modelMap ModelMap
+     * @return activate page
+     */
     @GetMapping(value = "/activate")
     public String activateUser(@RequestParam String token, @RequestParam String userId, @RequestParam(required = false) String error, ModelMap modelMap) {
         modelMap.addAttribute("token", token);
@@ -99,11 +124,18 @@ public class Main {
         return "activate";
     }
 
+    /**
+     * Return login page if activation is correct or return activate page again
+     * @param passwordRepassword passwordRePasswordError
+     * @param bindingResult BindingResult
+     * @param modelMap ModelMap
+     * @return activate page in case of error orElse login page
+     */
     @PostMapping("/activate")
     @Transactional
     public String activate(@Valid PasswordRepassword passwordRepassword, BindingResult bindingResult, ModelMap modelMap) {
         if (bindingResult.hasErrors()) {
-            modelMap.addAttribute("pesswordRepasswordError", "Wrong Password, Repassword value");
+            modelMap.addAttribute("passwordRePasswordError", "Wrong Password, RePassword value");
             return "activate";
         }
 
@@ -131,7 +163,7 @@ public class Main {
             modelMap.addAttribute("wrongActivation", "Wrong account activation data");
             return "register";
         }
-        modelMap.addAttribute("pesswordRepasswordError", "Wrong Password, Repassword value");
+        modelMap.addAttribute("passwordRePasswordError", "Wrong Password, RePassword value");
         modelMap.addAttribute("userId", passwordRepassword.getUserId());
         modelMap.addAttribute("token", passwordRepassword.getToken());
         return "activate";

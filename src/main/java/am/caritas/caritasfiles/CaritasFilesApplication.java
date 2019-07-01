@@ -15,6 +15,11 @@ public class CaritasFilesApplication  implements CommandLineRunner {
         SpringApplication.run(CaritasFilesApplication.class, args);
     }
 
+
+    /**
+     * This method creates SimpleMailMessage Bean
+     * @return creating SimpleMailMessage Bean
+     */
     @Bean
     public SimpleMailMessage templateSimpleMessage() {
         SimpleMailMessage message = new SimpleMailMessage();
