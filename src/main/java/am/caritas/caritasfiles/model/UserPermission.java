@@ -19,13 +19,13 @@ public class UserPermission {
     @Column
     private Long id;
 
-    @OneToMany
+    @ManyToOne
     private User user;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private Role role;
 
-    @OneToMany
+    @ManyToOne
     private Permission permission;
 }

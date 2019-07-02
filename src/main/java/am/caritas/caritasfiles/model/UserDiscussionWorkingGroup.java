@@ -18,12 +18,12 @@ public class UserDiscussionWorkingGroup {
     @Column
     private Long id;
 
-    @OneToMany
+    @ManyToOne
     private User user;
 
-    @OneToMany
+    @ManyToOne
     private Discussion discussion;
 
-    @OneToMany
+    @ManyToOne
     private WorkingGroup workingGroup;
 }
