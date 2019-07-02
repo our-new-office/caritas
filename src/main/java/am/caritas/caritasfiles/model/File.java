@@ -1,5 +1,6 @@
 package am.caritas.caritasfiles.model;
 
+import am.caritas.caritasfiles.model.enums.FileStatus;
 import am.caritas.caritasfiles.model.enums.FileType;
 import am.caritas.caritasfiles.model.enums.Status;
 import lombok.*;
@@ -27,5 +28,5 @@ public class File {
     private FileType fileType;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private FileStatus fileStatus;
 }
