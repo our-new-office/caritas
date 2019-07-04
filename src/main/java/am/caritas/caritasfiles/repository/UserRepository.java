@@ -19,4 +19,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return true if User exists by Id and EmailToken orElse false
      */
     Boolean existsByIdAndEmailToken(Long id, String token);
+
+    /**
+     * Return boolean
+     * @param email String
+     * @return true if exists by email orElse false
+     */
+    Boolean existsByEmail(String email);
 }

@@ -72,31 +72,31 @@ public class Main {
     @Transactional
     public String registration(@Valid User user, BindingResult bindingResult, ModelMap modelMap) {
 
-        boolean error = false;
-        String bindingError = null;
-        String nameError = null;
-        String emailError = null;
-
-        if (bindingResult.hasErrors()) {
-            error = true;
-            bindingError = "Something went wrong, try once more";
-        }
-        if ((user.getName()) == null || (user.getName()).trim().equals("")) {
-            error = true;
-            nameError = "Name field is required, please fill it";
-        }
-        if ((user.getEmail()) == null || (user.getEmail()).trim().equals("")) {
-            error = true;
-            emailError = "Email field is required, please fill it";
-        }
-        if(error){
-            modelMap.addAttribute("bindingError", bindingError);
-            modelMap.addAttribute("nameError", nameError);
-            modelMap.addAttribute("emailError", emailError);
-            modelMap.addAttribute("oldUser", user);
-            log.info("Something went wrong, returning to registration page again");
-            return "register";
-        }
+//        boolean error = false;
+//        String bindingError = null;
+//        String nameError = null;
+//        String emailError = null;
+//
+//        if (bindingResult.hasErrors()) {
+//            error = true;
+//            bindingError = "Something went wrong, try once more";
+//        }
+//        if ((user.getName()) == null || (user.getName()).trim().equals("")) {
+//            error = true;
+//            nameError = "Name field is required, please fill it";
+//        }
+//        if ((user.getEmail()) == null || (user.getEmail()).trim().equals("")) {
+//            error = true;
+//            emailError = "Email field is required, please fill it";
+//        }
+//        if(error){
+//            modelMap.addAttribute("bindingError", bindingError);
+//            modelMap.addAttribute("nameError", nameError);
+//            modelMap.addAttribute("emailError", emailError);
+//            modelMap.addAttribute("oldUser", user);
+//            log.info("Something went wrong, returning to registration page again");
+//            return "register";
+//        }
 
         user.setCreatedDate(new Date());
         user.setEmailToken(uuid.toString());

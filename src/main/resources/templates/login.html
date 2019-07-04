@@ -10,7 +10,6 @@
     <!------ Include the above in your HEAD tag ---------->
 </head>
 <body>
-
 <div class="container" style="margin-top: 150px">
     <form class="form-horizontal" role="form" method="POST" action="/login">
         <div class="row">
@@ -21,8 +20,10 @@
 
             </div>
             <div class="col-12 d-flex justify-content-center">
-
                 <h2 style="text-transform: uppercase; color: #dc3545; font-weight: bold">Մուտք</h2>
+            </div>
+            <div class="col-12 d-flex justify-content-center">
+                <h3 style="text-align: center; margin-top: 20px;color: #dc3545" th:if="${#request.getParameter('error')=='unauthorized'}" th:text="'Access denied for unauthorized users, Please Login'"></h3>
             </div>
 
             <hr>
