@@ -2,6 +2,7 @@ package am.caritas.caritasfiles.service;
 
 import am.caritas.caritasfiles.model.User;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
@@ -34,4 +35,17 @@ public interface UserService {
      * @param user User
      */
     void saveUser(User user);
+
+    /**
+     * Returns all users from repository
+     * @return all Users
+     */
+    List<User> users();
+
+    /**
+     * Return boolean
+     * @param email String
+     * @return true if exists by email orElse false
+     */
+    Boolean existsByEmail(String email);
 }
