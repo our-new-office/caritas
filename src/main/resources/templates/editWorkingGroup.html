@@ -163,31 +163,28 @@
 
                     <div class="row">
                         <div class="col-md-12">
-                            <h3 class="title-5 m-b-35">Օգտատերի փոփոխում</h3>
+                            <h3 class="title-5 m-b-35">Խմբի փոփոխում</h3>
 
                             <div class="card">
                                 <div class="card-header">
-                                    <h4>Օգտատերի փոփոխման ինֆորմացիա</h4>
+                                    <h4>Խմբի փոփոխման ինֆորմացիա</h4>
                                 </div>
                                 <div class="card-body">
-                                    <p class="text-muted m-b-15">Օգտատեր փոփոխելու համար մուտքագրեք email և անուն</p>
+                                    <p class="text-muted m-b-15">Խումբը փոփոխելու համար մուտքագրեք վերնագիր և
+                                        նկարագրություն</p>
 
 
                                     <div style="font-weight: bold" th:if="${bindingError!=null}"
                                          class="alert alert-success" th:text="${bindingError}">
                                     </div>
 
-                                    <div style="font-weight: bold" th:if="${nameError!=null}" class="alert alert-danger"
-                                         th:text="${nameError}">
+                                    <div style="font-weight: bold" th:if="${titleError!=null}"
+                                         class="alert alert-danger"
+                                         th:text="${titleError}">
                                     </div>
 
-                                    <div style="font-weight: bold" th:if="${emailError!=null}"
-                                         class="alert alert-danger" th:text="${emailError}">
-                                    </div>
-
-
-                                    <div style="font-weight: bold" th:if="${notUnique!=null}" class="alert alert-danger"
-                                         th:text="${notUnique}">
+                                    <div style="font-weight: bold" th:if="${descriptionError!=null}"
+                                         class="alert alert-danger" th:text="${descriptionError}">
                                     </div>
                                 </div>
                             </div>
@@ -195,44 +192,25 @@
 
                             <div class="card">
                                 <div class="card-header">
-                                    <strong>Օգտատերի դետալներ</strong>
+                                    <strong>Խմբի դետալներ</strong>
                                 </div>
                                 <div class="card-body card-block">
-                                    <form action="/users/user/update" method="post" enctype="multipart/form-data"
+                                    <form action="/working_groups/working_group/update" method="post"
+                                          enctype="multipart/form-data"
                                           class="form-horizontal">
-                                        <input type="hidden" name="id" th:value="${user.getId()}">
+                                        <input type="hidden" name="id" th:value="${workingGroup.getId()}">
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
-                                                <p class="form-control-static">Անուն</p>
-                                            </div>
-                                        </div>
-                                        <div class="row form-group">
-
-                                            <div class="col-12 col-md-12">
-                                                <input type="text" id="text-input" name="name" placeholder="Անուն"
-                                                       class="form-control" th:value="${user.getName()}">
+                                                <input type="text" id="text-input" name="title" placeholder="Վերնագիր"
+                                                       class="form-control" th:value="${workingGroup.getTitle()}">
                                             </div>
                                         </div>
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
-                                                <input type="email" id="email-input" name="email"
-                                                       placeholder="Email" class="form-control"
-                                                       th:value="${user.getEmail()}">
+                                                <input type="text" id="text-input" name="description" placeholder="Նկարագրություն"
+                                                       class="form-control" th:value="${workingGroup.getDescription()}">
                                             </div>
                                         </div>
-
-
-                                        <div class="row form-group">
-
-                                            <div class="col-12 col-md-12">
-                                                <select name="role" id="select" class="form-control">
-                                                    <option th:each="role: ${roles}" th:value="${role.name()}"
-                                                            th:text="${role.name()}" th:selected="${user.getRole().name()==role.name()}"></option>
-
-                                                </select>
-                                            </div>
-                                        </div>
-
                                         <div class="card-footer">
                                             <button type="submit" class="btn btn-primary btn-sm">
                                                 <i class="fa fa-dot-circle-o"></i> Submit

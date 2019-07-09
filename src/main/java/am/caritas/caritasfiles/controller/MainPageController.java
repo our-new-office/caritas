@@ -1,9 +1,11 @@
 package am.caritas.caritasfiles.controller;
 
 import am.caritas.caritasfiles.model.User;
+import am.caritas.caritasfiles.model.WorkingGroup;
 import am.caritas.caritasfiles.model.enums.Role;
 import am.caritas.caritasfiles.security.CurrentUser;
 import am.caritas.caritasfiles.service.UserService;
+import am.caritas.caritasfiles.service.WorkingGroupService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -19,9 +21,11 @@ import java.util.List;
 public class MainPageController {
 
     private final UserService userService;
+    private final WorkingGroupService workingGroupService;
 
-    public MainPageController(UserService userService) {
+    public MainPageController(UserService userService, WorkingGroupService workingGroupService) {
         this.userService = userService;
+        this.workingGroupService = workingGroupService;
     }
 
     /**
@@ -37,7 +41,9 @@ public class MainPageController {
             modelMap.addAttribute("currentUser", currentUser.getUser());
             if (currentUser.getUser().getRole().equals(Role.ADMIN)) {
                 List<User> users = userService.users();
+                List<WorkingGroup> workingGroups = workingGroupService.workingGroups();
                 modelMap.addAttribute("users", users);
+                modelMap.addAttribute("workingGroups", workingGroups);
                 log.info("Admin dashboard main page loaded");
                 return "adminPanel";
             } else if (currentUser.getUser().getRole().equals(Role.USER)) {

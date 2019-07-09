@@ -54,4 +54,12 @@ public interface UserService {
      * @return true if exists by email orElse false
      */
     Boolean existsByEmail(String email);
+
+    /**
+     * Updates user
+     * @param user User
+     */
+    void updateUser(User user);
+
+    void deleteById(Long id);
 }

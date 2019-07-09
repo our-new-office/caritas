@@ -40,38 +40,38 @@
     <!-- HEADER MOBILE-->
     <header class="header-mobile d-block d-lg-none">
         <div class="header-mobile__bar">
-        <div class="header-mobile__bar">
-            <div class="container-fluid">
-                <div class="header-mobile-inner">
-                    <a class="logo" href="/">
-                        <!--                            <img src="/images/icon/logo.png" alt="CoolAdmin" />-->
-                        <img src="img/karitaslogo.png" alt="">
-                    </a>
-                    <a href="/" style="color: #dc3545; margin-left: 10px">
-                        Caritas Application
-                    </a>
-                    <button class="hamburger hamburger--slider" type="button">
+            <div class="header-mobile__bar">
+                <div class="container-fluid">
+                    <div class="header-mobile-inner">
+                        <a class="logo" href="/">
+                            <!--                            <img src="/images/icon/logo.png" alt="CoolAdmin" />-->
+                            <img src="img/karitaslogo.png" alt="">
+                        </a>
+                        <a href="/" style="color: #dc3545; margin-left: 10px">
+                            Caritas Application
+                        </a>
+                        <button class="hamburger hamburger--slider" type="button">
                             <span class="hamburger-box">
                                 <span class="hamburger-inner"></span>
                             </span>
-                    </button>
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-        <nav class="navbar-mobile">
-            <div class="container-fluid">
-                <ul class="navbar-mobile__list list-unstyled">
-                    <li class="has-sub">
-                        <a class="js-arrow" href="/users/user_page">
-                            <i class="fas fa-user"></i>Ստեղծել օգտատեր</a>
-                    </li>
-                    <li>
-                        <a href="/working_groups/working_group_page">
-                            <i class="fas fa-chart-bar"></i>Ստեղծել խումբ</a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+            <nav class="navbar-mobile">
+                <div class="container-fluid">
+                    <ul class="navbar-mobile__list list-unstyled">
+                        <li class="has-sub">
+                            <a class="js-arrow" href="/users/user_page">
+                                <i class="fas fa-user"></i>Ստեղծել օգտատեր</a>
+                        </li>
+                        <li>
+                            <a href="/working_groups/working_group_page">
+                                <i class="fas fa-chart-bar"></i>Ստեղծել խումբ</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
     </header>
     <!-- END HEADER MOBILE-->
 
@@ -124,7 +124,8 @@
                                         <img src="img/no_image_user_profile.png" alt="John Doe"/>
                                     </div>
                                     <div class="content">
-                                        <a class="js-acc-btn" href="#" th:text="'Բարի գալուստ ' + ${currentUser.getName()}">john
+                                        <a class="js-acc-btn" href="#"
+                                           th:text="'Բարի գալուստ ' + ${currentUser.getName()}">john
                                             doe</a>
                                     </div>
                                     <div class="account-dropdown js-dropdown">
@@ -167,6 +168,9 @@
                         <div class="col-md-12">
                             <h3 class="title-5 m-b-35">Աշխատանքային խմբեր</h3>
                             <!-- DATA TABLE-->
+                            <div th:if="${workingGroupNotExists!=null}" class="alert alert-danger" role="alert">
+                                Խումբը չի գտնվել․․․
+                            </div>
                             <div class="table-responsive m-b-40">
                                 <table class="table table-borderless table-data3">
                                     <thead>
@@ -179,47 +183,41 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>Working Group 1</td>
-                                        <td>This is the first Working Group</td>
+                                    <tr class="tr-shadow" th:each="workingGroup: ${workingGroups}">
+                                        <td th:text="${workingGroup.getId()}"></td>
+                                        <td th:text="${workingGroup.getTitle()}"></td>
+                                        <td th:text="${workingGroup.getDescription()}"></td>
                                         <td>
                                             <div class="image"><img style="width: 60px; height:auto"
                                                                     src="images/icon/avatar-02.jpg" alt=""></div>
                                         </td>
                                         <td>
                                             <div class="table-data-feature">
-                                                <button class="item" data-toggle="tooltip" data-placement="top"
-                                                        title="Ջնջել">
-                                                    <i class="zmdi zmdi-delete"></i>
-                                                </button>
-                                                <button class="item" data-toggle="tooltip" data-placement="top"
-                                                        title="Փոփոխել">
-                                                    <i class="zmdi zmdi-edit"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>Working Group 2</td>
-                                        <td>This is the second Working Group</td>
-                                        <td>
-                                            <div class="image"><img style="width: 60px; height:auto"
-                                                                    src="img/no_image_user_profile.png" alt=""></div>
-                                        </td>
-                                        <td>
-                                            <div class="table-data-feature">
                                                 <a class="item" data-toggle="tooltip" data-placement="top"
-                                                   title="Ջնջել" href="#">
+                                                   title="Ջնջել"
+                                                   th:href="@{'/working_groups/working_group/delete/'+${workingGroup.getId()}}">
                                                     <i class="zmdi zmdi-delete"></i>
                                                 </a>
-                                                <a class="item" data-toggle="tooltip" data-placement="top" title="Փոփոխել"
-                                                   href="#">
+                                                <a class="item" data-toggle="tooltip" data-placement="top"
+                                                   title="Փոփոխել"
+                                                   th:href="@{'/working_groups/working_group_page/'+${workingGroup.getId()}}">
                                                     <i class="zmdi zmdi-edit"></i>
                                                 </a>
                                             </div>
                                         </td>
+
+                                        <!--<td>-->
+                                        <!--<div class="table-data-feature">-->
+                                        <!--<button class="item" data-toggle="tooltip" data-placement="top"-->
+                                        <!--title="Ջնջել">-->
+                                        <!--<i class="zmdi zmdi-delete"></i>-->
+                                        <!--</button>-->
+                                        <!--<button class="item" data-toggle="tooltip" data-placement="top"-->
+                                        <!--title="Փոփոխել">-->
+                                        <!--<i class="zmdi zmdi-edit"></i>-->
+                                        <!--</button>-->
+                                        <!--</div>-->
+                                        <!--</td>-->
                                     </tr>
                                     </tbody>
                                 </table>
@@ -231,7 +229,11 @@
                     <div class="row">
                         <div class="col-md-12">
                             <!-- DATA TABLE -->
-                            <h3 class="title-5 m-b-35">Users</h3>
+                            <h3 class="title-5 m-b-35">Օգտատերեր</h3>
+
+                            <div th:if="${userNotExists!=null}" class="alert alert-danger" role="alert">
+                                Օգտատերը չի գտնվել․․․
+                            </div>
                             <div class="table-responsive table-responsive-data3">
                                 <table class="table table-data3">
                                     <thead>
@@ -262,10 +264,11 @@
                                         <td>
                                             <div class="table-data-feature">
                                                 <a class="item" data-toggle="tooltip" data-placement="top"
-                                                   title="Ջնջել" href="#">
+                                                   title="Ջնջել" th:href="@{'/users/user/delete/' + ${user.id}}">
                                                     <i class="zmdi zmdi-delete"></i>
                                                 </a>
-                                                <a class="item" data-toggle="tooltip" data-placement="top" title="Փոփոխել"
+                                                <a class="item" data-toggle="tooltip" data-placement="top"
+                                                   title="Փոփոխել"
                                                    th:href="@{'/users/edit_user_page/' + ${user.id}}">
                                                     <i class="zmdi zmdi-edit"></i>
                                                 </a>

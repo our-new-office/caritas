@@ -69,6 +69,16 @@ public class UserServiceImpl implements UserService {
         emailService.sendUserActivationEmail(user.getEmail(), baseUrl + "/activate?token=" + user.getEmailToken() + "&userId=" + user.getId());
 
     }
+    @Override
+    @Transactional
+    public void updateUser(User user) {
+        userRepository.save(user);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        userRepository.deleteById(id);
+    }
 
     @Override
     public List<User> users() {

@@ -53,9 +53,10 @@ public class UserController {
 
     /**
      * Returns editUser page
+     *
      * @param currentUser CurrentUser
-     * @param modelMap ModelMap
-     * @param id Long
+     * @param modelMap    ModelMap
+     * @param id          Long
      * @return Edit User page
      */
     @GetMapping("/edit_user_page/{id}")
@@ -65,10 +66,10 @@ public class UserController {
             if (currentUser.getUser().getRole().equals(Role.ADMIN)) {
                 List<Role> roles = Arrays.asList(Role.values());
                 Optional<User> byId = userService.findById(id);
-                if(byId.isPresent()){
+                if (byId.isPresent()) {
                     User user = byId.get();
                     modelMap.addAttribute("user", user);
-                }else{
+                } else {
                     log.warn("No such user to edit");
                 }
                 modelMap.addAttribute("roles", roles);
@@ -79,8 +80,6 @@ public class UserController {
         log.error("Unauthorized user, redirect login page");
         return "redirect:/login?error=unauthorized";
     }
-
-
 
 
     /**
@@ -134,5 +133,78 @@ public class UserController {
         return "redirect:/";
     }
 
+    @PostMapping("/user/update")
+    public String ubdateUser(@Valid User user, BindingResult result, ModelMap modelMap,
+                             @AuthenticationPrincipal CurrentUser currentUser) {
+        modelMap.addAttribute("currentUser", currentUser.getUser());
+        List<Role> roles = Arrays.asList(Role.values());
+        boolean error = false;
+        String bindingError = null;
+        String nameError = null;
+        String emailError = null;
+        String notUnique = null;
 
+        if (result.hasErrors()) {
+            error = true;
+            bindingError = "Something went wrong, try once more";
+        }
+        if ((user.getName()) == null || (user.getName()).trim().equals("")) {
+            error = true;
+            nameError = "Name field is required, please fill it";
+        }
+        if ((user.getEmail()) == null || (user.getEmail()).trim().equals("")) {
+            error = true;
+            emailError = "Email field is required, please fill it";
+        }
+        if (!this.checkEmail(user)) {
+            error = true;
+            notUnique = "User with email " + user.getEmail() + " already exists";
+        }
+        if (error) {
+            modelMap.addAttribute("bindingError", bindingError);
+            modelMap.addAttribute("nameError", nameError);
+            modelMap.addAttribute("emailError", emailError);
+            modelMap.addAttribute("oldUser", user);
+            modelMap.addAttribute("notUnique", notUnique);
+            modelMap.addAttribute("roles", roles);
+            log.info("Something went wrong, returning to user registration page again");
+            return "editUser";
+        }
+        Optional<User> optionalUser = userService.findById(user.getId());
+        if (optionalUser.isPresent()) {
+            User userForSave = optionalUser.get();
+            userForSave.setEmail(user.getEmail());
+            userForSave.setName(user.getName());
+            userForSave.setRole(user.getRole());
+            userService.updateUser(userForSave);
+        }
+        return "redirect:/";
+    }
+
+    private boolean checkEmail(User user) {
+        Optional<User> optionalUser = userService.findById(user.getId());
+        if (optionalUser.isPresent()) {
+            User userFromRepo = optionalUser.get();
+            if (userFromRepo.getEmail().equals(user.getEmail())) {
+                return true;
+            }
+            return !userService.existsByEmail(user.getEmail());
+        }
+        return false;
+    }
+
+    @GetMapping("/user/delete/{id}")
+    public String deleteUser(@PathVariable Long id, ModelMap modelMap) {
+        String notExists = null;
+        Optional<User> byId = userService.findById(id);
+        if (byId.isPresent()) {
+            if (!byId.get().getRole().equals(Role.ADMIN)) {
+                userService.deleteById(id);
+            }
+            return "redirect:/";
+        }
+        notExists = "User doesn't exists";
+        modelMap.addAttribute("userNotExists", notExists);
+        return "adminPanel";
+    }
 }
