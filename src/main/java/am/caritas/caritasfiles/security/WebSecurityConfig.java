@@ -42,7 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .formLogin()
                 .loginPage("/login")
-                .defaultSuccessUrl("/register")
+                .defaultSuccessUrl("/")
                 .usernameParameter("email")
                 .failureUrl("/login?error")
                 .and()
@@ -53,7 +53,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .tokenValiditySeconds(3600 * 1000 * 24 * 7)
                 .and()
                 .logout()
-                .logoutSuccessUrl("/")
+                .logoutSuccessUrl("/login")
                 .deleteCookies("RM");
     }
 

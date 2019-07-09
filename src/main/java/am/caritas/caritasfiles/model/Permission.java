@@ -12,7 +12,7 @@ import javax.persistence.*;
 @ToString
 @Builder
 @Entity
-@Table(name="permission")
+@Table(name = "permission")
 public class Permission {
 
     @Id
