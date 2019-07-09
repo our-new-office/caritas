@@ -10,13 +10,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Controller
@@ -32,12 +31,13 @@ public class UserController {
 
     /**
      * Returns createUser page
+     *
      * @param currentUser CurrentUser
-     * @param modelMap ModelMap
+     * @param modelMap    ModelMap
      * @return createUser page
      */
     @GetMapping("/user_page")
-    public String createUserPage(@AuthenticationPrincipal CurrentUser currentUser, ModelMap modelMap){
+    public String createUserPage(@AuthenticationPrincipal CurrentUser currentUser, ModelMap modelMap) {
         if (currentUser != null) {
             modelMap.addAttribute("currentUser", currentUser.getUser());
             if (currentUser.getUser().getRole().equals(Role.ADMIN)) {
@@ -52,15 +52,48 @@ public class UserController {
     }
 
     /**
-     * Returns createUserPage orElse admin dashboard
-     * @param user User
-     * @param result BindingResult
+     * Returns editUser page
+     * @param currentUser CurrentUser
      * @param modelMap ModelMap
+     * @param id Long
+     * @return Edit User page
+     */
+    @GetMapping("/edit_user_page/{id}")
+    public String editUserPage(@AuthenticationPrincipal CurrentUser currentUser, ModelMap modelMap, @PathVariable Long id) {
+        if (currentUser != null) {
+            modelMap.addAttribute("currentUser", currentUser.getUser());
+            if (currentUser.getUser().getRole().equals(Role.ADMIN)) {
+                List<Role> roles = Arrays.asList(Role.values());
+                Optional<User> byId = userService.findById(id);
+                if(byId.isPresent()){
+                    User user = byId.get();
+                    modelMap.addAttribute("user", user);
+                }else{
+                    log.warn("No such user to edit");
+                }
+                modelMap.addAttribute("roles", roles);
+                log.info("Update User page loaded");
+                return "editUser";
+            }
+        }
+        log.error("Unauthorized user, redirect login page");
+        return "redirect:/login?error=unauthorized";
+    }
+
+
+
+
+    /**
+     * Returns createUserPage orElse admin dashboard
+     *
+     * @param user        User
+     * @param result      BindingResult
+     * @param modelMap    ModelMap
      * @param currentUser CurrentUser
      * @return createUserPage orElse admin dashboard
      */
     @PostMapping("/user")
-    public String createUser(@Valid User user, BindingResult result, ModelMap modelMap, @AuthenticationPrincipal CurrentUser currentUser){
+    public String createUser(@Valid User user, BindingResult result, ModelMap modelMap, @AuthenticationPrincipal CurrentUser currentUser) {
 
         modelMap.addAttribute("currentUser", currentUser.getUser());
         List<Role> roles = Arrays.asList(Role.values());
@@ -82,11 +115,11 @@ public class UserController {
             error = true;
             emailError = "Email field is required, please fill it";
         }
-        if(userService.existsByEmail(user.getEmail())){
+        if (userService.existsByEmail(user.getEmail())) {
             error = true;
             notUnique = "User with email " + user.getEmail() + " already exists";
         }
-        if(error){
+        if (error) {
             modelMap.addAttribute("bindingError", bindingError);
             modelMap.addAttribute("nameError", nameError);
             modelMap.addAttribute("emailError", emailError);

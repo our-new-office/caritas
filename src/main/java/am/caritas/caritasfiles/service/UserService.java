@@ -9,7 +9,8 @@ public interface UserService {
 
     /**
      * Checks if user is activated
-     * @param user User
+     *
+     * @param user     User
      * @param password String
      * @return true if user is activated orElse false
      */
@@ -17,6 +18,7 @@ public interface UserService {
 
     /**
      * Retrieves Optional<User> by given Id
+     *
      * @param userId Long
      * @return User by Id
      */
@@ -24,7 +26,8 @@ public interface UserService {
 
     /**
      * Returns true if User is found by Id and EmailToken orElse returns false
-     * @param id Long
+     *
+     * @param id         Long
      * @param emailToken String
      * @return true if User is found by Id and EmailToken orElse false
      */
@@ -32,18 +35,21 @@ public interface UserService {
 
     /**
      * Saves User
+     *
      * @param user User
      */
     void saveUser(User user);
 
     /**
      * Returns all users from repository
+     *
      * @return all Users
      */
     List<User> users();
 
     /**
      * Return boolean
+     *
      * @param email String
      * @return true if exists by email orElse false
      */

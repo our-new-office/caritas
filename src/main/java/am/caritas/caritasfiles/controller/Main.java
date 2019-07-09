@@ -126,29 +126,29 @@ public class Main {
 
     /**
      * Return login page if activation is correct or return activate page again
-     * @param passwordRepassword passwordRePasswordError
+     * @param passwordRePassword passwordRePasswordError
      * @param bindingResult BindingResult
      * @param modelMap ModelMap
      * @return activate page in case of error orElse login page
      */
     @PostMapping("/activate")
     @Transactional
-    public String activate(@Valid PasswordRepassword passwordRepassword, BindingResult bindingResult, ModelMap modelMap) {
+    public String activate(@Valid PasswordRepassword passwordRePassword, BindingResult bindingResult, ModelMap modelMap) {
         if (bindingResult.hasErrors()) {
             modelMap.addAttribute("passwordRePasswordError", "Wrong Password, RePassword value");
             return "activate";
         }
 
-        String password = passwordRepassword.getPassword();
-        String rePassword = passwordRepassword.getRePassword();
-        String token = passwordRepassword.getToken();
+        String password = passwordRePassword.getPassword();
+        String rePassword = passwordRePassword.getRePassword();
+        String token = passwordRePassword.getToken();
         if (password.equals(rePassword)) {
-            Long userId = passwordRepassword.getUserId();
+            Long userId = passwordRePassword.getUserId();
             Optional<User> byId = userService.findById(userId);
             if (byId.isPresent()) {
-                if (byId.get().getId().equals(passwordRepassword.getUserId())) {
+                if (byId.get().getId().equals(passwordRePassword.getUserId())) {
                     User user = byId.get();
-                    if (userService.findByIdAndToken(user.getId(), passwordRepassword.getToken())) {
+                    if (userService.findByIdAndToken(user.getId(), passwordRePassword.getToken())) {
                         if (userService.activateUser(user, password)) {
                             modelMap.addAttribute("activationSuccess", "Success!!! please Login");
                             log.info("Mail with new created password has been send to user");
@@ -164,8 +164,8 @@ public class Main {
             return "register";
         }
         modelMap.addAttribute("passwordRePasswordError", "Wrong Password, RePassword value");
-        modelMap.addAttribute("userId", passwordRepassword.getUserId());
-        modelMap.addAttribute("token", passwordRepassword.getToken());
+        modelMap.addAttribute("userId", passwordRePassword.getUserId());
+        modelMap.addAttribute("token", passwordRePassword.getToken());
         return "activate";
     }
 }

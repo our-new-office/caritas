@@ -12,7 +12,7 @@ import javax.persistence.*;
 @EqualsAndHashCode
 @ToString
 @Entity
-@Table(name="user_permission")
+@Table(name = "user_permission")
 public class UserPermission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

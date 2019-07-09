@@ -14,7 +14,7 @@ import javax.persistence.*;
 @EqualsAndHashCode
 @ToString
 @Entity
-@Table(name="file")
+@Table(name = "file")
 public class File {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
 @EnableAsync
-public class CaritasFilesApplication  implements CommandLineRunner {
+public class CaritasFilesApplication implements CommandLineRunner {
 
     public static void main(String[] args) {
         SpringApplication.run(CaritasFilesApplication.class, args);
@@ -18,6 +18,7 @@ public class CaritasFilesApplication  implements CommandLineRunner {
 
     /**
      * This method creates SimpleMailMessage Bean
+     *
      * @return creating SimpleMailMessage Bean
      */
     @Bean

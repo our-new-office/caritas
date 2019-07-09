@@ -11,7 +11,7 @@ import javax.persistence.*;
 @EqualsAndHashCode
 @ToString
 @Entity
-@Table(name="working_group")
+@Table(name = "working_group")
 public class WorkingGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

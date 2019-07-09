@@ -7,6 +7,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     /**
      * Retrieve User by given email
+     *
      * @param email String
      * @return User by given Email
      */
@@ -14,7 +15,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     /**
      * Return true if User exists by Id and EmailToken orElse return false
-     * @param id Long
+     *
+     * @param id    Long
      * @param token String
      * @return true if User exists by Id and EmailToken orElse false
      */
@@ -22,6 +24,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     /**
      * Return boolean
+     *
      * @param email String
      * @return true if exists by email orElse false
      */
