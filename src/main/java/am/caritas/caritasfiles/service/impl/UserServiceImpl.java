@@ -1,6 +1,7 @@
 package am.caritas.caritasfiles.service.impl;
 
 import am.caritas.caritasfiles.model.User;
+import am.caritas.caritasfiles.model.enums.Role;
 import am.caritas.caritasfiles.model.enums.Status;
 import am.caritas.caritasfiles.model.mail.Mail;
 import am.caritas.caritasfiles.repository.UserRepository;
@@ -11,10 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -78,6 +77,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteById(Long id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public List<User> allUsersForGroupAdmin() {
+        List<User> all = userRepository.findAll();
+        List<User> newList = new ArrayList<>();
+        for (User user : all) {
+           if(!user.getRole().equals(Role.ADMIN)){
+               newList.add(user);
+           }
+        }
+        return newList;
     }
 
     @Override

@@ -10,6 +10,7 @@ import javax.persistence.*;
 @Setter
 @EqualsAndHashCode
 @ToString
+@Builder
 @Entity
 @Table(name = "working_group")
 public class WorkingGroup {

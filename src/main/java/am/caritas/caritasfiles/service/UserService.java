@@ -62,4 +62,9 @@ public interface UserService {
     void updateUser(User user);
 
     void deleteById(Long id);
+
+    List<User> allUsersForGroupAdmin();
+
+
+
 }

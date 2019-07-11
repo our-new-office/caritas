@@ -211,6 +211,18 @@
                                                        class="form-control" th:value="${workingGroup.getDescription()}">
                                             </div>
                                         </div>
+
+                                        <div class="row form-group">
+
+                                            <div class="col-12 col-md-12">
+                                                <select name="role" id="select" class="form-control">
+                                                    <option th:each="newuser: ${users}" th:value="${user.getName()}"
+                                                            th:text="${newuser.getName()}" th:selected="${user.getName()==newuser.getName()}"></option>
+
+                                                </select>
+                                            </div>
+                                        </div>
+
                                         <div class="card-footer">
                                             <button type="submit" class="btn btn-primary btn-sm">
                                                 <i class="fa fa-dot-circle-o"></i> Submit
