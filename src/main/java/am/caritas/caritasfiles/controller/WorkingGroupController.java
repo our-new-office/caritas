@@ -1,8 +1,12 @@
 package am.caritas.caritasfiles.controller;
 
+import am.caritas.caritasfiles.dto.WorkingGroupDto;
+import am.caritas.caritasfiles.model.User;
 import am.caritas.caritasfiles.model.WorkingGroup;
 import am.caritas.caritasfiles.model.enums.Role;
 import am.caritas.caritasfiles.security.CurrentUser;
+//import am.caritas.caritasfiles.service.UserDiscussionWorkingGroupService;
+import am.caritas.caritasfiles.service.UserService;
 import am.caritas.caritasfiles.service.WorkingGroupService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +29,15 @@ import java.util.Optional;
 @RequestMapping("/working_groups")
 public class WorkingGroupController {
 
-    private WorkingGroupService workingGroupService;
+    private final WorkingGroupService workingGroupService;
+    private final UserService userService;
+//    private final UserDiscussionWorkingGroupService userDiscussionWorkingGroupService;
 
     @Autowired
-    public WorkingGroupController(WorkingGroupService workingGroupService) {
+    public WorkingGroupController(WorkingGroupService workingGroupService, UserService userService) {
         this.workingGroupService = workingGroupService;
+        this.userService = userService;
+
     }
 
     @GetMapping("/working_group_page")
@@ -39,6 +47,8 @@ public class WorkingGroupController {
             if (currentUser.getUser().getRole().equals(Role.ADMIN)) {
                 List<Role> roles = Arrays.asList(Role.values());
                 modelMap.addAttribute("roles", roles);
+                List<User> users = userService.allUsersForGroupAdmin();
+                modelMap.addAttribute("users", users);
                 log.info("Create Working Group page loaded");
                 return "createWorkingGroup";
             }
@@ -56,6 +66,7 @@ public class WorkingGroupController {
                 Optional<WorkingGroup> workingGroupById = workingGroupService.findById(id);
                 if (workingGroupById.isPresent()) {
                     WorkingGroup workingGroup = workingGroupById.get();
+
                     modelMap.addAttribute("workingGroup", workingGroup);
                 } else {
                     log.warn("No such working to edit");
@@ -70,7 +81,7 @@ public class WorkingGroupController {
     }
 
     @PostMapping("/working_group")
-    public String createworkingGroup(@Valid WorkingGroup workingGroup, BindingResult result, ModelMap modelMap, @AuthenticationPrincipal CurrentUser currentUser) {
+    public String createworkingGroup(@Valid WorkingGroupDto workingGroupDto, BindingResult result, ModelMap modelMap, @AuthenticationPrincipal CurrentUser currentUser) {
 
         modelMap.addAttribute("currentUser", currentUser.getUser());
         List<Role> roles = Arrays.asList(Role.values());
@@ -82,11 +93,11 @@ public class WorkingGroupController {
             error = true;
             bindingError = "Something went wrong, try once more";
         }
-        if ((workingGroup.getTitle()) == null || (workingGroup.getTitle()).trim().equals("")) {
+        if ((workingGroupDto.getTitle()) == null || (workingGroupDto.getTitle()).trim().equals("")) {
             error = true;
             titleError = "Title field is required, please fill it";
         }
-        if ((workingGroup.getDescription()) == null || (workingGroup.getDescription()).trim().equals("")) {
+        if ((workingGroupDto.getDescription()) == null || (workingGroupDto.getDescription()).trim().equals("")) {
             error = true;
             descriptionError = "Description field is required, please fill it";
         }
@@ -94,13 +105,14 @@ public class WorkingGroupController {
         if (error) {
             modelMap.addAttribute("bindingError", bindingError);
             modelMap.addAttribute("titleError", titleError);
-            modelMap.addAttribute("oldWorkingGroup", workingGroup);
+            modelMap.addAttribute("oldWorkingGroup", workingGroupDto);
             modelMap.addAttribute("descriptionError", descriptionError);
             modelMap.addAttribute("roles", roles);
             log.info("Something went wrong, returning to user registration page again");
             return "createWorkingGroup";
         }
-        workingGroupService.saveWorkingGroup(workingGroup);
+        workingGroupService.saveWorkingGroup(workingGroupDto);
+
         return "redirect:/";
     }
 

@@ -1,6 +1,11 @@
 package am.caritas.caritasfiles.service.impl;
 
+import am.caritas.caritasfiles.dto.WorkingGroupDto;
+import am.caritas.caritasfiles.model.User;
+import am.caritas.caritasfiles.model.UserDiscussionWorkingGroup;
 import am.caritas.caritasfiles.model.WorkingGroup;
+import am.caritas.caritasfiles.repository.UserDiscussionWorkingGroupRepository;
+import am.caritas.caritasfiles.repository.UserRepository;
 import am.caritas.caritasfiles.repository.WorkingGroupRepository;
 import am.caritas.caritasfiles.service.WorkingGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +18,14 @@ import java.util.Optional;
 @Service
 public class WorkingGroupServiceImpl implements WorkingGroupService {
     private final WorkingGroupRepository workingGroupRepository;
+    private final UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public WorkingGroupServiceImpl(WorkingGroupRepository workingGroupRepository) {
+    public WorkingGroupServiceImpl(WorkingGroupRepository workingGroupRepository, UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository, UserRepository userRepository) {
         this.workingGroupRepository = workingGroupRepository;
+        this.userDiscussionWorkingGroupRepository = userDiscussionWorkingGroupRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -25,8 +34,23 @@ public class WorkingGroupServiceImpl implements WorkingGroupService {
     }
 
     @Override
-    public void saveWorkingGroup(WorkingGroup workingGroup) {
+    public void saveWorkingGroup(WorkingGroupDto workingGroupDto) {
+        WorkingGroup workingGroup = WorkingGroup.builder()
+                .title(workingGroupDto.getTitle())
+                .description(workingGroupDto.getDescription())
+                .thumbnail(workingGroupDto.getThumbnail())
+                .build();
         workingGroupRepository.save(workingGroup);
+        Long userId = workingGroupDto.getUserId();
+        Optional<User> byId = userRepository.findById(userId);
+        if (byId.isPresent()) {
+            User user = byId.get();
+            UserDiscussionWorkingGroup userDiscussionWorkingGroup = UserDiscussionWorkingGroup.builder()
+                    .workingGroup(workingGroup)
+                    .user(user)
+                    .build();
+            userDiscussionWorkingGroupRepository.save(userDiscussionWorkingGroup);
+        }
     }
 
     @Override
