@@ -18,13 +18,11 @@ import java.util.Optional;
 @Service
 public class WorkingGroupServiceImpl implements WorkingGroupService {
     private final WorkingGroupRepository workingGroupRepository;
-    private final UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository;
     private final UserRepository userRepository;
 
     @Autowired
-    public WorkingGroupServiceImpl(WorkingGroupRepository workingGroupRepository, UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository, UserRepository userRepository) {
+    public WorkingGroupServiceImpl(WorkingGroupRepository workingGroupRepository, UserRepository userRepository) {
         this.workingGroupRepository = workingGroupRepository;
-        this.userDiscussionWorkingGroupRepository = userDiscussionWorkingGroupRepository;
         this.userRepository = userRepository;
     }
 
@@ -35,21 +33,16 @@ public class WorkingGroupServiceImpl implements WorkingGroupService {
 
     @Override
     public void saveWorkingGroup(WorkingGroupDto workingGroupDto) {
-        WorkingGroup workingGroup = WorkingGroup.builder()
-                .title(workingGroupDto.getTitle())
-                .description(workingGroupDto.getDescription())
-                .thumbnail(workingGroupDto.getThumbnail())
-                .build();
-        workingGroupRepository.save(workingGroup);
-        Long userId = workingGroupDto.getUserId();
-        Optional<User> byId = userRepository.findById(userId);
-        if (byId.isPresent()) {
-            User user = byId.get();
-            UserDiscussionWorkingGroup userDiscussionWorkingGroup = UserDiscussionWorkingGroup.builder()
-                    .workingGroup(workingGroup)
-                    .user(user)
+        Long workingGroupAdminId = workingGroupDto.getUserId();
+        Optional<User> workingGroupAdminById = userRepository.findById(workingGroupAdminId);
+        if(workingGroupAdminById.isPresent()){
+            WorkingGroup workingGroup = WorkingGroup.builder()
+                    .title(workingGroupDto.getTitle())
+                    .description(workingGroupDto.getDescription())
+                    .thumbnail(workingGroupDto.getThumbnail())
+                    .workingGroupAdmin(workingGroupAdminById.get())
                     .build();
-            userDiscussionWorkingGroupRepository.save(userDiscussionWorkingGroup);
+            workingGroupRepository.save(workingGroup);
         }
     }
 

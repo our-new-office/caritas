@@ -1,6 +1,5 @@
 package am.caritas.caritasfiles.dto;
 
-import am.caritas.caritasfiles.model.WorkingGroup;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

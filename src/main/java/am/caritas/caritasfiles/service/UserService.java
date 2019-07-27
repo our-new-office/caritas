@@ -66,5 +66,5 @@ public interface UserService {
     List<User> allUsersForGroupAdmin();
 
 
-
+    Boolean userIsNotBusy(Long id);
 }

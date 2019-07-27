@@ -26,7 +26,7 @@
 
             <hr>
             <div class="col col-12 d-flex justify-content-center">
-                <img src="/img/karitaslogo.png" alt="Caritas" style="display: flex;justify-content: center; width: 250px; height: 250px">
+                <img src="img/karitaslogo.jpg" alt="Caritas" style="display: flex;justify-content: center; width: 250px; height: 250px">
             </div>
 
         </div>
@@ -36,12 +36,13 @@
                 <div class="form-group">
                     <div class="input-group mb-2 mr-sm-2 mb-sm-0">
                         <div class="input-group-addon" style="width: 2.6rem"><i class="fa fa-at"></i></div>
-                        <input type="email" name="email" class="form-control" id="email"
+                        <input type="text" name="email" class="form-control" id="email"
                                placeholder="you@example.com" autofocus th:if="${oldUser!=null}"
                                th:value="${oldUser.getEmail()}">
-                        <input type="email" name="email" class="form-control" id="email"
+                        <input type="text" name="email" class="form-control" id="email"
                                placeholder="you@example.com" autofocus th:unless="${oldUser!=null}">
                     </div>
+                    <div id="email_error" style="color: #dc3545"></div>
                 </div>
             </div>
             <div class="col-md-3">
@@ -63,8 +64,10 @@
                         <input type="password" name="password" class="form-control" id="password"
                                placeholder="******" autofocus th:unless="${oldUser!=null}">
                     </div>
+                    <div id="password_error" style="color: #dc3545"></div>
                 </div>
             </div>
+
             <div class="col-md-3">
                 <div class="form-control-feedback">
                         <span class="text-danger align-middle">
@@ -77,7 +80,7 @@
 
         <div class="row">
             <div class="col-md-12 d-flex justify-content-center">
-                <button type="submit" class="btn btn-danger btn-lg"><i class="fa fa-user-plus"></i> Login</button>
+                <button type="submit" class="btn btn-danger btn-lg" id="submit"><i class="fa fa-user-plus"></i> Login</button>
             </div>
         </div>
     </form>
@@ -87,5 +90,43 @@
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#submit').click(function(){
+            var password = $('#password').val();
+            var email = $('#email').val();
+            var error;
+
+            if(email== ''){
+                $("#email").css("border", "#dc3545 solid 2px");
+                $("#email_error").text("Email դաշտը չի կարող լինել դատարկ")
+                error = true
+            }
+            if(IsEmail(email)==false){
+                $("#email").css("border", "#dc3545 solid 2px");
+                $("#email_error").text("Դատարկ Email կամ Սխալ Email  ֆորմատ")
+                error = true;
+            }
+
+            if(password == ''){
+               $("#password").css("border", "#dc3545 solid 2px");
+               $("#password_error").text("Գաղտնաբառը չի կարող լինել դատարկ")
+                error = true
+            }
+
+            if(error){
+                return false;
+            }
+        });
+    });
+    function IsEmail(email) {
+        var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        if(!regex.test(email)) {
+            return false;
+        }else{
+            return true;
+        }
+    }
+</script>
 </body>
 </html>

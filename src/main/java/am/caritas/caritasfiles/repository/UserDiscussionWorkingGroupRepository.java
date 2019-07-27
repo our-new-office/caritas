@@ -10,4 +10,6 @@ public interface UserDiscussionWorkingGroupRepository extends JpaRepository<User
     Boolean existsByWorkingGroupAndUser(WorkingGroup workingGroup, User user);
 
     UserDiscussionWorkingGroup findByWorkingGroupAndUser(WorkingGroup workingGroup, User user);
+
+    Boolean existsByUserId(Long id);
 }

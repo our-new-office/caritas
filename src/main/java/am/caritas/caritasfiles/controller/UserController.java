@@ -194,12 +194,16 @@ public class UserController {
     }
 
     @GetMapping("/user/delete/{id}")
-    public String deleteUser(@PathVariable Long id, ModelMap modelMap) {
+    public String deleteUser(@PathVariable Long id, ModelMap modelMap, @AuthenticationPrincipal CurrentUser currentUser) {
         String notExists = null;
         Optional<User> byId = userService.findById(id);
         if (byId.isPresent()) {
             if (!byId.get().getRole().equals(Role.ADMIN)) {
-                userService.deleteById(id);
+                if (userService.userIsNotBusy(id)){
+                    userService.deleteById(id);
+                }else{
+                    return "redirect:/?userIsBusy=true";
+                }
             }
             return "redirect:/";
         }
