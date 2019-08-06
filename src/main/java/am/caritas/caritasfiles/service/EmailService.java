@@ -74,7 +74,7 @@ public class EmailService {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
 
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false, "utf-8");
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "utf-8");
 
             mimeMessage.setContent(mailHtml, "text/html");
 

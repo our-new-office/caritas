@@ -28,4 +28,7 @@ public class WorkingGroup {
     @Column
     private String thumbnail;
 
+    @ManyToOne
+    private User workingGroupAdmin;
+
 }

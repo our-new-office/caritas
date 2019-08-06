@@ -5,14 +5,21 @@ import am.caritas.caritasfiles.model.enums.Role;
 import am.caritas.caritasfiles.security.CurrentUser;
 import am.caritas.caritasfiles.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +30,9 @@ import java.util.Optional;
 public class UserController {
 
     private final UserService userService;
+
+    @Value("${user.pic.url}")
+    private String userPicUrl;
 
     @Autowired
     public UserController(UserService userService) {
@@ -92,8 +102,9 @@ public class UserController {
      * @return createUserPage orElse admin dashboard
      */
     @PostMapping("/user")
-    public String createUser(@Valid User user, BindingResult result, ModelMap modelMap, @AuthenticationPrincipal CurrentUser currentUser) {
-
+    public String createUser(@Valid User user, BindingResult result, ModelMap modelMap,
+                             @AuthenticationPrincipal CurrentUser currentUser,
+                             @RequestParam("thumbnail") MultipartFile multipartFile) {
         modelMap.addAttribute("currentUser", currentUser.getUser());
         List<Role> roles = Arrays.asList(Role.values());
         boolean error = false;
@@ -128,6 +139,17 @@ public class UserController {
             log.info("Something went wrong, returning to user registration page again");
             return "createUser";
         }
+        File dir = new File(userPicUrl);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        String userImage = multipartFile.getOriginalFilename();
+        try {
+            multipartFile.transferTo(new File(dir, userImage));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        user.setAvatar(userImage);
         userService.saveUser(user);
 
         return "redirect:/";
@@ -194,12 +216,16 @@ public class UserController {
     }
 
     @GetMapping("/user/delete/{id}")
-    public String deleteUser(@PathVariable Long id, ModelMap modelMap) {
+    public String deleteUser(@PathVariable Long id, ModelMap modelMap, @AuthenticationPrincipal CurrentUser currentUser) {
         String notExists = null;
         Optional<User> byId = userService.findById(id);
         if (byId.isPresent()) {
             if (!byId.get().getRole().equals(Role.ADMIN)) {
-                userService.deleteById(id);
+                if (userService.userIsNotBusy(id)){
+                    userService.deleteById(id);
+                }else{
+                    return "redirect:/?userIsBusy=true";
+                }
             }
             return "redirect:/";
         }
@@ -207,4 +233,12 @@ public class UserController {
         modelMap.addAttribute("userNotExists", notExists);
         return "adminPanel";
     }
+
+    @GetMapping(value = "/userImage")
+    public @ResponseBody
+    byte[] clientImage(@RequestParam("userImage") String userImage) throws IOException {
+        InputStream in = new FileInputStream(userPicUrl + userImage);
+        return IOUtils.toByteArray(in);
+    }
+
 }

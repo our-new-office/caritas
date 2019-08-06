@@ -4,6 +4,7 @@ import am.caritas.caritasfiles.model.User;
 import am.caritas.caritasfiles.model.enums.Role;
 import am.caritas.caritasfiles.model.enums.Status;
 import am.caritas.caritasfiles.model.mail.Mail;
+import am.caritas.caritasfiles.repository.UserDiscussionWorkingGroupRepository;
 import am.caritas.caritasfiles.repository.UserRepository;
 import am.caritas.caritasfiles.service.EmailService;
 import am.caritas.caritasfiles.service.UserService;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -22,14 +22,16 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final UUID uuid = UUID.randomUUID();
+    private final UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository;
 
     @Value("${caritas.base.url}")
     private String baseUrl;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService, UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
+        this.userDiscussionWorkingGroupRepository = userDiscussionWorkingGroupRepository;
     }
 
     @Override
@@ -89,6 +91,11 @@ public class UserServiceImpl implements UserService {
            }
         }
         return newList;
+    }
+
+    @Override
+    public Boolean userIsNotBusy(Long id) {
+        return !userDiscussionWorkingGroupRepository.existsByUserId(id);
     }
 
     @Override

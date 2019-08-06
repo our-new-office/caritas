@@ -60,6 +60,9 @@ public class WorkingGroupController {
     @GetMapping("/working_group_page/{id}")
     public String editWorkingGroupPage(@AuthenticationPrincipal CurrentUser currentUser, ModelMap modelMap, @PathVariable Long id) {
         if (currentUser != null) {
+
+            List<User> users = userService.allUsersForGroupAdmin();
+            modelMap.addAttribute("users", users);
             modelMap.addAttribute("currentUser", currentUser.getUser());
             if (currentUser.getUser().getRole().equals(Role.ADMIN)) {
                 List<Role> roles = Arrays.asList(Role.values());
@@ -151,8 +154,8 @@ public class WorkingGroupController {
             WorkingGroup workingGroupForSave = optionalWorkingGroup.get();
             workingGroupForSave.setTitle(workingGroup.getTitle());
             workingGroupForSave.setDescription(workingGroup.getDescription());
-
-            workingGroupService.updateWorkingGroup(workingGroup);
+            workingGroupForSave.setWorkingGroupAdmin(workingGroup.getWorkingGroupAdmin());
+            workingGroupService.updateWorkingGroup(workingGroupForSave);
         }
         return "redirect:/";
     }

@@ -207,7 +207,7 @@
                                         </div>
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
-                                                <input type="text" id="text-input" name="description" placeholder="Նկարագրություն"
+                                                <input type="text" id="text-input1" name="description" placeholder="Նկարագրություն"
                                                        class="form-control" th:value="${workingGroup.getDescription()}">
                                             </div>
                                         </div>
@@ -215,9 +215,9 @@
                                         <div class="row form-group">
 
                                             <div class="col-12 col-md-12">
-                                                <select name="role" id="select" class="form-control">
-                                                    <option th:each="newuser: ${users}" th:value="${user.getName()}"
-                                                            th:text="${newuser.getName()}" th:selected="${user.getName()==newuser.getName()}"></option>
+                                                <select name="workingGroupAdmin" id="select" class="form-control">
+                                                    <option th:each="newuser: ${users}" th:value="${newuser.getId()}"
+                                                            th:text="${newuser.getName()}" th:selected="${workingGroup.getWorkingGroupAdmin().getId()==newuser.getId()}"></option>
 
                                                 </select>
                                             </div>
