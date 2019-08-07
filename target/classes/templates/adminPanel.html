@@ -121,7 +121,8 @@
                             <div class="account-wrap">
                                 <div class="account-item clearfix js-item-menu">
                                     <div class="image">
-                                        <img src="img/no_image_user_profile.png" alt="John Doe"/>
+                                        <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}"
+                                             th:alt="${currentUser.getName()}"/>
                                     </div>
                                     <div class="content">
                                         <a class="js-acc-btn" href="#"
@@ -132,8 +133,9 @@
                                         <div class="info clearfix">
                                             <div class="image">
                                                 <a href="#">
-                                                    <img src="img/no_image_user_profile.png" alt="John Doe"/>
-                                                </a>
+                                                    <img/>
+                                                </a>th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}"
+                                                th:alt="${currentUser.getName()}"
                                             </div>
                                             <div class="content">
                                                 <h5 class="name">
@@ -177,8 +179,8 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Վերնագիր</th>
-                                        <th>Նկարագրություն</th>
                                         <th>Նկար</th>
+                                        <th>Նկարագրություն</th>
                                         <th>Գործողություն</th>
                                     </tr>
                                     </thead>
@@ -186,11 +188,13 @@
                                     <tr class="tr-shadow" th:each="workingGroup: ${workingGroups}">
                                         <td th:text="${workingGroup.getId()}"></td>
                                         <td th:text="${workingGroup.getTitle()}"></td>
-                                        <td th:text="${workingGroup.getDescription()}"></td>
                                         <td>
-                                            <div class="image"><img style="width: 60px; height:auto"
-                                                                    src="images/icon/avatar-02.jpg" alt=""></div>
+                                            <div class="image">
+                                                <img style="width: 60px; height:auto"
+                                                     th:src="@{'/working_groups/workingGroupImage?'(wGImage=${workingGroup.getThumbnail()})}"
+                                                ></div>
                                         </td>
+                                        <td th:text="${workingGroup.getDescription()}"></td>
                                         <td>
                                             <div class="table-data-feature">
                                                 <a class="item" data-toggle="tooltip" data-placement="top"
@@ -234,7 +238,8 @@
                             <div th:if="${userNotExists!=null}" class="alert alert-danger" role="alert">
                                 Օգտատերը չի գտնվել․․․
                             </div>
-                            <div th:if="${#request.getParameter('userIsBusy')=='true'}" class="alert alert-danger" role="alert">
+                            <div th:if="${#request.getParameter('userIsBusy')=='true'}" class="alert alert-danger"
+                                 role="alert">
                                 Օգտատերը կապված է ինչ որ օբյեկտի հետ և չի կարող ջնջվել
                             </div>
 
@@ -244,6 +249,7 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Անուն</th>
+                                        <th>Նկար</th>
                                         <th>Email</th>
                                         <th>Ստեղծման ամսաթիվ</th>
                                         <th>Դեր</th>
@@ -255,6 +261,12 @@
                                     <tr class="tr-shadow" th:each="user: ${users}">
                                         <td th:text="${user.getId()}"></td>
                                         <td th:text="${user.getName()}"></td>
+                                        <td>
+                                            <div class="image">
+                                                <img style="width: 60px; height:auto"
+                                                     th:src="@{'/users/userImage?'(userImage=${user.getAvatar()})}"
+                                                     alt=""></div>
+                                        </td>
                                         <td>
                                             <span class="block-email" th:text="${user.getEmail()}"></span>
                                         </td>

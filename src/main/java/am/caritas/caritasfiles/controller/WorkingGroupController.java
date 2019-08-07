@@ -9,17 +9,21 @@ import am.caritas.caritasfiles.security.CurrentUser;
 import am.caritas.caritasfiles.service.UserService;
 import am.caritas.caritasfiles.service.WorkingGroupService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +36,9 @@ public class WorkingGroupController {
     private final WorkingGroupService workingGroupService;
     private final UserService userService;
 //    private final UserDiscussionWorkingGroupService userDiscussionWorkingGroupService;
+
+    @Value("${working.group.pic.url}")
+    private String workingGroupPicUrl;
 
     @Autowired
     public WorkingGroupController(WorkingGroupService workingGroupService, UserService userService) {
@@ -84,7 +91,11 @@ public class WorkingGroupController {
     }
 
     @PostMapping("/working_group")
-    public String createworkingGroup(@Valid WorkingGroupDto workingGroupDto, BindingResult result, ModelMap modelMap, @AuthenticationPrincipal CurrentUser currentUser) {
+    public String createworkingGroup(@Valid WorkingGroupDto workingGroupDto,
+                                     BindingResult result,
+                                     ModelMap modelMap,
+                                     @AuthenticationPrincipal CurrentUser currentUser,
+                                     @RequestParam("thumbnailWorkingGroup") MultipartFile multipartFile) {
 
         modelMap.addAttribute("currentUser", currentUser.getUser());
         List<Role> roles = Arrays.asList(Role.values());
@@ -114,8 +125,18 @@ public class WorkingGroupController {
             log.info("Something went wrong, returning to user registration page again");
             return "createWorkingGroup";
         }
+        File dir = new File(workingGroupPicUrl);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        String workingGroupImage = multipartFile.getOriginalFilename();
+        try {
+            multipartFile.transferTo(new File(dir, workingGroupImage));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        workingGroupDto.setThumbnail(workingGroupImage);
         workingGroupService.saveWorkingGroup(workingGroupDto);
-
         return "redirect:/";
     }
 
@@ -173,5 +194,11 @@ public class WorkingGroupController {
         modelMap.addAttribute("workingGroupNotExists", notExists);
         return "adminPanel";
     }
-}
 
+    @GetMapping("/workingGroupImage")
+    public @ResponseBody
+    byte[] clientImage(@RequestParam("wGImage") String wGImage) throws IOException {
+        InputStream in = new FileInputStream(workingGroupPicUrl + wGImage);
+        return IOUtils.toByteArray(in);
+    }
+}
