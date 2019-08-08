@@ -120,7 +120,7 @@
                             <div class="account-wrap">
                                 <div class="account-item clearfix js-item-menu">
                                     <div class="image">
-                                        <img src="/img/no_image_user_profile.png" alt="John Doe"/>
+                                        <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}" th:alt="${currentUser.getName()}"/>
                                     </div>
                                     <div class="content">
                                         <a class="js-acc-btn" href="#" th:text="'Բարի գալուստ ' + ${currentUser.getName()}">john
@@ -130,7 +130,7 @@
                                         <div class="info clearfix">
                                             <div class="image">
                                                 <a href="#">
-                                                    <img src="/img/no_image_user_profile.png" alt="John Doe"/>
+                                                    <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}" th:alt="${currentUser.getName()}"/>
                                                 </a>
                                             </div>
                                             <div class="content">
@@ -223,10 +223,11 @@
                                                 </select>
                                             </div>
                                         </div>
-
-
-
-
+                                        <div class="row form-group">
+                                            <div class="col-12 col-md-12">
+                                                <input type="file" name="thumbnailWorkingGroup"  class="form-control">
+                                            </div>
+                                        </div>
                                         <div class="card-footer">
                                             <button type="submit" class="btn btn-primary btn-sm">
                                                 <i class="fa fa-dot-circle-o"></i> Submit

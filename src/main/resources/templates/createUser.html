@@ -120,7 +120,7 @@
                             <div class="account-wrap">
                                 <div class="account-item clearfix js-item-menu">
                                     <div class="image">
-                                        <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}" alt="John Doe"/>
+                                        <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}" th:alt="${currentUser.getName()}"/>
                                     </div>
                                     <div class="content">
                                         <a class="js-acc-btn" href="#" th:text="'Բարի գալուստ ' + ${currentUser.getName()}">john
@@ -130,7 +130,7 @@
                                         <div class="info clearfix">
                                             <div class="image">
                                                 <a href="#">
-                                                    <img src="/img/no_image_user_profile.png" alt="John Doe"/>
+                                                    <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}" th:alt="${currentUser.getName()}"/>
                                                 </a>
                                             </div>
                                             <div class="content">
