@@ -122,7 +122,7 @@ public class WorkingGroupController {
             modelMap.addAttribute("oldWorkingGroup", workingGroupDto);
             modelMap.addAttribute("descriptionError", descriptionError);
             modelMap.addAttribute("roles", roles);
-            log.info("Something went wrong, returning to user registration page again");
+            log.info("Something went wrong, returning to working group creation page again");
             return "createWorkingGroup";
         }
         File dir = new File(workingGroupPicUrl);
@@ -137,12 +137,14 @@ public class WorkingGroupController {
         }
         workingGroupDto.setThumbnail(workingGroupImage);
         workingGroupService.saveWorkingGroup(workingGroupDto);
+        log.info("Working group has been created successfully");
         return "redirect:/";
     }
 
     @PostMapping("/working_group/update")
     public String ubdateWorkingGroup(@Valid WorkingGroup workingGroup, BindingResult result, ModelMap modelMap,
-                                     @AuthenticationPrincipal CurrentUser currentUser) {
+                                     @AuthenticationPrincipal CurrentUser currentUser,
+                                     @RequestParam("thumbnailWorkingGroup") MultipartFile multipartFile) {
         modelMap.addAttribute("currentUser", currentUser.getUser());
         List<Role> roles = Arrays.asList(Role.values());
         boolean error = false;
@@ -173,10 +175,25 @@ public class WorkingGroupController {
         Optional<WorkingGroup> optionalWorkingGroup = workingGroupService.findById(workingGroup.getId());
         if (optionalWorkingGroup.isPresent()) {
             WorkingGroup workingGroupForSave = optionalWorkingGroup.get();
+            File dir = new File(workingGroupPicUrl);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            if(!multipartFile.isEmpty()){
+                String workingGroupImage = multipartFile.getOriginalFilename();
+                try {
+                    multipartFile.transferTo(new File(dir, workingGroupImage));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                workingGroupForSave.setThumbnail(workingGroupImage);
+            }
+
             workingGroupForSave.setTitle(workingGroup.getTitle());
             workingGroupForSave.setDescription(workingGroup.getDescription());
             workingGroupForSave.setWorkingGroupAdmin(workingGroup.getWorkingGroupAdmin());
             workingGroupService.updateWorkingGroup(workingGroupForSave);
+            log.info("Working group has been updated successfully");
         }
         return "redirect:/";
     }
@@ -188,10 +205,14 @@ public class WorkingGroupController {
         Optional<WorkingGroup> byId = workingGroupService.findById(id);
         if (byId.isPresent()) {
             workingGroupService.deleteById(id);
+            File file = new File(workingGroupPicUrl+byId.get().getThumbnail());
+            file.delete();
+            log.info("Working group has been deleted");
             return "redirect:/";
         }
         notExists = "Working Group doesn't exists";
         modelMap.addAttribute("workingGroupNotExists", notExists);
+        log.error("Working group can not be deleted, because it does`nt exists");
         return "adminPanel";
     }
 

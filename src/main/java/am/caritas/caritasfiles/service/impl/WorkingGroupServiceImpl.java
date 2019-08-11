@@ -32,6 +32,11 @@ public class WorkingGroupServiceImpl implements WorkingGroupService {
     }
 
     @Override
+    public Optional<WorkingGroup> findByAdminId(Long id) {
+        return workingGroupRepository.findByWorkingGroupAdminId(id);
+    }
+
+    @Override
     public void saveWorkingGroup(WorkingGroupDto workingGroupDto) {
         Long workingGroupAdminId = workingGroupDto.getUserId();
         Optional<User> workingGroupAdminById = userRepository.findById(workingGroupAdminId);

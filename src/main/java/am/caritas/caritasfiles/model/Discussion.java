@@ -32,5 +32,8 @@ public class Discussion {
     private List<File> files;
 
     @ManyToMany
+    private List<Link> links;
+
+    @ManyToMany
     private List<Chat> chats;
 }

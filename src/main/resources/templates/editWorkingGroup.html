@@ -44,7 +44,7 @@
                 <div class="header-mobile-inner">
                     <div class="logo">
                         <a href="/">
-                            <img src="/img/karitaslogo.png" alt="" style="width: 60px">
+                            <img src="/img/karitaslogo.jpg" alt="" style="width: 60px">
                         </a>
                         <a href="/" style="color: #dc3545; margin-left: 10px">
                             Caritas Application
@@ -79,7 +79,7 @@
     <aside class="menu-sidebar d-none d-lg-block">
         <div class="logo">
             <a href="/">
-                <img src="/img/karitaslogo.png" alt="" style="width: 60px">
+                <img src="/img/karitaslogo.jpg" alt="" style="width: 60px">
             </a>
             <a href="/" style="color: #dc3545; margin-left: 10px">
                 Caritas Application
@@ -120,7 +120,7 @@
                             <div class="account-wrap">
                                 <div class="account-item clearfix js-item-menu">
                                     <div class="image">
-                                        <img src="/img/no_image_user_profile.png" alt="John Doe"/>
+                                        <img th:src="@{'/users/userImage?&userImage='+ ${currentUser.getAvatar()}}" alt="John Doe"/>
                                     </div>
                                     <div class="content">
                                         <a class="js-acc-btn" href="#"
@@ -130,9 +130,8 @@
                                     <div class="account-dropdown js-dropdown">
                                         <div class="info clearfix">
                                             <div class="image">
-                                                <a href="#">
-                                                    <img src="/img/no_image_user_profile.png" alt="John Doe"/>
-                                                </a>
+                                                <img th:src="@{'/users/userImage?&userImage='+ ${currentUser.getAvatar()}}" alt="John Doe"/>
+
                                             </div>
                                             <div class="content">
                                                 <h5 class="name">
@@ -199,6 +198,7 @@
                                           enctype="multipart/form-data"
                                           class="form-horizontal">
                                         <input type="hidden" name="id" th:value="${workingGroup.getId()}">
+                                        <input type="hidden" name="thumbnail" th:value="${workingGroup.getThumbnail()}">
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
                                                 <input type="text" id="text-input" name="title" placeholder="Վերնագիր"
@@ -221,6 +221,17 @@
 
                                                 </select>
                                             </div>
+
+                                        </div>
+
+                                        <div class="row form-group">
+                                            <div class="col-12 col-md-12">
+                                                <input type="file" name="thumbnailWorkingGroup"  class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 col-md-12">
+                                            <img th:src="@{'/working_groups/workingGroupImage?wGImage='+${workingGroup.getThumbnail()}}" alt="">
                                         </div>
 
                                         <div class="card-footer">

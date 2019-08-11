@@ -157,7 +157,8 @@ public class UserController {
 
     @PostMapping("/user/update")
     public String ubdateUser(@Valid User user, BindingResult result, ModelMap modelMap,
-                             @AuthenticationPrincipal CurrentUser currentUser) {
+                             @AuthenticationPrincipal CurrentUser currentUser,
+                             @RequestParam("thumbnail") MultipartFile multipartFile) {
         modelMap.addAttribute("currentUser", currentUser.getUser());
         List<Role> roles = Arrays.asList(Role.values());
         boolean error = false;
@@ -192,8 +193,22 @@ public class UserController {
             log.info("Something went wrong, returning to user registration page again");
             return "editUser";
         }
+
         Optional<User> optionalUser = userService.findById(user.getId());
         if (optionalUser.isPresent()) {
+            File dir = new File(userPicUrl);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            if (!multipartFile.isEmpty()) {
+                String userImage = multipartFile.getOriginalFilename();
+                try {
+                    multipartFile.transferTo(new File(dir, userImage));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                optionalUser.get().setAvatar(userImage);
+            }
             User userForSave = optionalUser.get();
             userForSave.setEmail(user.getEmail());
             userForSave.setName(user.getName());
@@ -221,9 +236,11 @@ public class UserController {
         Optional<User> byId = userService.findById(id);
         if (byId.isPresent()) {
             if (!byId.get().getRole().equals(Role.ADMIN)) {
-                if (userService.userIsNotBusy(id)){
+                if (userService.userIsNotBusy(id)) {
                     userService.deleteById(id);
-                }else{
+                    File file = new File(userPicUrl + byId.get().getAvatar());
+                    file.delete();
+                } else {
                     return "redirect:/?userIsBusy=true";
                 }
             }

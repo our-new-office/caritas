@@ -9,6 +9,8 @@ import java.util.Optional;
 public interface WorkingGroupService {
     Optional<WorkingGroup> findById(Long workingGroupId);
 
+    Optional<WorkingGroup> findByAdminId(Long id);
+
     void saveWorkingGroup(WorkingGroupDto workingGroupDto);
 
     void updateWorkingGroup(WorkingGroup workingGroup);

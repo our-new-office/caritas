@@ -44,8 +44,8 @@
                 <div class="container-fluid">
                     <div class="header-mobile-inner">
                         <a class="logo" href="/">
-                            <!--                            <img src="/images/icon/logo.png" alt="CoolAdmin" />-->
-                            <img src="img/karitaslogo.png" alt="">
+                                                        <img src="/images/icon/logo.png" alt="CoolAdmin" />
+                            <img src="img/karitaslogo.jpg" alt="">
                         </a>
                         <a href="/" style="color: #dc3545; margin-left: 10px">
                             Caritas Application
@@ -79,7 +79,7 @@
     <aside class="menu-sidebar d-none d-lg-block">
         <div class="logo">
             <a href="/">
-                <img src="img/karitaslogo.png" alt="" style="width: 60px">
+                <img src="img/karitaslogo.jpg" alt="" style="width: 60px">
             </a>
             <a href="/" style="color: #dc3545; margin-left: 10px">
                 Caritas Application
@@ -133,9 +133,9 @@
                                         <div class="info clearfix">
                                             <div class="image">
                                                 <a href="#">
-                                                    <img/>
-                                                </a>th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}"
-                                                th:alt="${currentUser.getName()}"
+                                                    <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}"
+                                                         th:alt="${currentUser.getName()}"/>
+                                                </a>
                                             </div>
                                             <div class="content">
                                                 <h5 class="name">
