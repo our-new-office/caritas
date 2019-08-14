@@ -35,7 +35,7 @@
 
 </head>
 
-<body class="animsition">
+<body>
 <div class="page-wrapper">
     <!-- HEADER MOBILE-->
     <header class="header-mobile d-block d-lg-none">
@@ -89,7 +89,7 @@
             <nav class="navbar-sidebar">
                 <ul class="list-unstyled navbar__list">
                     <li class="has-sub">
-                        <a class="js-arrow" href="/working_group_admin/create_discussion">
+                        <a href="/working_group_admin/create_discussion">
                             <i class="fab fa-cc-discover"></i>Ստեղծել Զրույց</a>
                     </li>
                     <!--<li>-->
@@ -164,57 +164,57 @@
                             <h3 class="title-5 m-b-35">Խմբի ստեղծում</h3>
 
                             <div class="table-responsive m-b-40">
-                                <!--<table class="table table-borderless table-data3">-->
-                                    <!--<thead>-->
-                                    <!--<tr>-->
-                                        <!--<th>#</th>-->
-                                        <!--<th>Վերնագիր</th>-->
-                                        <!--<th>Նկար</th>-->
-                                        <!--<th>Նկարագրություն</th>-->
-                                        <!--<th>Գործողություն</th>-->
-                                    <!--</tr>-->
-                                    <!--</thead>-->
-                                    <!--<tbody>-->
-                                    <!--<tr class="tr-shadow" th:each="workingGroup: ${workingGroups}">-->
-                                        <!--<td th:text="${workingGroup.getId()}"></td>-->
-                                        <!--<td th:text="${workingGroup.getTitle()}"></td>-->
-                                        <!--<td>-->
-                                            <!--<div class="image">-->
-                                                <!--<img style="width: 60px; height:auto"-->
-                                                     <!--th:src="@{'/working_groups/workingGroupImage?'(wGImage=${workingGroup.getThumbnail()})}"-->
-                                                <!--&gt;</div>-->
-                                        <!--</td>-->
-                                        <!--<td th:text="${workingGroup.getDescription()}"></td>-->
-                                        <!--<td>-->
-                                            <!--<div class="table-data-feature">-->
-                                                <!--<a class="item" data-toggle="tooltip" data-placement="top"-->
-                                                   <!--title="Ջնջել"-->
-                                                   <!--th:href="@{'/working_groups/working_group/delete/'+${workingGroup.getId()}}">-->
-                                                    <!--<i class="zmdi zmdi-delete"></i>-->
-                                                <!--</a>-->
-                                                <!--<a class="item" data-toggle="tooltip" data-placement="top"-->
-                                                   <!--title="Փոփոխել"-->
-                                                   <!--th:href="@{'/working_groups/working_group_page/'+${workingGroup.getId()}}">-->
-                                                    <!--<i class="zmdi zmdi-edit"></i>-->
-                                                <!--</a>-->
-                                            <!--</div>-->
-                                        <!--</td>-->
+                                <table class="table table-borderless table-data3">
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Վերնագիր</th>
+                                        <th>Նկար</th>
+                                        <th>Նկարագրություն</th>
+                                        <th>Գործողություն</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr class="tr-shadow" th:each="workingGroup: ${workingGroups}">
+                                        <td th:text="${workingGroup.getId()}"></td>
+                                        <td th:text="${workingGroup.getTitle()}"></td>
+                                        <td>
+                                            <div class="image">
+                                                <img style="width: 60px; height:auto"
+                                                     th:src="@{'/working_groups/workingGroupImage?'(wGImage=${workingGroup.getThumbnail()})}"
+                                                ></div>
+                                        </td>
+                                        <td th:text="${workingGroup.getDescription()}"></td>
+                                        <td>
+                                            <div class="table-data-feature">
+                                                <a class="item" data-toggle="tooltip" data-placement="top"
+                                                   title="Ջնջել"
+                                                   th:href="@{'/working_groups/working_group/delete/'+${workingGroup.getId()}}">
+                                                    <i class="zmdi zmdi-delete"></i>
+                                                </a>
+                                                <a class="item" data-toggle="tooltip" data-placement="top"
+                                                   title="Փոփոխել"
+                                                   th:href="@{'/working_groups/working_group_page/'+${workingGroup.getId()}}">
+                                                    <i class="zmdi zmdi-edit"></i>
+                                                </a>
+                                            </div>
+                                        </td>
 
-                                        <!--&lt;!&ndash;<td>&ndash;&gt;-->
-                                        <!--&lt;!&ndash;<div class="table-data-feature">&ndash;&gt;-->
-                                        <!--&lt;!&ndash;<button class="item" data-toggle="tooltip" data-placement="top"&ndash;&gt;-->
-                                        <!--&lt;!&ndash;title="Ջնջել">&ndash;&gt;-->
-                                        <!--&lt;!&ndash;<i class="zmdi zmdi-delete"></i>&ndash;&gt;-->
-                                        <!--&lt;!&ndash;</button>&ndash;&gt;-->
-                                        <!--&lt;!&ndash;<button class="item" data-toggle="tooltip" data-placement="top"&ndash;&gt;-->
-                                        <!--&lt;!&ndash;title="Փոփոխել">&ndash;&gt;-->
-                                        <!--&lt;!&ndash;<i class="zmdi zmdi-edit"></i>&ndash;&gt;-->
-                                        <!--&lt;!&ndash;</button>&ndash;&gt;-->
-                                        <!--&lt;!&ndash;</div>&ndash;&gt;-->
-                                        <!--&lt;!&ndash;</td>&ndash;&gt;-->
-                                    <!--</tr>-->
-                                    <!--</tbody>-->
-                                <!--</table>-->
+                                        <td>
+                                        <div class="table-data-feature">
+                                        <button class="item" data-toggle="tooltip" data-placement="top"
+                                        title="Ջնջել">
+                                        <i class="zmdi zmdi-delete"></i>
+                                        </button>
+                                        <button class="item" data-toggle="tooltip" data-placement="top"
+                                        title="Փոփոխել">
+                                        <i class="zmdi zmdi-edit"></i>
+                                        </button>
+                                        </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             </div>
 <div class="row">
     <div th:each="discussion: ${discussions}">

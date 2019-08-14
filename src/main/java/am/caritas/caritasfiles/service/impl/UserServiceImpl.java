@@ -94,6 +94,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> allUsersForDiscussion(User currentUser) {
+        List<User> all = userRepository.findAll();
+        List<User> newList = new ArrayList<>();
+        for (User user : all) {
+            if(!user.getRole().equals(Role.ADMIN) && !user.equals(currentUser)){
+                newList.add(user);
+            }
+        }
+        return newList;
+    }
+
+    @Override
     public Boolean userIsNotBusy(Long id) {
         return !userDiscussionWorkingGroupRepository.existsByUserId(id);
     }

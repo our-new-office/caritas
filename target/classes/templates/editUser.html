@@ -35,7 +35,7 @@
 
 </head>
 
-<body class="animsition">
+<body>
 <div class="page-wrapper">
     <!-- HEADER MOBILE-->
     <header class="header-mobile d-block d-lg-none">
@@ -44,7 +44,7 @@
                 <div class="header-mobile-inner">
                     <div class="logo">
                         <a href="/">
-                            <img src="/img/karitaslogo.png" alt="" style="width: 60px">
+                            <img src="/img/karitaslogo.jpg" alt="" style="width: 60px">
                         </a>
                         <a href="/" style="color: #dc3545; margin-left: 10px">
                             Caritas Application
@@ -79,7 +79,7 @@
     <aside class="menu-sidebar d-none d-lg-block">
         <div class="logo">
             <a href="/">
-                <img src="/img/karitaslogo.png" alt="" style="width: 60px">
+                <img src="/img/karitaslogo.jpg" alt="" style="width: 60px">
             </a>
             <a href="/" style="color: #dc3545; margin-left: 10px">
                 Caritas Application
@@ -120,7 +120,10 @@
                             <div class="account-wrap">
                                 <div class="account-item clearfix js-item-menu">
                                     <div class="image">
-                                        <img src="/img/no_image_user_profile.png" alt="John Doe"/>
+                                        <a href="#">
+                                            <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}"
+                                                 th:alt="${currentUser.getName()}"/>
+                                        </a>
                                     </div>
                                     <div class="content">
                                         <a class="js-acc-btn" href="#"
@@ -131,8 +134,10 @@
                                         <div class="info clearfix">
                                             <div class="image">
                                                 <a href="#">
-                                                    <img src="/img/no_image_user_profile.png" alt="John Doe"/>
-                                                </a>
+                                                    <a href="#">
+                                                        <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}"
+                                                             th:alt="${currentUser.getName()}"/>
+                                                    </a>                                                </a>
                                             </div>
                                             <div class="content">
                                                 <h5 class="name">
@@ -201,6 +206,7 @@
                                     <form action="/users/user/update" method="post" enctype="multipart/form-data"
                                           class="form-horizontal">
                                         <input type="hidden" name="id" th:value="${user.getId()}">
+                                        <input type="hidden" name="avatar" th:value="${user.getAvatar()}">
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
                                                 <p class="form-control-static">Անուն</p>
@@ -231,6 +237,15 @@
 
                                                 </select>
                                             </div>
+                                        </div>
+
+                                        <div class="row form-group">
+                                            <div class="col-12 col-md-12">
+                                                <input type="file" name="thumbnail"  class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-md-12">
+                                            <img th:src="@{'/users/userImage?userImage='+ ${user.getAvatar()}}" alt="">
                                         </div>
 
                                         <div class="card-footer">

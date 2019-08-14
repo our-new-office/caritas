@@ -14,8 +14,9 @@ import javax.persistence.*;
 @EqualsAndHashCode
 @ToString
 @Entity
-@Table(name = "file")
-public class File {
+@Builder
+@Table(name = "document")
+public class Document {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column

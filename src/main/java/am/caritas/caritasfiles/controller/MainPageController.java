@@ -73,7 +73,7 @@ public class MainPageController {
                 }
                 modelMap.addAttribute("discussions", discussions);
                 modelMap.addAttribute("currentUser", currentUser.getUser());
-                return "workingGroupAdminPage";
+                return "discussion";
             }
         }
         log.error("Unauthorized user, redirect login page");

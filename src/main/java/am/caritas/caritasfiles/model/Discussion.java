@@ -29,11 +29,14 @@ public class Discussion {
     private String thumbnail;
 
     @ManyToMany
-    private List<File> files;
+    private List<Document> documents;
 
     @ManyToMany
     private List<Link> links;
 
     @ManyToMany
     private List<Chat> chats;
+
+    @ManyToMany
+    private List<User> users;
 }

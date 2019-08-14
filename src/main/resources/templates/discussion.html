@@ -5,12 +5,12 @@
     <!-- Required meta tags-->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="au theme template">
-    <meta name="author" content="Hau Nguyen">
+    <meta name="description" content="Caritas Application">
+    <meta name="author" content="Ara Hovhannisyan">
     <meta name="keywords" content="au theme template">
 
     <!-- Title Page-->
-    <title>Admin Panel - Caritas</title>
+    <title>YES</title>
 
     <!-- Fontfaces CSS-->
     <link href="/css/font-face.css" rel="stylesheet" media="all">
@@ -36,7 +36,7 @@
 </head>
 
 <body>
-<div class="page-wrapper">
+<div>
     <!-- HEADER MOBILE-->
     <header class="header-mobile d-block d-lg-none">
         <div class="header-mobile__bar">
@@ -63,12 +63,12 @@
                 <ul class="navbar-mobile__list list-unstyled">
                     <li class="has-sub">
                         <a class="js-arrow" href="/users/user_page">
-                            <i class="fas fa-user"></i>Ստեղծել օգտատեր</a>
+                            <i class="fas fa-user"></i>Ստեղծել Զրույց</a>
                     </li>
-                    <li>
-                        <a href="/working_groups/working_group_page">
-                            <i class="fas fa-chart-bar"></i>Ստեղծել խումբ</a>
-                    </li>
+                    <!--<li>-->
+                    <!--<a href="/working_groups/working_group_page">-->
+                    <!--<i class="fas fa-chart-bar"></i>Ստեղծել խումբ</a>-->
+                    <!--</li>-->
                 </ul>
             </div>
         </nav>
@@ -89,13 +89,13 @@
             <nav class="navbar-sidebar">
                 <ul class="list-unstyled navbar__list">
                     <li class="has-sub">
-                        <a class="js-arrow" href="/users/user_page">
-                            <i class="fas fa-user"></i>Ստեղծել օգտատեր</a>
+                        <a href="/discussions/create_discussion">
+                            <i class="fab fa-cc-discover"></i>Ստեղծել Զրույց</a>
                     </li>
-                    <li>
-                        <a href="/working_groups/working_group_page">
-                            <i class="fas fa-chart-bar"></i>Ստեղծել խումբ</a>
-                    </li>
+                    <!--<li>-->
+                    <!--<a href="/working_groups/working_group_page">-->
+                    <!--<i class="fas fa-chart-bar"></i>Ստեղծել խումբ</a>-->
+                    <!--</li>-->
                 </ul>
             </nav>
         </div>
@@ -119,9 +119,9 @@
                         <div class="header-button">
                             <div class="account-wrap">
                                 <div class="account-item clearfix js-item-menu">
-                                    <div class="image">
+                                    <a href="#">
                                         <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}" th:alt="${currentUser.getName()}"/>
-                                    </div>
+                                    </a>
                                     <div class="content">
                                         <a class="js-acc-btn" href="#" th:text="'Բարի գալուստ ' + ${currentUser.getName()}">john
                                             doe</a>
@@ -139,11 +139,11 @@
                                                 </h5>
                                                 <span class="email" th:text="${currentUser.getEmail()}">johndoe@example.com</span>
                                             </div>
-                                        </div>
 
-                                        <div class="account-dropdown__footer">
-                                            <a href="/logout">
-                                                <i class="zmdi zmdi-power"></i>Ելք</a>
+                                            <div class="account-dropdown__footer">
+                                                <a href="/logout">
+                                                    <i class="zmdi zmdi-power"></i>Ելք</a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -151,7 +151,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
         </header>
         <!-- END HEADER DESKTOP-->
 
@@ -162,91 +161,49 @@
 
                     <div class="row">
                         <div class="col-md-12">
-                            <h3 class="title-5 m-b-35">Օգտատերի ստեղծում</h3>
+                            <h3 class="title-5 m-b-35">Խմբի ստեղծում</h3>
 
-                            <div class="card">
-                                <div class="card-header">
-                                    <h4>Օգտատերի ստեղծման ինֆորմացիա</h4>
-                                </div>
-                                <div class="card-body">
-                                    <p class="text-muted m-b-15">Օգտատեր ստեղծելու համար բավական է մուտքագրել email և անուն</p>
-
-
-                                    <div style="font-weight: bold" th:if="${bindingError!=null}"
-                                         class="alert alert-success" th:text="${bindingError}">
-                                    </div>
-
-                                    <div style="font-weight: bold" th:if="${nameError!=null}" class="alert alert-danger"
-                                         th:text="${nameError}">
-                                    </div>
-
-                                    <div style="font-weight: bold" th:if="${emailError!=null}"
-                                         class="alert alert-danger" th:text="${emailError}">
-                                    </div>
-
-
-                                    <div style="font-weight: bold" th:if="${notUnique!=null}" class="alert alert-danger"
-                                         th:text="${notUnique}">
-                                    </div>
-                                </div>
+                            <div class="table-responsive m-b-40">
+                                <table class="table table-borderless table-data3">
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Վերնագիր</th>
+                                        <th>Նկար</th>
+                                        <th>Նկարագրություն</th>
+                                        <th>Գործողություն</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr class="tr-shadow" th:each="discussion: ${discussions}">
+                                        <td th:text="${discussion.getId()}"></td>
+                                        <td th:text="${discussion.getTitle()}"></td>
+                                        <td>
+                                            <div class="image">
+                                                <img style="width: 60px; height:auto"
+                                                     th:src="@{'/discussions/discussionImage?'(image=${discussion.getThumbnail()})}"
+                                                ></div>
+                                        </td>
+                                        <td th:text="${discussion.getDescription()}"></td>
+                                        <td>
+                                            <div class="table-data-feature">
+                                                <a class="item" data-toggle="tooltip" data-placement="top"
+                                                   title="Ջնջել"
+                                                   th:href="@{'/working_groups/working_group/delete/'+${discussion.getId()}}">
+                                                    <i class="zmdi zmdi-delete"></i>
+                                                </a>
+                                                <a class="item" data-toggle="tooltip" data-placement="top"
+                                                   title="Փոփոխել"
+                                                   th:href="@{'/discussions/edit_discussion/'+${discussion.getId()}}">
+                                                    <i class="zmdi zmdi-edit"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
                             </div>
 
-
-                            <div class="card">
-                                <div class="card-header">
-                                    <strong>Օգտատերի դետալներ</strong>
-                                </div>
-                                <div class="card-body card-block">
-                                    <form action="/users/user" method="post" enctype="multipart/form-data"
-                                          class="form-horizontal">
-                                        <div class="row form-group">
-                                            <div class="col-12 col-md-12">
-                                                <input type="text" id="text-input" name="name" placeholder="Անուն"
-                                                       class="form-control" th:if="${oldUser!=null}"
-                                                       th:value="${oldUser.getName()}">
-                                                <input type="text" id="text-input" name="name" placeholder="Անուն"
-                                                       class="form-control" th:unless="${oldUser!=null}">
-                                            </div>
-                                        </div>
-                                        <div class="row form-group">
-                                            <div class="col-12 col-md-12">
-                                                <input type="email" id="email-input" name="email"
-                                                       placeholder="Email" class="form-control"
-                                                       th:if="${oldUser!=null}" th:value="${oldUser.getEmail()}">
-                                                <input type="email" id="email-input" name="email"
-                                                       placeholder="Email" class="form-control"
-                                                       th:unless="${oldUser!=null}">
-                                            </div>
-                                        </div>
-
-
-                                        <div class="row form-group">
-
-                                            <div class="col-12 col-md-12">
-                                                <select name="role" id="select" class="form-control">
-                                                    <option th:each="role: ${roles}" th:value="${role.name()}"
-                                                            th:text="${role.name()}"></option>
-
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="row form-group">
-                                            <div class="col-12 col-md-12">
-                                                <input type="file" name="thumbnail"  class="form-control">
-                                            </div>
-                                        </div>
-                                        <div class="card-footer">
-                                            <button type="submit" class="btn btn-primary btn-sm">
-                                                <i class="fa fa-dot-circle-o"></i> Submit
-                                            </button>
-
-                                            <a href="/" type="reset" class="btn btn-danger btn-sm">
-                                                <i class="fa fa-ban"></i> Reset
-                                            </a>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="copyright">
