@@ -185,12 +185,21 @@
 
                                     <form action="/discussions/edit_discussion" method="post" enctype="multipart/form-data"
                                           class="form-horizontal" id="discuss">
+
+
+                                        <div th:each="oldLink: ${discussion.getLinks()}">
+                                            <input type="hidden" name="links" th:value="${oldLink.getId()}">
+                                        </div>
+
+
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
                                                 <input type="hidden" name="id" th:value="${discussion.getId()}">
                                                 <input type="hidden" name="thumbnail" th:value="${discussion.getThumbnail()}">
+
+
                                                 <input type="text" id="text-input" name="title" placeholder="Վերնագիր"
-                                                       class="form-control" th:value="${discussion.getTitle()}">
+                                                       class="form-control" th:value="${discussion.getTitle()}">getDocuments
 
                                             </div>
                                         </div>
@@ -219,15 +228,15 @@
                                                 <input type="file" name="fewfiles" id="files" multiple  class="form-control">
                                             </div>
                                             <div class="col-12" th:each="document:${discussion.getDocuments()}" onclick="deleteLink(event.currentTarget)">
-                                                <input type="hidden" name="oldFewFiles" th:value="${document.getId()}">
+                                                <input type="hidden" name="changedFiles" th:value="${document.getId()}">
                                                 <div><a th:href="@{'/discussions/discussionFile?file='+ ${document.getUrl()}}" th:download="${document.getUrl()}" th:text="${document.getUrl()}"></a><i style="cursor: pointer" class="zmdi zmdi-delete"></i></div>
                                             </div>
                                         </div>
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
-                                                <div th:each="doc: ${discussion.getLinks()}"  onclick="deleteLink(event.currentTarget)">
-                                                    <input type="hidden" name="docs" th:id="${doc.getId()}" th:value="${doc.getId()}" multiple >
-                                                    <span style="margin-right: 10px" th:text="${doc.getUrl()}"></span>
+                                                <div th:if="${discussion.getLinks()!=null}" th:each="link: ${discussion.getLinks()}"  onclick="deleteLink(event.currentTarget)">
+                                                    <input type="hidden" name="changedLinks" th:id="${link.getId()}" th:value="${link.getId()}" multiple >
+                                                    <span style="margin-right: 10px" th:text="${link.getUrl()}"></span>
                                                     <i style="cursor: pointer" class="zmdi zmdi-delete"></i>
                                                 </div>
 

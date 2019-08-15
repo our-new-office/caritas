@@ -13,6 +13,7 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +34,7 @@ import java.util.UUID;
 @RequestMapping("/discussions")
 public class WorkingGroupAdminController {
 
-    UUID uuid = UUID.randomUUID();
+    private UUID uuid = UUID.randomUUID();
 
     @Value("${discussion.pic.url}")
     private String discussionThumbUrl;
@@ -259,13 +260,21 @@ public class WorkingGroupAdminController {
     }
 
     @PostMapping("/edit_discussion")
+    @Transactional
     public String editDiscussion(@Valid Discussion discussion,
                                  BindingResult bindingResult,
-                                 @RequestParam(value = "docs", required = false) Long[] docs,
-                                 @RequestParam(value = "oldFewFiles", required = false) Long[] docFiles,
                                  ModelMap modelMap,
                                  @AuthenticationPrincipal CurrentUser currentUser,
-                                 @RequestParam(value = "usersForDiscussion", required = false) Long[] userIds) {
+
+                                 @RequestParam(value = "changedLinks", required = false) Long[] changedLinks,
+                                 @RequestParam(value = "hrefs", required = false) String[] hrefs,
+
+                                 @RequestParam(value = "changedFiles", required = false) Long[] changedFiles,
+                                 @RequestParam(value = "fewfiles", required = false) MultipartFile[] fewFiles,
+
+                                 @RequestParam(value = "usersForDiscussion", required = false) Long[] userIds,
+                                 @RequestParam(value = "thumbnail", required = false) String thumbnail,
+                                 @RequestParam(value = "img", required = false) MultipartFile multipartFile) {
 
         modelMap.addAttribute("currentUser", currentUser.getUser());
 
@@ -306,25 +315,159 @@ public class WorkingGroupAdminController {
             return "discussionsPage";
         }
 
-        List<Document> documents = discussion.getDocuments();
-        List<Document> newDocuments = new ArrayList<>();
+//        List<Link> oldLinksList = new ArrayList<>();
 
-        for (Long docFile : docFiles) {
-            Optional<Document> byId = fileRepository.findById(docFile);
-            if (byId.isPresent()) {
-                Document newDoc = byId.get();
-                newDocuments.add(newDoc);
+        Long id = discussion.getId();
+        Optional<Discussion> discussionOptional = discussionRepository.findById(id);
+        if (discussionOptional.isPresent()) {
+            Discussion discussionFromRepo = discussionOptional.get();
+//            List<Link> oldLinks = discussionFromRepo.getLinks();
+
+            List<Link> changedLinkList = new ArrayList<>();
+
+            if (changedLinks != null) {
+
+                for (Long changedLink : changedLinks) {
+                    Optional<Link> byId = linkRepository.findById(changedLink);
+                    if (byId.isPresent()) {
+                        Link link = byId.get();
+                        String url = link.getUrl();
+                        Link newLink = Link.builder()
+                                .url(url)
+                                .build();
+                        linkRepository.save(newLink);
+                        changedLinkList.add(newLink);
+                    }
+                }
             }
+            List<Link> links = discussionFromRepo.getLinks();
+            discussionFromRepo.setLinks(null);
+            discussionRepository.save(discussionFromRepo);
+            for (Link link : links) {
+                linkRepository.delete(link);
+            }
+
+
+//            linkRepository.deleteAll(oldLinks);
+
+
+            if (hrefs.length > 0) {
+                for (String href : hrefs) {
+                    Link link = Link.builder()
+                            .url(href)
+                            .build();
+                    if (link.getUrl() != null && link.getUrl().trim().equals("")) {
+                        linkRepository.save(link);
+                        changedLinkList.add(link);
+                    } else {
+                        modelMap.addAttribute("hrefError", "empty Link");
+                        return "discussionsPage";
+                    }
+                }
+            }
+            discussionFromRepo.setLinks(changedLinkList);
+
+
+            //Files
+            List<Document> documents = discussionFromRepo.getDocuments();
+            List<Document> changedDocuments = new ArrayList<>();
+            List<Document> documentsForDelete = new ArrayList<>();
+            if (changedFiles != null) {
+                for (Long changedFile : changedFiles) {
+
+                    Optional<Document> byId = fileRepository.findById(changedFile);
+                    if (byId.isPresent()) {
+                        Document document = byId.get();
+                        Document changedDocument = Document.builder()
+                                .fileStatus(document.getFileStatus())
+                                .fileType(document.getFileType())
+                                .url(document.getUrl())
+                                .build();
+                        fileRepository.save(changedDocument);
+
+                        changedDocuments.add(changedDocument);
+                    }
+                }
+            }
+
+            if (documents != null) {
+                for (Document document : documents) {
+                    if (!changedDocuments.contains(document)) {
+                        documentsForDelete.add(document);
+                    }
+                }
+            } else {
+                changedDocuments = documents;
+                documentsForDelete = null;
+                discussionFromRepo.setDocuments(null);
+            }
+
+            if (documentsForDelete != null) {
+                for (Document document : documentsForDelete) {
+                    File file = new File(discussionFilesUrl + document.getUrl());
+                    file.delete();
+                }
+
+                discussionFromRepo.setDocuments(null);
+                discussionRepository.save(discussionFromRepo);
+
+                for (Document document : documentsForDelete) {
+                    fileRepository.delete(document);
+                }
+
+                discussionFromRepo.setDocuments(changedDocuments);
+                discussionRepository.save(discussionFromRepo);
+
+
+            }
+
+            File dir = new File(discussionThumbUrl);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            if (!multipartFile.isEmpty()) {
+                String discussionThumb = multipartFile.getOriginalFilename();
+                discussionThumb = uuid + discussionThumb;
+                try {
+                    multipartFile.transferTo(new File(dir, discussionThumb));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                discussionFromRepo.setThumbnail(discussionThumb);
+            } else {
+                discussionFromRepo.setThumbnail(thumbnail);
+            }
+
+
+            File filesdir = new File(discussionFilesUrl);
+            if (!filesdir.exists()) {
+                filesdir.mkdirs();
+            }
+
+
+            if (!fewFiles[0].isEmpty()) {
+                for (MultipartFile fewFile : fewFiles) {
+                    String originalFilename = fewFile.getOriginalFilename();
+                    originalFilename = uuid + originalFilename;
+                    try {
+                        multipartFile.transferTo(new File(filesdir, originalFilename));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Document documentForSave = Document.builder()
+                            .fileStatus(FileStatus.VISIBLE)
+                            .fileType(FileType.FILE)
+                            .url(originalFilename)
+                            .build();
+
+                    fileRepository.save(documentForSave);
+                    discussionFromRepo.getDocuments().add(documentForSave);
+                }
+            }
+            discussionRepository.save(discussionFromRepo);
         }
 
-        for (Document document : documents) {
-            if (!newDocuments.contains(document)) {
-                File file = new File(discussionFilesUrl + document.getUrl());
-                file.delete();
-                fileRepository.delete(document);
-            }
-        }
         return "redirect:/";
     }
-
 }
