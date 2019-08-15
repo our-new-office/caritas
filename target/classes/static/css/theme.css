@@ -14683,3 +14683,30 @@ section {
 .copyright{
     display: block!important;
 }
+
+
+td{vertical-align: middle!important;}
+
+.js-item-menu>a{
+    width: 50px!important;
+    height: auto;
+}
+
+.js-item-menu{
+    display: flex;
+    align-items: center;
+}
+
+.image img{
+    max-width: 100px;
+    height: auto;
+}
+
+input[type='checkbox'] {
+    /*-webkit-appearance:none;*/
+    width:20px;
+    height:20px;
+    /*background:white;*/
+    border-radius:5px;
+    border:2px solid #555;
+}

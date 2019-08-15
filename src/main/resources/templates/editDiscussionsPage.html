@@ -35,7 +35,7 @@
 
 </head>
 
-<body class="animsition">
+<body>
 <div class="page-wrapper">
     <!-- HEADER MOBILE-->
     <header class="header-mobile d-block d-lg-none">
@@ -89,12 +89,12 @@
             <nav class="navbar-sidebar">
                 <ul class="list-unstyled navbar__list">
                     <li class="has-sub">
-                        <a class="js-arrow" href="/users/user_page">
-                            <i class="fas fa-user"></i>Ստեղծել օգտատեր</a>
+                        <a href="/">
+                            <i class="fas fa-user"></i>Գլխավոր</a>
                     </li>
                     <li>
                         <a href="/working_groups/working_group_page">
-                            <i class="fas fa-chart-bar"></i>Ստեղծել խումբ</a>
+                            <i class="fas fa-chart-bar"></i>Դեպի զրուցարան</a>
                     </li>
                 </ul>
             </nav>
@@ -108,14 +108,8 @@
         <header class="header-desktop">
             <div class="section__content section__content--p30">
                 <div class="container-fluid">
-                    <div class="header-wrap">
-                        <form class="form-header" action="" method="POST">
-                            <input class="au-input au-input--xl" type="text" name="search"
-                                   placeholder="Search for datas &amp; reports..."/>
-                            <button class="au-btn--submit" type="submit">
-                                <i class="zmdi zmdi-search"></i>
-                            </button>
-                        </form>
+                    <div class="header-wrap" style="display: flex; justify-content: flex-end">
+
                         <div class="header-button">
                             <div class="account-wrap">
                                 <div class="account-item clearfix js-item-menu">
@@ -162,31 +156,22 @@
 
                     <div class="row">
                         <div class="col-md-12">
-                            <h3 class="title-5 m-b-35">Օգտատերի ստեղծում</h3>
+                            <h3 class="title-5 m-b-35">Զրույցի ստեղծում</h3>
 
                             <div class="card">
                                 <div class="card-header">
-                                    <h4>Օգտատերի ստեղծման ինֆորմացիա</h4>
+                                    <h4>Զրույցի ստեղծման ինֆորմացիա</h4>
                                 </div>
                                 <div class="card-body">
-                                    <p class="text-muted m-b-15">Օգտատեր ստեղծելու համար բավական է մուտքագրել email և անուն</p>
-
-
+                                    <p class="text-muted m-b-15">Զրույց ստեղծելու համար բավական է մուտքագրել ստորև նշված դաշտերը</p>
                                     <div style="font-weight: bold" th:if="${bindingError!=null}"
-                                         class="alert alert-success" th:text="${bindingError}">
+                                         class="alert alert-danger" th:text="${bindingError}">
                                     </div>
-
-                                    <div style="font-weight: bold" th:if="${nameError!=null}" class="alert alert-danger"
-                                         th:text="${nameError}">
+                                    <div style="font-weight: bold" th:if="${titleError!=null}"
+                                         class="alert alert-danger" th:text="${titleError}">
                                     </div>
-
-                                    <div style="font-weight: bold" th:if="${emailError!=null}"
-                                         class="alert alert-danger" th:text="${emailError}">
-                                    </div>
-
-
-                                    <div style="font-weight: bold" th:if="${notUnique!=null}" class="alert alert-danger"
-                                         th:text="${notUnique}">
+                                    <div style="font-weight: bold" th:if="${descriptionError!=null}"
+                                         class="alert alert-danger" th:text="${descriptionError}">
                                     </div>
                                 </div>
                             </div>
@@ -194,53 +179,100 @@
 
                             <div class="card">
                                 <div class="card-header">
-                                    <strong>Օգտատերի դետալներ</strong>
+                                    <strong>Զրույցի դետալներ</strong>
                                 </div>
                                 <div class="card-body card-block">
-                                    <form action="/users/user" method="post" enctype="multipart/form-data"
-                                          class="form-horizontal">
+
+                                    <form action="/discussions/edit_discussion" method="post" enctype="multipart/form-data"
+                                          class="form-horizontal" id="discuss">
+
+
+                                        <div th:each="oldLink: ${discussion.getLinks()}">
+                                            <input type="hidden" name="links" th:value="${oldLink.getId()}">
+                                        </div>
+
+
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
-                                                <input type="text" id="text-input" name="name" placeholder="Անուն"
-                                                       class="form-control" th:if="${oldUser!=null}"
-                                                       th:value="${oldUser.getName()}">
-                                                <input type="text" id="text-input" name="name" placeholder="Անուն"
-                                                       class="form-control" th:unless="${oldUser!=null}">
+                                                <input type="hidden" name="id" th:value="${discussion.getId()}">
+                                                <input type="hidden" name="thumbnail" th:value="${discussion.getThumbnail()}">
+
+
+                                                <input type="text" id="text-input" name="title" placeholder="Վերնագիր"
+                                                       class="form-control" th:value="${discussion.getTitle()}">getDocuments
+
                                             </div>
                                         </div>
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
-                                                <input type="email" id="email-input" name="email"
-                                                       placeholder="Email" class="form-control"
-                                                       th:if="${oldUser!=null}" th:value="${oldUser.getEmail()}">
-                                                <input type="email" id="email-input" name="email"
-                                                       placeholder="Email" class="form-control"
-                                                       th:unless="${oldUser!=null}">
+                                                <textarea name="description" id="" class="form-control" cols="30" rows="10" th:value="${discussion.getDescription()}" th:text="${discussion.getDescription()}"></textarea>
+
+                                            </div>
+                                        </div>
+
+                                            <div class="row form-group">
+                                                <div class="col-12 col-md-12">
+                                                    <label for="thumbnail">Նկար</label>
+                                                    <input type="file" name="img" id="thumbnail"  class="form-control">
+                                                </div>
+                                                <div class="row form-group">
+                                                    <div class="col-12 col-md-12">
+                                                        <div class="thumb"><img  th:src="@{'/discussions/discussionImage?'(image=${discussion.getThumbnail()})}"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        <div class="row form-group">
+                                            <div class="col-12 col-md-12">
+                                                <label for="files">Փաստաթղթեր</label>
+                                                <input type="file" name="fewfiles" id="files" multiple  class="form-control">
+                                            </div>
+                                            <div class="col-12" th:each="document:${discussion.getDocuments()}" onclick="deleteLink(event.currentTarget)">
+                                                <input type="hidden" name="changedFiles" th:value="${document.getId()}">
+                                                <div><a th:href="@{'/discussions/discussionFile?file='+ ${document.getUrl()}}" th:download="${document.getUrl()}" th:text="${document.getUrl()}"></a><i style="cursor: pointer" class="zmdi zmdi-delete"></i></div>
+                                            </div>
+                                        </div>
+                                        <div class="row form-group">
+                                            <div class="col-12 col-md-12">
+                                                <div th:if="${discussion.getLinks()!=null}" th:each="link: ${discussion.getLinks()}"  onclick="deleteLink(event.currentTarget)">
+                                                    <input type="hidden" name="changedLinks" th:id="${link.getId()}" th:value="${link.getId()}" multiple >
+                                                    <span style="margin-right: 10px" th:text="${link.getUrl()}"></span>
+                                                    <i style="cursor: pointer" class="zmdi zmdi-delete"></i>
+                                                </div>
+
                                             </div>
                                         </div>
 
 
                                         <div class="row form-group">
-
                                             <div class="col-12 col-md-12">
-                                                <select name="role" id="select" class="form-control">
-                                                    <option th:each="role: ${roles}" th:value="${role.name()}"
-                                                            th:text="${role.name()}"></option>
-
-                                                </select>
+                                                <label for="links" id="label">Հղումներ</label>
+                                                <input type="text" name="hrefs" id="links" class="form-control">
                                             </div>
                                         </div>
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
-                                                <input type="file" name="thumbnail"  class="form-control">
+                                                <span class="btn badge-info" onclick="addInput()">Ավելացնել <i class="fas fa-plus"></i>․․․</span>
                                             </div>
                                         </div>
+
+                                        <div class="row form-group">
+                                            <div class="col-12 col-md-12">
+                                                <input type="hidden" name="usersForDiscussion" th:value="${currentUser.getId()}">
+                                                <p th:each="user: ${users}">
+                                                    <input type="checkbox" name="usersForDiscussion" th:value="${user.getId()}" th:checked="${discussion.getUsers().contains(user)}" style="padding: 2px">
+                                                    <span th:text="${user.getName()}"></span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="workingGroupForDiscussion" th:value="${workingGroup.getId()}">
+
                                         <div class="card-footer">
                                             <button type="submit" class="btn btn-primary btn-sm">
                                                 <i class="fa fa-dot-circle-o"></i> Submit
                                             </button>
 
-                                            <a href="/" type="reset" class="btn btn-danger btn-sm">
+                                            <a href="/" type="reset" class="btn btn-danger btn-sm" id="more">
                                                 <i class="fa fa-ban"></i> Reset
                                             </a>
                                         </div>
@@ -286,8 +318,13 @@
 <script src="/vendor/select2/select2.min.js">
 </script>
 
+<script>
+
+</script>
+
 <!-- Main JS-->
 <script src="/js/main.js"></script>
+
 
 </body>
 

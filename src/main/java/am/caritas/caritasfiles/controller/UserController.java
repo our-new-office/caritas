@@ -257,5 +257,4 @@ public class UserController {
         InputStream in = new FileInputStream(userPicUrl + userImage);
         return IOUtils.toByteArray(in);
     }
-
 }

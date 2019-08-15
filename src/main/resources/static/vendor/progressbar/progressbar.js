@@ -638,7 +638,7 @@
                         , 'composeEasingObject': composeEasingObject
                     });
 
-                    // `root` is provided in the intro/outro files.
+                    // `root` is provided in the intro/outro documents.
 
                     // A hook used for unit testing.
                     if (typeof SHIFTY_DEBUG_NOW === 'function') {
