@@ -54,7 +54,7 @@ public class WorkingGroupController {
             if (currentUser.getUser().getRole().equals(Role.ADMIN)) {
                 List<Role> roles = Arrays.asList(Role.values());
                 modelMap.addAttribute("roles", roles);
-                List<User> users = userService.allUsersForGroupAdmin();
+                List<User> users = userService.allUsersForDiscussionAdmin();
                 modelMap.addAttribute("users", users);
                 log.info("Create Working Group page loaded");
                 return "createWorkingGroup";
@@ -68,7 +68,7 @@ public class WorkingGroupController {
     public String editWorkingGroupPage(@AuthenticationPrincipal CurrentUser currentUser, ModelMap modelMap, @PathVariable Long id) {
         if (currentUser != null) {
 
-            List<User> users = userService.allUsersForGroupAdmin();
+            List<User> users = userService.allUsersForDiscussionAdmin();
             modelMap.addAttribute("users", users);
             modelMap.addAttribute("currentUser", currentUser.getUser());
             if (currentUser.getUser().getRole().equals(Role.ADMIN)) {
@@ -126,14 +126,17 @@ public class WorkingGroupController {
             return "createWorkingGroup";
         }
         File dir = new File(workingGroupPicUrl);
+        String workingGroupImage = "1.jpg";
         if (!dir.exists()) {
             dir.mkdirs();
         }
-        String workingGroupImage = multipartFile.getOriginalFilename();
-        try {
-            multipartFile.transferTo(new File(dir, workingGroupImage));
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(!multipartFile.isEmpty()){
+            workingGroupImage = multipartFile.getOriginalFilename();
+            try {
+                multipartFile.transferTo(new File(dir, workingGroupImage));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         workingGroupDto.setThumbnail(workingGroupImage);
         workingGroupService.saveWorkingGroup(workingGroupDto);
@@ -206,7 +209,9 @@ public class WorkingGroupController {
         if (byId.isPresent()) {
             workingGroupService.deleteById(id);
             File file = new File(workingGroupPicUrl+byId.get().getThumbnail());
-            file.delete();
+            if(!byId.get().getThumbnail().equals("1.jpg")){
+                file.delete();
+            }
             log.info("Working group has been deleted");
             return "redirect:/";
         }

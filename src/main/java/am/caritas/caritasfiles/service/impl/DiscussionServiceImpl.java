@@ -1,6 +1,7 @@
 package am.caritas.caritasfiles.service.impl;
 
 import am.caritas.caritasfiles.model.Discussion;
+import am.caritas.caritasfiles.model.User;
 import am.caritas.caritasfiles.model.UserDiscussionWorkingGroup;
 import am.caritas.caritasfiles.repository.DiscussionRepository;
 import am.caritas.caritasfiles.repository.UserDiscussionWorkingGroupRepository;
@@ -35,5 +36,25 @@ public class DiscussionServiceImpl implements DiscussionService {
             discussions.add(discussion);
         }
         return discussions;
+    }
+
+    @Override
+    public List<Discussion> findAllByWorkingGroupId(Long id) {
+        return discussionRepository.findAllByWorkingGroupId(id);
+    }
+
+    @Override
+    public List<Discussion> findAllForUser(User user) {
+
+        List<Discussion> allForDiscussion = new ArrayList<>();
+        List<Discussion> all = discussionRepository.findAll();
+        for (Discussion discussion : all) {
+            List<User> users = discussion.getUsers();
+            if(users.contains(user)){
+                allForDiscussion.add(discussion);
+            }
+        }
+        return allForDiscussion;
+
     }
 }

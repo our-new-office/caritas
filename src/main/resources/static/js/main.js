@@ -1679,7 +1679,7 @@ function addInput() {
     input.type = 'text';
     input.classList.add("form-control");
     input.name = 'hrefs';
-    input.placeholder = 'Հղում ' + counter;
+    input.placeholder = 'Հղում ';
     input.style.marginTop='5px';
     input.style.marginBottom='5px';
 

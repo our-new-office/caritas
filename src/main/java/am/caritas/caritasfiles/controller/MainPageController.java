@@ -57,7 +57,16 @@ public class MainPageController {
                 log.info("Admin dashboard main page loaded");
                 return "adminPanel";
             } else if (currentUser.getUser().getRole().equals(Role.USER)) {
+                List<Discussion> allForUser = discussionService.findAllForUser(currentUser.getUser());
+                modelMap.addAttribute("discussions", allForUser);
                 log.info("User dashboard main page loaded");
+
+
+
+
+
+
+
                 return "userBoard";
             } else if (currentUser.getUser().getRole().equals(Role.WORKING_GROUP_ADMIN)) {
                 Long id = currentUser.getUser().getId();
@@ -65,16 +74,15 @@ public class MainPageController {
                 List<Discussion> discussions = new ArrayList<>();
                 if (byAdminId.isPresent()) {
                     WorkingGroup workingGroup = byAdminId.get();
-                    List<UserDiscussionWorkingGroup> allByWorkingGroupId = userDiscussionWorkingGroupRepository.findAllByWorkingGroupId(workingGroup.getId());
-                    for (UserDiscussionWorkingGroup userDiscussionWorkingGroup : allByWorkingGroupId) {
-                        Discussion discussion = userDiscussionWorkingGroup.getDiscussion();
-                        discussions.add(discussion);
-                    }
+                    List<Discussion> allByWorkingGroupId = discussionService.findAllByWorkingGroupId(workingGroup.getId());
+                    modelMap.addAttribute("discussions", allByWorkingGroupId);
+                    modelMap.addAttribute("currentUser", currentUser.getUser());
                 }
-                modelMap.addAttribute("discussions", discussions);
-                modelMap.addAttribute("currentUser", currentUser.getUser());
                 return "discussion";
             }
+
+
+
         }
         log.error("Unauthorized user, redirect login page");
         return "redirect:/login?error=unauthorized";

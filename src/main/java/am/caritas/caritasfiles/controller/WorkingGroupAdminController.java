@@ -50,8 +50,9 @@ public class WorkingGroupAdminController {
     private final WorkingGroupService workingGroupService;
     private final WorkingGroupRepository workingGroupRepository;
     private final UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository;
+    private final ChatRepository chatRepository;
 
-    public WorkingGroupAdminController(DiscussionService discussionService, UserService userService, FileRepository fileRepository, DiscussionRepository discussionRepository, LinkRepository linkRepository, WorkingGroupService workingGroupService, WorkingGroupRepository workingGroupRepository, UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository) {
+    public WorkingGroupAdminController(DiscussionService discussionService, UserService userService, FileRepository fileRepository, DiscussionRepository discussionRepository, LinkRepository linkRepository, WorkingGroupService workingGroupService, WorkingGroupRepository workingGroupRepository, UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository, ChatRepository chatRepository) {
         this.discussionService = discussionService;
         this.userService = userService;
         this.fileRepository = fileRepository;
@@ -60,6 +61,7 @@ public class WorkingGroupAdminController {
         this.workingGroupService = workingGroupService;
         this.workingGroupRepository = workingGroupRepository;
         this.userDiscussionWorkingGroupRepository = userDiscussionWorkingGroupRepository;
+        this.chatRepository = chatRepository;
     }
 
     @GetMapping("/create_discussion")
@@ -92,6 +94,12 @@ public class WorkingGroupAdminController {
                                 @RequestParam("workingGroupForDiscussion") Long workingGroupId) {
 
         modelMap.addAttribute("currentUser", currentUser.getUser());
+        List<User> usersForDiscussion = userService.allUsersForGroupAdmin();
+        Optional<WorkingGroup> byAdminId = workingGroupService.findByAdminId(currentUser.getUser().getId());
+        if (byAdminId.isPresent()) {
+            WorkingGroup workingGroup = byAdminId.get();
+            modelMap.addAttribute("workingGroup", workingGroup);
+        }
 
         boolean error = false;
         String bindingError = null;
@@ -114,14 +122,8 @@ public class WorkingGroupAdminController {
         }
 
         if (error) {
-            List<User> users = userService.allUsersForGroupAdmin();
-            Optional<WorkingGroup> byAdminId = workingGroupService.findByAdminId(currentUser.getUser().getId());
-            if (byAdminId.isPresent()) {
-                WorkingGroup workingGroup = byAdminId.get();
-                modelMap.addAttribute("workingGroup", workingGroup);
-            }
             modelMap.addAttribute("bindingError", bindingError);
-            modelMap.addAttribute("users", users);
+            modelMap.addAttribute("users", usersForDiscussion);
             modelMap.addAttribute("currentUser", currentUser.getUser());
             modelMap.addAttribute("titleError", titleError);
             modelMap.addAttribute("oldDiscussion", discussion);
@@ -198,23 +200,15 @@ public class WorkingGroupAdminController {
         }
         discussion.setUsers(users);
 
-
-        discussionRepository.save(discussion);
-
         Optional<WorkingGroup> byId = workingGroupRepository.findById(workingGroupId);
         if (byId.isPresent()) {
             WorkingGroup workingGroup = byId.get();
-            UserDiscussionWorkingGroup userDiscussionWorkingGroup = UserDiscussionWorkingGroup.builder()
-                    .discussion(discussion)
-                    .workingGroup(workingGroup)
-                    .build();
-
-            for (User user : users) {
-                userDiscussionWorkingGroup.setUser(user);
-                userDiscussionWorkingGroupRepository.save(userDiscussionWorkingGroup);
-            }
-
+            discussion.setWorkingGroup(workingGroup);
         }
+
+        discussionRepository.save(discussion);
+
+
 
 
         return "redirect:/";
@@ -277,11 +271,18 @@ public class WorkingGroupAdminController {
                                  @RequestParam(value = "img", required = false) MultipartFile multipartFile) {
 
         modelMap.addAttribute("currentUser", currentUser.getUser());
+        List<User> users = userService.allUsersForGroupAdmin();
+        Optional<WorkingGroup> byAdminId = workingGroupService.findByAdminId(currentUser.getUser().getId());
+        if (byAdminId.isPresent()) {
+            WorkingGroup workingGroup = byAdminId.get();
+            modelMap.addAttribute("workingGroup", workingGroup);
+        }
 
         boolean error = false;
         String bindingError = null;
         String titleError = null;
         String descriptionError = null;
+        String hrefError = null;
         if (bindingResult.hasErrors()) {
             error = true;
             bindingError = "Something went wrong, try once more";
@@ -297,22 +298,26 @@ public class WorkingGroupAdminController {
         if (userIds == null) {
             System.out.println("no user");
         }
+        for (String href : hrefs) {
+            if (href.trim().equals("")) {
+                error = true;
+                hrefError = "empty Link or links";
+            }
+        }
+
 
         if (error) {
-            List<User> users = userService.allUsersForGroupAdmin();
-            Optional<WorkingGroup> byAdminId = workingGroupService.findByAdminId(currentUser.getUser().getId());
-            if (byAdminId.isPresent()) {
-                WorkingGroup workingGroup = byAdminId.get();
-                modelMap.addAttribute("workingGroup", workingGroup);
-            }
             modelMap.addAttribute("bindingError", bindingError);
             modelMap.addAttribute("users", users);
             modelMap.addAttribute("currentUser", currentUser.getUser());
             modelMap.addAttribute("titleError", titleError);
             modelMap.addAttribute("oldDiscussion", discussion);
+            modelMap.addAttribute("oldChangedLinks", changedLinks);
+            modelMap.addAttribute("oldHrefs", hrefs);
+            modelMap.addAttribute("hrefError", hrefError);
             modelMap.addAttribute("descriptionError", descriptionError);
             log.info("Something went wrong, returning to discussion creation page again");
-            return "discussionsPage";
+            return "editDiscussionsPage";
         }
 
 //        List<Link> oldLinksList = new ArrayList<>();
@@ -332,11 +337,15 @@ public class WorkingGroupAdminController {
                     if (byId.isPresent()) {
                         Link link = byId.get();
                         String url = link.getUrl();
-                        Link newLink = Link.builder()
-                                .url(url)
-                                .build();
-                        linkRepository.save(newLink);
-                        changedLinkList.add(newLink);
+                        url = url.trim();
+
+                        if (!url.equals("")) {
+                            Link newLink = Link.builder()
+                                    .url(url)
+                                    .build();
+                            linkRepository.save(newLink);
+                            changedLinkList.add(newLink);
+                        }
                     }
                 }
             }
@@ -356,13 +365,10 @@ public class WorkingGroupAdminController {
                     Link link = Link.builder()
                             .url(href)
                             .build();
-                    if (link.getUrl() != null && link.getUrl().trim().equals("")) {
-                        linkRepository.save(link);
-                        changedLinkList.add(link);
-                    } else {
-                        modelMap.addAttribute("hrefError", "empty Link");
-                        return "discussionsPage";
-                    }
+
+                    linkRepository.save(link);
+                    changedLinkList.add(link);
+
                 }
             }
             discussionFromRepo.setLinks(changedLinkList);
@@ -451,7 +457,7 @@ public class WorkingGroupAdminController {
                     String originalFilename = fewFile.getOriginalFilename();
                     originalFilename = uuid + originalFilename;
                     try {
-                        multipartFile.transferTo(new File(filesdir, originalFilename));
+                        fewFile.transferTo(new File(filesdir, originalFilename));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -464,8 +470,71 @@ public class WorkingGroupAdminController {
                     fileRepository.save(documentForSave);
                     discussionFromRepo.getDocuments().add(documentForSave);
                 }
+
             }
+            List<User> usersForDiscussion = new ArrayList<>();
+
+            if (userIds != null && userIds.length > 0) {
+                for (Long userId : userIds) {
+                    Optional<User> byId = userService.findById(userId);
+                    if (byId.isPresent()) {
+                        User user = byId.get();
+                        usersForDiscussion.add(user);
+                    }
+                }
+            }
+
+            discussionFromRepo.setUsers(null);
             discussionRepository.save(discussionFromRepo);
+            discussionFromRepo.setUsers(usersForDiscussion);
+            discussionRepository.save(discussionFromRepo);
+        }
+
+        return "redirect:/";
+    }
+
+    @GetMapping("/delete/{id}")
+    @Transactional
+    public String deleteDiscussion(@PathVariable Long id){
+
+        Optional<Discussion> byId = discussionRepository.findById(id);
+        if(byId.isPresent()){
+            Discussion discussion = byId.get();
+            List<Document> documents = discussion.getDocuments();
+
+            List<Link> links = discussion.getLinks();
+            List<User> users = discussion.getUsers();
+            List<Chat> chats = discussion.getChats();
+
+
+            discussion.setDocuments(null);
+            discussion.setUsers(null);
+            discussion.setLinks(null);
+            discussion.setChats(null);
+            discussion.setWorkingGroup(null);
+            discussionRepository.delete(discussion);
+
+            for (Link link : links) {
+                linkRepository.delete(link);
+            }
+
+
+            for (Chat chat : chats) {
+                chatRepository.delete(chat);
+            }
+
+            for (Document document : documents) {
+                File file = new File(discussionFilesUrl + document.getUrl());
+                file.delete();
+                fileRepository.delete(document);
+            }
+
+            String thumbnail = discussion.getThumbnail();
+            File file = new File(discussionThumbUrl+thumbnail);
+            if(!thumbnail.equals("1.jpg")){
+                file.delete();
+            }
+
         }
 
         return "redirect:/";

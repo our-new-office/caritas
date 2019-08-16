@@ -10,7 +10,7 @@
     <meta name="keywords" content="au theme template">
 
     <!-- Title Page-->
-    <title>Admin Panel - Caritas</title>
+    <title>Yes</title>
 
     <!-- Fontfaces CSS-->
     <link href="/css/font-face.css" rel="stylesheet" media="all">
@@ -197,15 +197,18 @@
                                                 <input type="hidden" name="id" th:value="${discussion.getId()}">
                                                 <input type="hidden" name="thumbnail" th:value="${discussion.getThumbnail()}">
 
-
-                                                <input type="text" id="text-input" name="title" placeholder="Վերնագիր"
-                                                       class="form-control" th:value="${discussion.getTitle()}">getDocuments
+                                                <input type="text" id="text-input0" name="title" placeholder="Վերնագիր"
+                                                       class="form-control" th:if="${oldDiscussion!=null}"
+                                                       th:value="${oldDiscussion.getTitle()}">
+                                                <input type="text" id="text-input" name="title" th:value="${discussion.getTitle()}" placeholder="Վերնագիր"
+                                                       class="form-control" th:unless="${oldDiscussion!=null}">
 
                                             </div>
                                         </div>
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
-                                                <textarea name="description" id="" class="form-control" cols="30" rows="10" th:value="${discussion.getDescription()}" th:text="${discussion.getDescription()}"></textarea>
+                                                <textarea name="description" id="" class="form-control" cols="30" rows="10" th:if="${oldDiscussion!=null}" th:value="${discussion.getDescription()}" th:text="${oldDiscussion.getDescription()}"></textarea>
+                                                <textarea name="description" id="" class="form-control" cols="30" rows="10" th:if="${oldDiscussion==null}" th:value="${discussion.getDescription()}" th:text="${discussion.getDescription()}"></textarea>
 
                                             </div>
                                         </div>
@@ -217,7 +220,7 @@
                                                 </div>
                                                 <div class="row form-group">
                                                     <div class="col-12 col-md-12">
-                                                        <div class="thumb"><img  th:src="@{'/discussions/discussionImage?'(image=${discussion.getThumbnail()})}"></div>
+                                                        <div class="thumb"><img th:src="@{'/discussions/discussionImage?'(image=${discussion.getThumbnail()})}"></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -229,17 +232,7 @@
                                             </div>
                                             <div class="col-12" th:each="document:${discussion.getDocuments()}" onclick="deleteLink(event.currentTarget)">
                                                 <input type="hidden" name="changedFiles" th:value="${document.getId()}">
-                                                <div><a th:href="@{'/discussions/discussionFile?file='+ ${document.getUrl()}}" th:download="${document.getUrl()}" th:text="${document.getUrl()}"></a><i style="cursor: pointer" class="zmdi zmdi-delete"></i></div>
-                                            </div>
-                                        </div>
-                                        <div class="row form-group">
-                                            <div class="col-12 col-md-12">
-                                                <div th:if="${discussion.getLinks()!=null}" th:each="link: ${discussion.getLinks()}"  onclick="deleteLink(event.currentTarget)">
-                                                    <input type="hidden" name="changedLinks" th:id="${link.getId()}" th:value="${link.getId()}" multiple >
-                                                    <span style="margin-right: 10px" th:text="${link.getUrl()}"></span>
-                                                    <i style="cursor: pointer" class="zmdi zmdi-delete"></i>
-                                                </div>
-
+                                                <div><a th:href="@{'/discussions/discussionFile?file='+ ${document.getUrl()}}" th:download="${document.getUrl()}" th:text="${document.getUrl()}"></a>&nbsp;&nbsp;<i style="cursor: pointer" class="zmdi zmdi-delete"></i></div>
                                             </div>
                                         </div>
 
@@ -258,7 +251,19 @@
 
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
-                                                <input type="hidden" name="usersForDiscussion" th:value="${currentUser.getId()}">
+                                                <div th:if="${discussion.getLinks()!=null}" th:each="link: ${discussion.getLinks()}" onclick="deleteLink(event.currentTarget)">
+                                                    <input type="hidden" name="changedLinks" th:id="${link.getId()}" th:value="${link.getId()}" multiple >
+                                                    <span style="margin-right: 30px" th:text="${link.getUrl()}"></span>
+                                                     <i style="cursor: pointer" class="zmdi zmdi-delete"></i>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+
+                                        <div class="row form-group">
+                                            <div class="col-12 col-md-12">
+                                                <!--<input type="hidden" name="usersForDiscussion" th:value="${currentUser.getId()}">-->
                                                 <p th:each="user: ${users}">
                                                     <input type="checkbox" name="usersForDiscussion" th:value="${user.getId()}" th:checked="${discussion.getUsers().contains(user)}" style="padding: 2px">
                                                     <span th:text="${user.getName()}"></span>

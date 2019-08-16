@@ -39,4 +39,7 @@ public class Discussion {
 
     @ManyToMany
     private List<User> users;
+
+    @ManyToOne
+    private WorkingGroup workingGroup;
 }

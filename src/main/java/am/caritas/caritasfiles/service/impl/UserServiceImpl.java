@@ -1,11 +1,13 @@
 package am.caritas.caritasfiles.service.impl;
 
 import am.caritas.caritasfiles.model.User;
+import am.caritas.caritasfiles.model.WorkingGroup;
 import am.caritas.caritasfiles.model.enums.Role;
 import am.caritas.caritasfiles.model.enums.Status;
 import am.caritas.caritasfiles.model.mail.Mail;
 import am.caritas.caritasfiles.repository.UserDiscussionWorkingGroupRepository;
 import am.caritas.caritasfiles.repository.UserRepository;
+import am.caritas.caritasfiles.repository.WorkingGroupRepository;
 import am.caritas.caritasfiles.service.EmailService;
 import am.caritas.caritasfiles.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,15 +25,17 @@ public class UserServiceImpl implements UserService {
     private final EmailService emailService;
     private final UUID uuid = UUID.randomUUID();
     private final UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository;
+    private final WorkingGroupRepository workingGroupRepository;
 
     @Value("${caritas.base.url}")
     private String baseUrl;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService, UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService, UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository, WorkingGroupRepository workingGroupRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
         this.userDiscussionWorkingGroupRepository = userDiscussionWorkingGroupRepository;
+        this.workingGroupRepository = workingGroupRepository;
     }
 
     @Override
@@ -89,6 +93,23 @@ public class UserServiceImpl implements UserService {
            if(!user.getRole().equals(Role.ADMIN)){
                newList.add(user);
            }
+        }
+        return newList;
+    }
+
+    @Override
+    public List<User> allUsersForDiscussionAdmin() {
+        List<User> all = userRepository.findAll();
+        List<User> newList = new ArrayList<>();
+        for (User user : all) {
+            if(user.getRole().equals(Role.WORKING_GROUP_ADMIN)){
+                List<WorkingGroup> workingGroups = workingGroupRepository.findAll();
+                for (WorkingGroup workingGroup : workingGroups) {
+                    if(!workingGroup.getWorkingGroupAdmin().equals(user)){
+                       newList.add(user);
+                    }
+                }
+            }
         }
         return newList;
     }
