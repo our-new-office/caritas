@@ -1,14 +1,8 @@
 package am.caritas.caritasfiles.controller;
 
 import am.caritas.caritasfiles.dto.ChatDto;
-import am.caritas.caritasfiles.model.Chat;
-import am.caritas.caritasfiles.model.Discussion;
-import am.caritas.caritasfiles.model.User;
-import am.caritas.caritasfiles.model.UserDiscussionFiles;
-import am.caritas.caritasfiles.repository.ChatRepository;
-import am.caritas.caritasfiles.repository.DiscussionRepository;
-import am.caritas.caritasfiles.repository.UserDiscussionFilesRepository;
-import am.caritas.caritasfiles.repository.UserRepository;
+import am.caritas.caritasfiles.model.*;
+import am.caritas.caritasfiles.repository.*;
 import am.caritas.caritasfiles.security.CurrentUser;
 import am.caritas.caritasfiles.service.DiscussionService;
 import lombok.extern.slf4j.Slf4j;
@@ -29,15 +23,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-import static com.sun.org.apache.xalan.internal.lib.ExsltDatetime.date;
-import static com.sun.org.apache.xalan.internal.lib.ExsltDatetime.time;
-
 @Controller
 @Slf4j
 @RequestMapping("/user_discussion")
 public class DiscussionController {
 
     private final DiscussionService discussionService;
+
+    private final LogRepository logRepository;
 
     private UUID uuid = UUID.randomUUID();
 
@@ -58,8 +51,9 @@ public class DiscussionController {
 
     private final UserDiscussionFilesRepository userDiscussionFilesRepository;
 
-    public DiscussionController(DiscussionService discussionService, DiscussionRepository discussionRepository, ChatRepository chatRepository, UserRepository userRepository, UserDiscussionFilesRepository userDiscussionFilesRepository) {
+    public DiscussionController(DiscussionService discussionService, LogRepository logRepository, DiscussionRepository discussionRepository, ChatRepository chatRepository, UserRepository userRepository, UserDiscussionFilesRepository userDiscussionFilesRepository) {
         this.discussionService = discussionService;
+        this.logRepository = logRepository;
         this.discussionRepository = discussionRepository;
         this.chatRepository = chatRepository;
         this.userRepository = userRepository;
@@ -68,47 +62,86 @@ public class DiscussionController {
 
     @GetMapping("/user_discussion_image")
     public @ResponseBody
-    byte[] clientImage(@RequestParam("discImage") String discImage) throws IOException {
-        InputStream in = new FileInputStream(discussionThumbUrl + discImage);
-        return IOUtils.toByteArray(in);
+    byte[] clientImage(@RequestParam("discImage") String discImage,
+                       @AuthenticationPrincipal CurrentUser currentUser) throws IOException {
+        if (currentUser.getUser() != null) {
+            InputStream in = new FileInputStream(discussionThumbUrl + discImage);
+            return IOUtils.toByteArray(in);
+        } else {
+            return null;
+        }
     }
 
     @GetMapping("/user_discussion_file")
     public @ResponseBody
-    byte[] clientFile(@RequestParam("file") String userdiscFile) throws IOException {
-        InputStream in = new FileInputStream(userDiscussionFilesDir + userdiscFile);
-        return IOUtils.toByteArray(in);
+    byte[] clientFile(@RequestParam("file") String userdiscFile,
+                      @AuthenticationPrincipal CurrentUser currentUser) throws IOException {
+        if (currentUser.getUser() != null) {
+            InputStream in = new FileInputStream(userDiscussionFilesDir + userdiscFile);
+            return IOUtils.toByteArray(in);
+        } else {
+            return null;
+        }
     }
 
     @GetMapping(value = "/discussionFile")
     public @ResponseBody
-    byte[] discussionFile(@RequestParam("file") String discussionFile) throws IOException {
-        InputStream in = new FileInputStream(discussionFilesUrl + discussionFile);
-        return IOUtils.toByteArray(in);
+    byte[] discussionFile(@RequestParam("file") String discussionFile,
+                          @AuthenticationPrincipal CurrentUser currentUser) throws IOException {
+        if (currentUser.getUser() != null) {
+            InputStream in = new FileInputStream(discussionFilesUrl + discussionFile);
+            return IOUtils.toByteArray(in);
+        } else {
+            return null;
+        }
     }
 
     @GetMapping("/discussion/{id}")
     public String chat(@PathVariable Long id,
                        ModelMap modelMap,
                        @AuthenticationPrincipal CurrentUser currentUser) {
+        if (currentUser.getUser() != null) {
+            Optional<Discussion> byId = discussionRepository.findById(id);
+            if (byId.isPresent()) {
+                Discussion discussion = byId.get();
 
-        Optional<Discussion> byId = discussionRepository.findById(id);
-        if (byId.isPresent()) {
-            Discussion discussion = byId.get();
+                List<User> users = discussion.getUsers();
+                if (!users.contains(currentUser.getUser())) {
+                    Log log = Log.builder()
+                            .date(new Date())
+                            .user(currentUser.getUser().getName())
+                            .action("Ոչ իր համար նախատեսված զրուցարանի մուտքի փորձ․․․")
+                            .build();
+                    logRepository.save(log);
+                    return "redirect:/";
+                }
 
 
-            List<User> users = discussion.getUsers();
-            if (!users.contains(currentUser.getUser())) {
-                return "redirect:/";
+                modelMap.addAttribute("currentUser", currentUser.getUser());
+                modelMap.addAttribute("discussion", discussion);
+                Log log = Log.builder()
+                        .date(new Date())
+                        .user(currentUser.getUser().getName())
+                        .action("Մուտք զրուցարան " + discussion.getTitle())
+                        .build();
+                logRepository.save(log);
+                return "chat";
             }
-
-
-            modelMap.addAttribute("currentUser", currentUser.getUser());
-            modelMap.addAttribute("discussion", discussion);
-            return "chat";
+            Log log = Log.builder()
+                    .date(new Date())
+                    .user(currentUser.getUser().getName())
+                    .action("Գոյություն չունեցող զրուցարանի մուտքի փորձ․․․")
+                    .build();
+            logRepository.save(log);
+            return "redirect:/";
         }
-
-        return "redirect:/";
+        Log log = Log.builder()
+                .user("Մուտք չգործած օգտագործող")
+                .action("Վերադարձ մուտքի էջ")
+                .date(new Date())
+                .build();
+        logRepository.save(log);
+        return "redirect:/login";
     }
 
     @PostMapping("/save")
@@ -121,6 +154,12 @@ public class DiscussionController {
         byId.ifPresent(chat::setUser);
         discById.ifPresent(chat::setDiscussion);
         chatRepository.save(chat);
+        Log log = Log.builder()
+                .date(new Date())
+                .user(byId.get().getName())
+                .action("Զրուցարանում նամակի ուղարկում")
+                .build();
+        logRepository.save(log);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -202,10 +241,20 @@ public class DiscussionController {
                 byId.ifPresent(userDiscussionFilesForSave::setDiscussion);
                 userDiscussionFilesRepository.save(userDiscussionFilesForSave);
 
+                Log log = Log.builder()
+                        .date(new Date())
+                        .user(currentUser.getUser().getName())
+                        .action(originalFilename + " Փաստաթղթի վերբեռնում զրուցարանում")
+                        .build();
+                logRepository.save(log);
             }
-
         }
-
+        Log log = Log.builder()
+                .date(new Date())
+                .user(currentUser.getUser().getName())
+                .action("Վերադարձ զրուցարանի էջ")
+                .build();
+        logRepository.save(log);
         return "redirect:/user_discussion/discussion/" + discId;
     }
 }

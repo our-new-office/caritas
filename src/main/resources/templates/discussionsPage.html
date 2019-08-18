@@ -92,11 +92,19 @@
                         <a href="/">
                             <i class="fas fa-user"></i>Գլխավոր</a>
                     </li>
-                    <li>
-                        <a href="/working_groups/working_group_page">
-                            <i class="fas fa-chart-bar"></i>Դեպի զրուցարան</a>
-                    </li>
                 </ul>
+
+                <ul class="list-unstyled navbar__list">
+
+                    <hr>
+                    <h4 th:if="${discussionsForGroupAdmin.size()>0}">Ձեր զրուցարանները</h4>
+                    <li class="has-sub" th:each="discussion:${discussionsForGroupAdmin}">
+                        <a th:href="@{'/user_discussion/discussion/'+${discussion.getId()}}" th:text="${discussion.getTitle()}">
+                            <i class="fas fa-user"></i>Գլխավոր</a>
+                    </li>
+
+                </ul>
+
             </nav>
         </div>
     </aside>
@@ -242,11 +250,11 @@
 
                                         <div class="card-footer">
                                             <button type="submit" class="btn btn-primary btn-sm">
-                                                <i class="fa fa-dot-circle-o"></i> Submit
+                                                <i class="fa fa-dot-circle-o"></i> Հաստատել
                                             </button>
 
                                             <a href="/" type="reset" class="btn btn-danger btn-sm" id="more">
-                                                <i class="fa fa-ban"></i> Reset
+                                                <i class="fa fa-ban"></i> Հրաժարվել
                                             </a>
                                         </div>
                                     </form>

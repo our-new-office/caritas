@@ -1,14 +1,17 @@
 package am.caritas.caritasfiles.controller;
 
 import am.caritas.caritasfiles.dto.WorkingGroupDto;
+import am.caritas.caritasfiles.model.Discussion;
+import am.caritas.caritasfiles.model.Log;
 import am.caritas.caritasfiles.model.User;
 import am.caritas.caritasfiles.model.WorkingGroup;
 import am.caritas.caritasfiles.model.enums.Role;
+import am.caritas.caritasfiles.repository.DiscussionRepository;
+import am.caritas.caritasfiles.repository.LogRepository;
 import am.caritas.caritasfiles.security.CurrentUser;
 //import am.caritas.caritasfiles.service.UserDiscussionWorkingGroupService;
 import am.caritas.caritasfiles.service.UserService;
 import am.caritas.caritasfiles.service.WorkingGroupService;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,42 +28,60 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @Controller
 @RequestMapping("/working_groups")
 public class WorkingGroupController {
 
     private final WorkingGroupService workingGroupService;
     private final UserService userService;
+    private final LogRepository logRepository;
+    private final DiscussionRepository discussionRepository;
 //    private final UserDiscussionWorkingGroupService userDiscussionWorkingGroupService;
 
     @Value("${working.group.pic.url}")
     private String workingGroupPicUrl;
 
     @Autowired
-    public WorkingGroupController(WorkingGroupService workingGroupService, UserService userService) {
+    public WorkingGroupController(WorkingGroupService workingGroupService, UserService userService, LogRepository logRepository, DiscussionRepository discussionRepository) {
         this.workingGroupService = workingGroupService;
         this.userService = userService;
 
+        this.logRepository = logRepository;
+        this.discussionRepository = discussionRepository;
     }
 
     @GetMapping("/working_group_page")
     public String createWorcingGroupPage(@AuthenticationPrincipal CurrentUser currentUser, ModelMap modelMap) {
         if (currentUser != null) {
+
+            List<Discussion> allByUsersContains = discussionRepository.findAllByUsersContains(currentUser.getUser());
+            modelMap.addAttribute("discussions", allByUsersContains);
+
             modelMap.addAttribute("currentUser", currentUser.getUser());
             if (currentUser.getUser().getRole().equals(Role.ADMIN)) {
                 List<Role> roles = Arrays.asList(Role.values());
                 modelMap.addAttribute("roles", roles);
                 List<User> users = userService.allUsersForDiscussionAdmin();
                 modelMap.addAttribute("users", users);
-                log.info("Create Working Group page loaded");
+                Log log = Log.builder()
+                        .user(currentUser.getUser().getName())
+                        .date(new Date())
+                        .action(" Մուտք Աշխատանքային խումբ ստեղծելու էջ։")
+                        .build();
+                logRepository.save(log);
                 return "createWorkingGroup";
             }
         }
-        log.error("Unauthorized user, redirect login page");
+        Log log = Log.builder()
+                .user("Մուտք չգործած օգտագործող")
+                .date(new Date())
+                .action("Վերադարձ մուտքի էջ")
+                .build();
+        logRepository.save(log);
         return "redirect:/login?error=unauthorized";
     }
 
@@ -68,8 +89,9 @@ public class WorkingGroupController {
     public String editWorkingGroupPage(@AuthenticationPrincipal CurrentUser currentUser, ModelMap modelMap, @PathVariable Long id) {
         if (currentUser != null) {
 
-            List<User> users = userService.allUsersForDiscussionAdmin();
-            modelMap.addAttribute("users", users);
+            List<Discussion> allByUsersContains = discussionRepository.findAllByUsersContains(currentUser.getUser());
+            modelMap.addAttribute("discussions", allByUsersContains);
+
             modelMap.addAttribute("currentUser", currentUser.getUser());
             if (currentUser.getUser().getRole().equals(Role.ADMIN)) {
                 List<Role> roles = Arrays.asList(Role.values());
@@ -77,16 +99,27 @@ public class WorkingGroupController {
                 if (workingGroupById.isPresent()) {
                     WorkingGroup workingGroup = workingGroupById.get();
 
+
+                    List<User> users = userService.allUsersForDiscussionAdminEdit(workingGroup.getId());
+                    modelMap.addAttribute("users", users);
                     modelMap.addAttribute("workingGroup", workingGroup);
-                } else {
-                    log.warn("No such working to edit");
                 }
                 modelMap.addAttribute("roles", roles);
-                log.info("Update Working Group page loaded");
+                Log log = Log.builder()
+                        .user(currentUser.getUser().getName())
+                        .date(new Date())
+                        .action("Մուտք Աշխատանքային խմբի փոփոխության էջ")
+                        .build();
+                logRepository.save(log);
                 return "editWorkingGroup";
             }
         }
-        log.error("Unauthorized user, redirect login page");
+        Log log = Log.builder()
+                .user("Մուտք չգործած օգտագործող")
+                .date(new Date())
+                .action("Վերադարձ մուտքի էջ")
+                .build();
+        logRepository.save(log);
         return "redirect:/login?error=unauthorized";
     }
 
@@ -122,7 +155,12 @@ public class WorkingGroupController {
             modelMap.addAttribute("oldWorkingGroup", workingGroupDto);
             modelMap.addAttribute("descriptionError", descriptionError);
             modelMap.addAttribute("roles", roles);
-            log.info("Something went wrong, returning to working group creation page again");
+            Log log = Log.builder()
+                    .user(currentUser.getUser().getName())
+                    .date(new Date())
+                    .action("Սխալ տվյալներ, վերադարձ աշխատանքային խմբի փոփոխության էջ")
+                    .build();
+            logRepository.save(log);
             return "createWorkingGroup";
         }
         File dir = new File(workingGroupPicUrl);
@@ -140,7 +178,12 @@ public class WorkingGroupController {
         }
         workingGroupDto.setThumbnail(workingGroupImage);
         workingGroupService.saveWorkingGroup(workingGroupDto);
-        log.info("Working group has been created successfully");
+        Log log = Log.builder()
+                .user(currentUser.getUser().getName())
+                .date(new Date())
+                .action(workingGroupDto.getTitle() + " Աշխատանքային խմբի ստեղծում")
+                .build();
+        logRepository.save(log);
         return "redirect:/";
     }
 
@@ -172,7 +215,12 @@ public class WorkingGroupController {
             modelMap.addAttribute("titleError", titleError);
             modelMap.addAttribute("descriptionError", descriptionError);
             modelMap.addAttribute("roles", roles);
-            log.info("Something went wrong, returning to user registration page again");
+            Log log = Log.builder()
+                    .user(currentUser.getUser().getName())
+                    .date(new Date())
+                    .action("Սխալ տվյալներ, Վերադարձ աշխատանքային խմբի փոփոխման էջ")
+                    .build();
+            logRepository.save(log);
             return "editWorkingGroup";
         }
         Optional<WorkingGroup> optionalWorkingGroup = workingGroupService.findById(workingGroup.getId());
@@ -196,28 +244,44 @@ public class WorkingGroupController {
             workingGroupForSave.setDescription(workingGroup.getDescription());
             workingGroupForSave.setWorkingGroupAdmin(workingGroup.getWorkingGroupAdmin());
             workingGroupService.updateWorkingGroup(workingGroupForSave);
-            log.info("Working group has been updated successfully");
+            Log log = Log.builder()
+                    .user(currentUser.getUser().getName())
+                    .date(new Date())
+                    .action(workingGroupForSave.getTitle() + " աշխատանքային խմբի փոփոխություն")
+                    .build();
+            logRepository.save(log);
         }
         return "redirect:/";
     }
 
 
     @GetMapping("/working_group/delete/{id}")
-    public String deleteWorkingGroup(@PathVariable Long id, ModelMap modelMap) {
+    public String deleteWorkingGroup(@PathVariable Long id, ModelMap modelMap, @AuthenticationPrincipal CurrentUser currentUser) {
         String notExists = null;
         Optional<WorkingGroup> byId = workingGroupService.findById(id);
         if (byId.isPresent()) {
+            String title = byId.get().getTitle();
             workingGroupService.deleteById(id);
             File file = new File(workingGroupPicUrl+byId.get().getThumbnail());
             if(!byId.get().getThumbnail().equals("1.jpg")){
                 file.delete();
             }
-            log.info("Working group has been deleted");
+            Log log = Log.builder()
+                    .user(currentUser.getUser().getName())
+                    .date(new Date())
+                    .action(title + " աշխատանքային խմբի ջնջում")
+                    .build();
+            logRepository.save(log);
             return "redirect:/";
         }
         notExists = "Working Group doesn't exists";
         modelMap.addAttribute("workingGroupNotExists", notExists);
-        log.error("Working group can not be deleted, because it does`nt exists");
+        Log log = Log.builder()
+                .user(currentUser.getUser().getName())
+                .date(new Date())
+                .action("Աշխատանքային խումբը չի ջնջվում, քանի որ այն գոյություն չունի")
+                .build();
+        logRepository.save(log);
         return "adminPanel";
     }
 

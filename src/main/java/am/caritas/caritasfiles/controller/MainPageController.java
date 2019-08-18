@@ -1,16 +1,17 @@
 package am.caritas.caritasfiles.controller;
 
 import am.caritas.caritasfiles.model.Discussion;
+import am.caritas.caritasfiles.model.Log;
 import am.caritas.caritasfiles.model.User;
-import am.caritas.caritasfiles.model.UserDiscussionWorkingGroup;
 import am.caritas.caritasfiles.model.WorkingGroup;
 import am.caritas.caritasfiles.model.enums.Role;
+import am.caritas.caritasfiles.repository.ChatRepository;
+import am.caritas.caritasfiles.repository.LogRepository;
 import am.caritas.caritasfiles.repository.UserDiscussionWorkingGroupRepository;
 import am.caritas.caritasfiles.security.CurrentUser;
 import am.caritas.caritasfiles.service.DiscussionService;
 import am.caritas.caritasfiles.service.UserService;
 import am.caritas.caritasfiles.service.WorkingGroupService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -18,10 +19,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
 @Controller
 @RequestMapping("/")
 public class MainPageController {
@@ -30,12 +31,16 @@ public class MainPageController {
     private final WorkingGroupService workingGroupService;
     private final DiscussionService discussionService;
     private final UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository;
+    private final LogRepository logRepository;
+    private final ChatRepository chatRepository;
 
-    public MainPageController(UserService userService, WorkingGroupService workingGroupService, DiscussionService discussionService, UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository) {
+    public MainPageController(UserService userService, WorkingGroupService workingGroupService, DiscussionService discussionService, UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository, LogRepository logRepository, ChatRepository chatRepository) {
         this.userService = userService;
         this.workingGroupService = workingGroupService;
         this.discussionService = discussionService;
         this.userDiscussionWorkingGroupRepository = userDiscussionWorkingGroupRepository;
+        this.logRepository = logRepository;
+        this.chatRepository = chatRepository;
     }
 
     /**
@@ -54,19 +59,22 @@ public class MainPageController {
                 List<WorkingGroup> workingGroups = workingGroupService.workingGroups();
                 modelMap.addAttribute("users", users);
                 modelMap.addAttribute("workingGroups", workingGroups);
-                log.info("Admin dashboard main page loaded");
+                Log log = Log.builder()
+                        .user(currentUser.getUser().getName())
+                        .date(new Date())
+                        .action("Մուտք Ադմինիստրացիոն գլխավոր էջ")
+                        .build();
+                logRepository.save(log);
                 return "adminPanel";
             } else if (currentUser.getUser().getRole().equals(Role.USER)) {
                 List<Discussion> allForUser = discussionService.findAllForUser(currentUser.getUser());
                 modelMap.addAttribute("discussions", allForUser);
-                log.info("User dashboard main page loaded");
-
-
-
-
-
-
-
+                Log log = Log.builder()
+                        .user(currentUser.getUser().getName())
+                        .date(new Date())
+                        .action("Մուտք Օգտագործողի գլխավոր էջ")
+                        .build();
+                logRepository.save(log);
                 return "userBoard";
             } else if (currentUser.getUser().getRole().equals(Role.WORKING_GROUP_ADMIN)) {
                 Long id = currentUser.getUser().getId();
@@ -78,13 +86,31 @@ public class MainPageController {
                     modelMap.addAttribute("discussions", allByWorkingGroupId);
                     modelMap.addAttribute("currentUser", currentUser.getUser());
                 }
+                Log log = Log.builder()
+                        .user(currentUser.getUser().getName())
+                        .action("Մուտք Խմբի Ադմինիստրատորի գլխավոր էջ")
+                        .date(new Date())
+                        .build();
+                logRepository.save(log);
                 return "discussion";
+            }else if(currentUser.getUser().getRole().equals(Role.LOG_MANAGER)){
+//                Log log = Log.builder()
+//                        .user(currentUser.getUser().getName())
+//                        .date(new Date())
+//                        .action("Մուտք Լոգավորողի գլխավոր էջ")
+//                        .build();
+//                logRepository.save(log);
+                return "redirect:/log_managment/list";
             }
 
 
-
         }
-        log.error("Unauthorized user, redirect login page");
+        Log log = Log.builder()
+                .user("Մուտք չգործած օգտագործող")
+                .action("Վերադարձ մուտքի էջ")
+                .date(new Date())
+                .build();
+        logRepository.save(log);
         return "redirect:/login?error=unauthorized";
     }
 }

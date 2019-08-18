@@ -8,7 +8,6 @@ import am.caritas.caritasfiles.security.CurrentUser;
 import am.caritas.caritasfiles.service.DiscussionService;
 import am.caritas.caritasfiles.service.UserService;
 import am.caritas.caritasfiles.service.WorkingGroupService;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,13 +23,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Controller
-@Slf4j
 @RequestMapping("/discussions")
 public class WorkingGroupAdminController {
 
@@ -42,6 +37,7 @@ public class WorkingGroupAdminController {
     @Value("${discussion.file.url}")
     private String discussionFilesUrl;
 
+    private final LogRepository logRepository;
     private final DiscussionService discussionService;
     private final UserService userService;
     private final FileRepository fileRepository;
@@ -52,7 +48,8 @@ public class WorkingGroupAdminController {
     private final UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository;
     private final ChatRepository chatRepository;
 
-    public WorkingGroupAdminController(DiscussionService discussionService, UserService userService, FileRepository fileRepository, DiscussionRepository discussionRepository, LinkRepository linkRepository, WorkingGroupService workingGroupService, WorkingGroupRepository workingGroupRepository, UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository, ChatRepository chatRepository) {
+    public WorkingGroupAdminController(LogRepository logRepository, DiscussionService discussionService, UserService userService, FileRepository fileRepository, DiscussionRepository discussionRepository, LinkRepository linkRepository, WorkingGroupService workingGroupService, WorkingGroupRepository workingGroupRepository, UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository, ChatRepository chatRepository) {
+        this.logRepository = logRepository;
         this.discussionService = discussionService;
         this.userService = userService;
         this.fileRepository = fileRepository;
@@ -68,6 +65,9 @@ public class WorkingGroupAdminController {
     public String createDiscussion(@AuthenticationPrincipal CurrentUser currentUser, ModelMap modelMap) {
         if (currentUser != null) {
 
+            List<Discussion> allByUsersContains = discussionRepository.findAllByUsersContains(currentUser.getUser());
+            modelMap.addAttribute("discussionsForGroupAdmin", allByUsersContains);
+
             Optional<WorkingGroup> byAdminId = workingGroupService.findByAdminId(currentUser.getUser().getId());
             if (byAdminId.isPresent()) {
                 List<User> users = userService.allUsersForDiscussion(currentUser.getUser());
@@ -76,9 +76,22 @@ public class WorkingGroupAdminController {
                 modelMap.addAttribute("discussions", allByUserId);
                 modelMap.addAttribute("users", users);
                 modelMap.addAttribute("workingGroup", byAdminId.get());
+                Log log = Log.builder()
+                        .user(currentUser.getUser().getName())
+                        .date(new Date())
+                        .action("Մուտք զրույց ստեղծելու էջ")
+                        .build();
+                logRepository.save(log);
                 return "discussionsPage";
             }
+            Log log = Log.builder()
+                    .user(currentUser.getUser().getName())
+                    .date(new Date())
+                    .action("Տվյալ օգտագործողի համար աշխատանքային խումբ չի գտնվել")
+                    .build();
+            logRepository.save(log);
         }
+
         return "redirect:/";
     }
 
@@ -128,7 +141,12 @@ public class WorkingGroupAdminController {
             modelMap.addAttribute("titleError", titleError);
             modelMap.addAttribute("oldDiscussion", discussion);
             modelMap.addAttribute("descriptionError", descriptionError);
-            log.info("Something went wrong, returning to discussion creation page again");
+            Log log = Log.builder()
+                    .user(currentUser.getUser().getName())
+                    .date(new Date())
+                    .action("Սխալ տվյալներ, վերադարձ զրույց ստեղծելու էջ")
+                    .build();
+            logRepository.save(log);
             return "discussionsPage";
         }
 
@@ -198,6 +216,7 @@ public class WorkingGroupAdminController {
                 users.add(user);
             }
         }
+        users.add(currentUser.getUser());
         discussion.setUsers(users);
 
         Optional<WorkingGroup> byId = workingGroupRepository.findById(workingGroupId);
@@ -207,10 +226,12 @@ public class WorkingGroupAdminController {
         }
 
         discussionRepository.save(discussion);
-
-
-
-
+        Log log = Log.builder()
+                .user(currentUser.getUser().getName())
+                .date(new Date())
+                .action(discussion.getTitle() + " զրույցի ստեղծում")
+                .build();
+        logRepository.save(log);
         return "redirect:/";
     }
 
@@ -234,12 +255,21 @@ public class WorkingGroupAdminController {
     public String editDiscussion(@AuthenticationPrincipal CurrentUser currentUser, ModelMap modelMap, @PathVariable Long id) {
         if (currentUser != null) {
 
+            List<Discussion> allByUsersContains = discussionRepository.findAllByUsersContains(currentUser.getUser());
+            modelMap.addAttribute("discussionsForGroupAdmin", allByUsersContains);
+
             Optional<WorkingGroup> byAdminId = workingGroupService.findByAdminId(currentUser.getUser().getId());
             if (byAdminId.isPresent()) {
                 Optional<Discussion> byId = discussionRepository.findById(id);
                 if (byId.isPresent()) {
                     Discussion discussion = byId.get();
                     modelMap.addAttribute("discussion", discussion);
+                    Log log = Log.builder()
+                            .user(currentUser.getUser().getName())
+                            .date(new Date())
+                            .action("Մուտք "+ byId.get().getTitle() +" զրույցի փոփոխման էջ")
+                            .build();
+                    logRepository.save(log);
                 }
                 List<User> users = userService.allUsersForDiscussion(currentUser.getUser());
                 List<Discussion> allByUserId = discussionService.findAllByUserId(currentUser.getUser().getId());
@@ -247,6 +277,7 @@ public class WorkingGroupAdminController {
                 modelMap.addAttribute("discussions", allByUserId);
                 modelMap.addAttribute("users", users);
                 modelMap.addAttribute("workingGroup", byAdminId.get());
+
                 return "editDiscussionsPage";
             }
         }
@@ -316,7 +347,12 @@ public class WorkingGroupAdminController {
             modelMap.addAttribute("oldHrefs", hrefs);
             modelMap.addAttribute("hrefError", hrefError);
             modelMap.addAttribute("descriptionError", descriptionError);
-            log.info("Something went wrong, returning to discussion creation page again");
+            Log log = Log.builder()
+                    .user(currentUser.getUser().getName())
+                    .date(new Date())
+                    .action("Սխալ տվյալներ, վերադարձ զրույցի փոփոխման էջ")
+                    .build();
+            logRepository.save(log);
             return "editDiscussionsPage";
         }
 
@@ -339,7 +375,7 @@ public class WorkingGroupAdminController {
                         String url = link.getUrl();
                         url = url.trim();
 
-                        if (!url.equals("")) {
+                        if (!url.equals("") && link!=null) {
                             Link newLink = Link.builder()
                                     .url(url)
                                     .build();
@@ -393,6 +429,8 @@ public class WorkingGroupAdminController {
 
                         changedDocuments.add(changedDocument);
                     }
+
+
                 }
             }
 
@@ -414,18 +452,19 @@ public class WorkingGroupAdminController {
                     file.delete();
                 }
 
-                discussionFromRepo.setDocuments(null);
-                discussionRepository.save(discussionFromRepo);
-
                 for (Document document : documentsForDelete) {
                     fileRepository.delete(document);
                 }
-
-                discussionFromRepo.setDocuments(changedDocuments);
-                discussionRepository.save(discussionFromRepo);
-
-
             }
+
+            discussionFromRepo.setDocuments(null);
+            discussionRepository.save(discussionFromRepo);
+
+
+
+
+            discussionFromRepo.setDocuments(changedDocuments);
+            discussionRepository.save(discussionFromRepo);
 
             File dir = new File(discussionThumbUrl);
             if (!dir.exists()) {
@@ -470,6 +509,7 @@ public class WorkingGroupAdminController {
                     fileRepository.save(documentForSave);
                     discussionFromRepo.getDocuments().add(documentForSave);
                 }
+                discussionRepository.save(discussionFromRepo);
 
             }
             List<User> usersForDiscussion = new ArrayList<>();
@@ -483,25 +523,34 @@ public class WorkingGroupAdminController {
                     }
                 }
             }
+            usersForDiscussion.add(currentUser.getUser());
 
             discussionFromRepo.setUsers(null);
             discussionRepository.save(discussionFromRepo);
             discussionFromRepo.setUsers(usersForDiscussion);
+            discussionFromRepo.setTitle(discussion.getTitle());
+            discussionFromRepo.setDescription(discussion.getDescription());
             discussionRepository.save(discussionFromRepo);
         }
 
+        Log log = Log.builder()
+                .user(currentUser.getUser().getName())
+                .date(new Date())
+                .action(discussion.getTitle() +" զրույցի փոփոխում")
+                .build();
+        logRepository.save(log);
         return "redirect:/";
     }
 
     @GetMapping("/delete/{id}")
     @Transactional
-    public String deleteDiscussion(@PathVariable Long id){
+    public String deleteDiscussion(@PathVariable Long id, @AuthenticationPrincipal CurrentUser currentUser){
 
         Optional<Discussion> byId = discussionRepository.findById(id);
         if(byId.isPresent()){
             Discussion discussion = byId.get();
             List<Document> documents = discussion.getDocuments();
-
+            String name = byId.get().getTitle();
             List<Link> links = discussion.getLinks();
             List<User> users = discussion.getUsers();
             List<Chat> chats = discussion.getChats();
@@ -534,6 +583,12 @@ public class WorkingGroupAdminController {
             if(!thumbnail.equals("1.jpg")){
                 file.delete();
             }
+            Log log = Log.builder()
+                    .user(currentUser.getUser().getName())
+                    .date(new Date())
+                    .action(name +" վերնագրով զրույցի ջնջում")
+                    .build();
+            logRepository.save(log);
 
         }
 

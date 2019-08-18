@@ -74,6 +74,7 @@ public class UserServiceImpl implements UserService {
         emailService.sendUserActivationEmail(user.getEmail(), baseUrl + "/activate?token=" + user.getEmailToken() + "&userId=" + user.getId());
 
     }
+
     @Override
     @Transactional
     public void updateUser(User user) {
@@ -90,9 +91,9 @@ public class UserServiceImpl implements UserService {
         List<User> all = userRepository.findAll();
         List<User> newList = new ArrayList<>();
         for (User user : all) {
-           if(!user.getRole().equals(Role.ADMIN)){
-               newList.add(user);
-           }
+            if (!user.getRole().equals(Role.ADMIN)) {
+                newList.add(user);
+            }
         }
         return newList;
     }
@@ -102,15 +103,38 @@ public class UserServiceImpl implements UserService {
         List<User> all = userRepository.findAll();
         List<User> newList = new ArrayList<>();
         for (User user : all) {
-            if(user.getRole().equals(Role.WORKING_GROUP_ADMIN)){
+            if (user.getRole().equals(Role.WORKING_GROUP_ADMIN)) {
                 List<WorkingGroup> workingGroups = workingGroupRepository.findAll();
+                List<User> workingGroupAdmins = new ArrayList<>();
                 for (WorkingGroup workingGroup : workingGroups) {
-                    if(!workingGroup.getWorkingGroupAdmin().equals(user)){
-                       newList.add(user);
-                    }
+                    workingGroupAdmins.add(workingGroup.getWorkingGroupAdmin());
+                }
+                if (!workingGroupAdmins.contains(user)) {
+                    newList.add(user);
                 }
             }
         }
+        return newList;
+    }
+
+    @Override
+    public List<User> allUsersForDiscussionAdminEdit(Long id) {
+        List<User> all = userRepository.findAll();
+        List<User> newList = new ArrayList<>();
+        for (User user : all) {
+            if (user.getRole().equals(Role.WORKING_GROUP_ADMIN)) {
+                List<WorkingGroup> workingGroups = workingGroupRepository.findAll();
+                List<User> workingGroupAdmins = new ArrayList<>();
+                for (WorkingGroup workingGroup : workingGroups) {
+                    workingGroupAdmins.add(workingGroup.getWorkingGroupAdmin());
+                }
+                if (!workingGroupAdmins.contains(user)) {
+                    newList.add(user);
+                }
+            }
+        }
+        Optional<WorkingGroup> byId = workingGroupRepository.findById(id);
+        byId.ifPresent(workingGroup -> newList.add(workingGroup.getWorkingGroupAdmin()));
         return newList;
     }
 
@@ -119,7 +143,7 @@ public class UserServiceImpl implements UserService {
         List<User> all = userRepository.findAll();
         List<User> newList = new ArrayList<>();
         for (User user : all) {
-            if(!user.getRole().equals(Role.ADMIN) && !user.equals(currentUser)){
+            if (!user.getRole().equals(Role.ADMIN) && !user.equals(currentUser)) {
                 newList.add(user);
             }
         }

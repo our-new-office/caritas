@@ -108,14 +108,8 @@
         <header class="header-desktop">
             <div class="section__content section__content--p30">
                 <div class="container-fluid">
-                    <div class="header-wrap">
-                        <form class="form-header" action="" method="POST">
-                            <input class="au-input au-input--xl" type="text" name="search"
-                                   placeholder="Search for datas &amp; reports..."/>
-                            <button class="au-btn--submit" type="submit">
-                                <i class="zmdi zmdi-search"></i>
-                            </button>
-                        </form>
+                    <div class="header-wrap" style="display: flex;justify-content: flex-end">
+
                         <div class="header-button">
                             <div class="account-wrap">
                                 <div class="account-item clearfix js-item-menu">
@@ -137,7 +131,7 @@
                                                     <a href="#">
                                                         <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}"
                                                              th:alt="${currentUser.getName()}"/>
-                                                    </a>                                                </a>
+                                                    </a> </a>
                                             </div>
                                             <div class="content">
                                                 <h5 class="name">
@@ -233,7 +227,20 @@
                                             <div class="col-12 col-md-12">
                                                 <select name="role" id="select" class="form-control">
                                                     <option th:each="role: ${roles}" th:value="${role.name()}"
-                                                            th:text="${role.name()}" th:selected="${user.getRole().name()==role.name()}"></option>
+                                                            th:text="${role.name()}"
+                                                            th:selected="${user.getRole().name()==role.name()}"></option>
+
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="row form-group">
+
+                                            <div class="col-12 col-md-12">
+                                                <select name="status" id="select1" class="form-control">
+                                                    <option th:each="status: ${statuses}" th:value="${status.name()}"
+                                                            th:text="${status.name()}"
+                                                            th:selected="${user.getStatus().name()==status.name()}"></option>
 
                                                 </select>
                                             </div>
@@ -241,7 +248,7 @@
 
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
-                                                <input type="file" name="thumbnail"  class="form-control">
+                                                <input type="file" name="thumbnail" class="form-control">
                                             </div>
                                         </div>
                                         <div class="col-12 col-md-12">
@@ -250,11 +257,11 @@
 
                                         <div class="card-footer">
                                             <button type="submit" class="btn btn-primary btn-sm">
-                                                <i class="fa fa-dot-circle-o"></i> Submit
+                                                <i class="fa fa-dot-circle-o"></i> Հաստատել
                                             </button>
 
                                             <a href="/" type="reset" class="btn btn-danger btn-sm">
-                                                <i class="fa fa-ban"></i> Reset
+                                                <i class="fa fa-ban"></i> Հրաժարվել
                                             </a>
                                         </div>
                                     </form>

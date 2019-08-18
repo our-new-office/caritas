@@ -47,8 +47,8 @@
                 <div class="container-fluid">
                     <div class="header-mobile-inner">
                         <a class="logo" href="/">
-                            <img src="/images/icon/logo.png" alt="CoolAdmin"/>
-                            <img src="img/karitaslogo.jpg" alt="">
+                            <!--<img src="/images/icon/logo.jpg" alt="CoolAdmin"/>-->
+                            <img src="/img/karitaslogo.jpg" alt="">
                         </a>
                         <a href="/" style="color: #dc3545; margin-left: 10px">
                             Caritas Application
@@ -65,12 +65,8 @@
                 <div class="container-fluid">
                     <ul class="navbar-mobile__list list-unstyled">
                         <li class="has-sub">
-                            <a href="/users/user_page">
-                                <i class="fas fa-user"></i>Ստեղծել օգտատեր</a>
-                        </li>
-                        <li>
-                            <a href="/working_groups/working_group_page">
-                                <i class="fas fa-chart-bar"></i>Ստեղծել խումբ</a>
+                            <a href="/">
+                                <i class="fas fa-user"></i>Գլխավոր</a>
                         </li>
                     </ul>
 
@@ -85,7 +81,7 @@
     <aside class="menu-sidebar d-none d-lg-block">
         <div class="logo">
             <a href="/">
-                <img src="img/karitaslogo.jpg" alt="" style="width: 60px">
+                <img src="/img/karitaslogo.jpg" alt="" style="width: 60px">
             </a>
             <a href="/" style="color: #dc3545; margin-left: 10px">
                 Caritas Application
@@ -95,12 +91,8 @@
             <nav class="navbar-sidebar">
                 <ul class="list-unstyled navbar__list">
                     <li class="has-sub">
-                        <a href="/users/user_page">
-                            <i class="fas fa-user"></i>Ստեղծել օգտատեր</a>
-                    </li>
-                    <li>
-                        <a href="/working_groups/working_group_page">
-                            <i class="fas fa-chart-bar"></i>Ստեղծել խումբ</a>
+                        <a href="/">
+                            <i class="fas fa-user"></i>Գլխավոր</a>
                     </li>
                 </ul>
             </nav>
@@ -115,14 +107,8 @@
         <header class="header-desktop">
             <div class="section__content section__content--p30">
                 <div class="container-fluid">
-                    <div class="header-wrap">
-                        <form class="form-header" action="" method="POST">
-                            <input class="au-input au-input--xl" type="text" name="search"
-                                   placeholder="Search for datas &amp; reports..."/>
-                            <button class="au-btn--submit" type="submit">
-                                <i class="zmdi zmdi-search"></i>
-                            </button>
-                        </form>
+                    <div class="header-wrap" style="display: flex;justify-content: flex-end">
+
                         <div class="header-button">
 
                             <div class="account-wrap">
@@ -182,15 +168,15 @@
                                       th:src="@{'/user_discussion/user_discussion_image?discImage='+${discussion.getThumbnail()}}"
                                       alt=""></div>
 
-                            <h4 style="text-align: center" th:if="${discussion.getLinks()!=null}">Links</h4>
+                            <h4 style="text-align: center" th:if="${discussion.getLinks()!=null}">Հղումներ</h4>
                             <div th:each="link: ${discussion.getLinks()}">
                                 <a th:href="@{${link.getUrl()}}" th:text="${link.getUrl()}" target="_blank"
                                    style="display: flex;justify-content: center; padding: 5px"></a>
 
                             </div>
 
-                            <h4 style="text-align: center; margin-top: 20px" th:if="${discussion.getDocuments()!=null}">
-                                DOCUMENTS</h4>
+                            <h4 th:if="${discussion.getDocuments()!=null}" style="text-align: center; margin-top: 20px">
+                                Փաստաթղթեր</h4>
                             <div th:each="document: ${discussion.getDocuments()}">
                                 <a th:href="@{'/user_discussion/discussionFile?file='+ ${document.getUrl()}}"
                                    th:download="${document.getUrl()}" th:text="${document.getUrl()}"
@@ -198,7 +184,7 @@
 
                             </div>
 
-                            <h3 style="text-align: center; margin: 20px auto">User uploades files</h3>
+                            <h3 style="text-align: center; margin: 20px auto">Խմբակիցների վերբեռնած փաստաթղթեր</h3>
                             <ul class="list-unstyled navbar__list" id="hrefs" style="text-align: center">
                             </ul>
 
@@ -206,7 +192,7 @@
                             <div style="width: 100%">
                                 <div class="row "
                                      style="padding-top:40px;background: #fff; display: block; margin: 5px auto;">
-                                    <h3 class="text-center">Discussion</h3>
+                                    <h3 class="text-center">Քննարկումներ</h3>
 
                                     <ul id="chat"
                                         style="border: 1px solid silver; height: 250px; width: 100%; overflow-y: scroll">
@@ -221,7 +207,7 @@
                                                    th:value="${discussion.getId()}">
                                             <br>
                                             <button type="button" id="send" class="btn btn-info"
-                                                    style="margin-bottom: 50px">Send
+                                                    style="margin-bottom: 50px">Ուղարկել
                                             </button>
 
                                         </form>
@@ -231,7 +217,7 @@
                                               enctype="multipart/form-data">
                                             <input type='file' name="img" id='file' multiple="multiple">
                                             <input type="hidden" th:value="${discussion.getId()}" name="discId">
-                                            <button type="submit" class="btn btn-warning" onclick="uplaod();">Upload
+                                            <button type="submit" class="btn btn-warning" onclick="uplaod();">Վերբեռնել
                                             </button>
                                         </form>
                                     </div>

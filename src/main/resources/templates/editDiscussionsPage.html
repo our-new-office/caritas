@@ -92,10 +92,18 @@
                         <a href="/">
                             <i class="fas fa-user"></i>Գլխավոր</a>
                     </li>
-                    <li>
-                        <a href="/working_groups/working_group_page">
-                            <i class="fas fa-chart-bar"></i>Դեպի զրուցարան</a>
+
+                </ul>
+
+                <ul class="list-unstyled navbar__list">
+
+                    <hr>
+                    <h4 th:if="${discussionsForGroupAdmin.size()>0}">Ձեր զրուցարանները</h4>
+                    <li class="has-sub" th:each="discussion:${discussionsForGroupAdmin}">
+                        <a th:href="@{'/user_discussion/discussion/'+${discussion.getId()}}" th:text="${discussion.getTitle()}">
+                            <i class="fas fa-user"></i>Գլխավոր</a>
                     </li>
+
                 </ul>
             </nav>
         </div>
@@ -156,14 +164,13 @@
 
                     <div class="row">
                         <div class="col-md-12">
-                            <h3 class="title-5 m-b-35">Զրույցի ստեղծում</h3>
+                            <h3 class="title-5 m-b-35">Զրույցի փոփոխություն</h3>
 
                             <div class="card">
                                 <div class="card-header">
-                                    <h4>Զրույցի ստեղծման ինֆորմացիա</h4>
+                                    <h4>Զրույցի փոփոխման ինֆորմացիա</h4>
                                 </div>
                                 <div class="card-body">
-                                    <p class="text-muted m-b-15">Զրույց ստեղծելու համար բավական է մուտքագրել ստորև նշված դաշտերը</p>
                                     <div style="font-weight: bold" th:if="${bindingError!=null}"
                                          class="alert alert-danger" th:text="${bindingError}">
                                     </div>
@@ -199,16 +206,16 @@
 
                                                 <input type="text" id="text-input0" name="title" placeholder="Վերնագիր"
                                                        class="form-control" th:if="${oldDiscussion!=null}"
-                                                       th:value="${oldDiscussion.getTitle()}">
+                                                       th:value="${oldDiscussion.getTitle()}" required>
                                                 <input type="text" id="text-input" name="title" th:value="${discussion.getTitle()}" placeholder="Վերնագիր"
-                                                       class="form-control" th:unless="${oldDiscussion!=null}">
+                                                       class="form-control" th:unless="${oldDiscussion!=null}" required>
 
                                             </div>
                                         </div>
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
-                                                <textarea name="description" id="" class="form-control" cols="30" rows="10" th:if="${oldDiscussion!=null}" th:value="${discussion.getDescription()}" th:text="${oldDiscussion.getDescription()}"></textarea>
-                                                <textarea name="description" id="" class="form-control" cols="30" rows="10" th:if="${oldDiscussion==null}" th:value="${discussion.getDescription()}" th:text="${discussion.getDescription()}"></textarea>
+                                                <textarea name="description" id="" class="form-control" cols="30" rows="10" th:if="${oldDiscussion!=null}" th:value="${discussion.getDescription()}" th:text="${oldDiscussion.getDescription()}" required></textarea>
+                                                <textarea name="description" id="" class="form-control" cols="30" rows="10" th:if="${oldDiscussion==null}" th:value="${discussion.getDescription()}" th:text="${discussion.getDescription()}" required></textarea>
 
                                             </div>
                                         </div>
@@ -264,6 +271,7 @@
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
                                                 <!--<input type="hidden" name="usersForDiscussion" th:value="${currentUser.getId()}">-->
+
                                                 <p th:each="user: ${users}">
                                                     <input type="checkbox" name="usersForDiscussion" th:value="${user.getId()}" th:checked="${discussion.getUsers().contains(user)}" style="padding: 2px">
                                                     <span th:text="${user.getName()}"></span>
@@ -274,11 +282,11 @@
 
                                         <div class="card-footer">
                                             <button type="submit" class="btn btn-primary btn-sm">
-                                                <i class="fa fa-dot-circle-o"></i> Submit
+                                                <i class="fa fa-dot-circle-o"></i> Հաստատել
                                             </button>
 
                                             <a href="/" type="reset" class="btn btn-danger btn-sm" id="more">
-                                                <i class="fa fa-ban"></i> Reset
+                                                <i class="fa fa-ban"></i> Հրաժարվել
                                             </a>
                                         </div>
                                     </form>

@@ -67,6 +67,8 @@ public interface UserService {
 
     List<User> allUsersForDiscussionAdmin();
 
+    List<User> allUsersForDiscussionAdminEdit(Long id);
+
     List<User> allUsersForDiscussion(User currentUser);
 
     Boolean userIsNotBusy(Long id);

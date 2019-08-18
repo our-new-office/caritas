@@ -14,4 +14,5 @@ public class ChatDto {
     private String content;
     private String user;
     private String discussion;
+    private String date;
 }

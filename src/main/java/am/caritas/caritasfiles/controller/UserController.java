@@ -1,10 +1,12 @@
 package am.caritas.caritasfiles.controller;
 
+import am.caritas.caritasfiles.model.Log;
 import am.caritas.caritasfiles.model.User;
 import am.caritas.caritasfiles.model.enums.Role;
+import am.caritas.caritasfiles.model.enums.Status;
+import am.caritas.caritasfiles.repository.LogRepository;
 import am.caritas.caritasfiles.security.CurrentUser;
 import am.caritas.caritasfiles.service.UserService;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,11 +22,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-@Slf4j
 @Controller
 @RequestMapping("/users")
 public class UserController {
@@ -34,10 +33,15 @@ public class UserController {
     @Value("${user.pic.url}")
     private String userPicUrl;
 
+    private final UUID uuid = UUID.randomUUID();
+
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, LogRepository logRepository) {
         this.userService = userService;
+        this.logRepository = logRepository;
     }
+
+    private final LogRepository logRepository;
 
     /**
      * Returns createUser page
@@ -53,11 +57,22 @@ public class UserController {
             if (currentUser.getUser().getRole().equals(Role.ADMIN)) {
                 List<Role> roles = Arrays.asList(Role.values());
                 modelMap.addAttribute("roles", roles);
-                log.info("Create User page loaded");
+                Log log = Log.builder()
+                        .user(currentUser.getUser().getName())
+                        .date(new Date())
+                        .action("Մուտք օգտագործող սարքելու էջ")
+                        .build();
+                logRepository.save(log);
                 return "createUser";
             }
         }
-        log.error("Unauthorized user, redirect login page");
+        Log log = Log.builder()
+                .user("Մուտք չգործած օգտատեր")
+                .date(new Date())
+                .action("Վերադարձ մուտքի էջ")
+                .build();
+        logRepository.save(log);
+
         return "redirect:/login?error=unauthorized";
     }
 
@@ -75,19 +90,29 @@ public class UserController {
             modelMap.addAttribute("currentUser", currentUser.getUser());
             if (currentUser.getUser().getRole().equals(Role.ADMIN)) {
                 List<Role> roles = Arrays.asList(Role.values());
+                List<Status> statuses = Arrays.asList(Status.values());
                 Optional<User> byId = userService.findById(id);
                 if (byId.isPresent()) {
                     User user = byId.get();
                     modelMap.addAttribute("user", user);
-                } else {
-                    log.warn("No such user to edit");
                 }
                 modelMap.addAttribute("roles", roles);
-                log.info("Update User page loaded");
+                modelMap.addAttribute("statuses", statuses);
+                Log log = Log.builder()
+                        .user(currentUser.getUser().getName())
+                        .date(new Date())
+                        .action("Մուտք Օգտագերծողի տվյալների փոփոխման էջ")
+                        .build();
+                logRepository.save(log);
                 return "editUser";
             }
         }
-        log.error("Unauthorized user, redirect login page");
+        Log log = Log.builder()
+                .user("Մուտք չգործած օգտատեր")
+                .date(new Date())
+                .action("Վերադարձ մուտքի էջ")
+                .build();
+        logRepository.save(log);
         return "redirect:/login?error=unauthorized";
     }
 
@@ -107,6 +132,7 @@ public class UserController {
                              @RequestParam("thumbnail") MultipartFile multipartFile) {
         modelMap.addAttribute("currentUser", currentUser.getUser());
         List<Role> roles = Arrays.asList(Role.values());
+        List<Status> statuses = Arrays.asList(Status.values());
         boolean error = false;
         String bindingError = null;
         String nameError = null;
@@ -136,7 +162,13 @@ public class UserController {
             modelMap.addAttribute("oldUser", user);
             modelMap.addAttribute("notUnique", notUnique);
             modelMap.addAttribute("roles", roles);
-            log.info("Something went wrong, returning to user registration page again");
+            modelMap.addAttribute("statuses", statuses);
+            Log log = Log.builder()
+                    .user(currentUser.getUser().getName())
+                    .date(new Date())
+                    .action("Սխալ տվյալներ, վարադարձ օգտագործող ստեղծելու էջ")
+                    .build();
+            logRepository.save(log);
             return "createUser";
         }
         File dir = new File(userPicUrl);
@@ -144,6 +176,7 @@ public class UserController {
             dir.mkdirs();
         }
         String userImage = multipartFile.getOriginalFilename();
+        userImage = uuid + userImage;
         try {
             multipartFile.transferTo(new File(dir, userImage));
         } catch (IOException e) {
@@ -151,7 +184,12 @@ public class UserController {
         }
         user.setAvatar(userImage);
         userService.saveUser(user);
-
+        Log log = Log.builder()
+                .user(currentUser.getUser().getName())
+                .date(new Date())
+                .action(user.getName() + " անունով օգտագործողը ստեղծված է")
+                .build();
+        logRepository.save(log);
         return "redirect:/";
     }
 
@@ -161,6 +199,7 @@ public class UserController {
                              @RequestParam("thumbnail") MultipartFile multipartFile) {
         modelMap.addAttribute("currentUser", currentUser.getUser());
         List<Role> roles = Arrays.asList(Role.values());
+        List<Status> statuses = Arrays.asList(Status.values());
         boolean error = false;
         String bindingError = null;
         String nameError = null;
@@ -190,7 +229,13 @@ public class UserController {
             modelMap.addAttribute("oldUser", user);
             modelMap.addAttribute("notUnique", notUnique);
             modelMap.addAttribute("roles", roles);
-            log.info("Something went wrong, returning to user registration page again");
+            modelMap.addAttribute("statuses", statuses);
+            Log log = Log.builder()
+                    .user(currentUser.getUser().getName())
+                    .date(new Date())
+                    .action("Սխալ տվյալներ, վերադարձ օգտագերծողի փոփոխման էջ")
+                    .build();
+            logRepository.save(log);
             return "editUser";
         }
 
@@ -202,6 +247,7 @@ public class UserController {
             }
             if (!multipartFile.isEmpty()) {
                 String userImage = multipartFile.getOriginalFilename();
+                userImage = uuid + userImage;
                 try {
                     multipartFile.transferTo(new File(dir, userImage));
                 } catch (IOException e) {
@@ -213,8 +259,15 @@ public class UserController {
             userForSave.setEmail(user.getEmail());
             userForSave.setName(user.getName());
             userForSave.setRole(user.getRole());
+            userForSave.setStatus(user.getStatus());
             userService.updateUser(userForSave);
         }
+        Log log = Log.builder()
+                .user(currentUser.getUser().getName())
+                .date(new Date())
+                .action(user.getName() + " օգտագերծողը փոփոխված է")
+                .build();
+        logRepository.save(log);
         return "redirect:/";
     }
 
@@ -236,13 +289,25 @@ public class UserController {
         Optional<User> byId = userService.findById(id);
         if (byId.isPresent()) {
             if (!byId.get().getRole().equals(Role.ADMIN)) {
+                String name = byId.get().getName();
                 if (userService.userIsNotBusy(id)) {
                     userService.deleteById(id);
                     File file = new File(userPicUrl + byId.get().getAvatar());
                     file.delete();
                 } else {
+                    Log log = Log.builder()
+                            .user(currentUser.getUser().getName())
+                            .date(new Date())
+                            .action(name + " անունով օգտագերծողը զբաղված է, չի կարող ջնջվել")
+                            .build();
+                    logRepository.save(log);
                     return "redirect:/?userIsBusy=true";
                 }
+                Log log = Log.builder()
+                        .user(currentUser.getUser().getName())
+                        .date(new Date())
+                        .action(name + " անունով օգտագործողը ջնջված է")
+                        .build();
             }
             return "redirect:/";
         }

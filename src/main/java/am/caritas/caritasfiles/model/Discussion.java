@@ -22,7 +22,7 @@ public class Discussion {
     @Column
     private String title;
 
-    @Column
+    @Column(length = 4096)
     private String description;
 
     @Column
