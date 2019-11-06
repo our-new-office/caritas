@@ -101,7 +101,7 @@ p {
 body {
     font-family: "Poppins", sans-serif;
     font-weight: 400;
-    font-size: 20px;
+    font-size: 14px;
     line-height: 1.625;
     color: #666;
     -webkit-font-smoothing: antialiased;
@@ -121,27 +121,27 @@ h6 {
 }
 
 h1 {
-    font-size: 36px;
-}
-
-h2 {
-    font-size: 30px;
-}
-
-h3 {
-    font-size: 26px;
-}
-
-h4 {
-    font-size: 24px;
-}
-
-h5 {
     font-size: 22px;
 }
 
-h6 {
+h2 {
     font-size: 20px;
+}
+
+h3 {
+    font-size: 18px;
+}
+
+h4 {
+    font-size: 16px;
+}
+
+h5 {
+    font-size: 14px;
+}
+
+h6 {
+    font-size: 12px;
 }
 
 blockquote {
@@ -14653,25 +14653,25 @@ section {
 }
 
 .table-data3 tbody td{
-    font-size: 20px;
+    font-size: 12px;
 }
 
 .block-email{
-    font-size: 20px;
+    font-size: 12px;
 }
 
 .navbar-sidebar .navbar__list li a{
-    font-size: 20px;
+    font-size: 14px;
 }
 
 @media (min-width:991px) {
 
     .header-desktop{
-        left: 360px;
+        left: 280px;
     }
 
     .menu-sidebar{
-        width: 360px;
+        width: 280px;
     }
 
     .section__content--p30{
@@ -14688,7 +14688,7 @@ section {
 td{vertical-align: middle!important;}
 
 .js-item-menu>a{
-    width: 50px!important;
+    width: 30px!important;
     height: auto;
 }
 
@@ -14698,7 +14698,6 @@ td{vertical-align: middle!important;}
 }
 
 .image img{
-    max-width: 100px;
     height: auto;
 }
 
@@ -14709,4 +14708,131 @@ input[type='checkbox'] {
     /*background:white;*/
     border-radius:5px;
     border:2px solid #555;
+}
+
+.table-data3 tbody td{
+    padding: 5px 20px;
+}
+
+@media (min-width: 991px){
+    .section__content--p30 {
+        left: 0;
+    }
+}
+
+.section__content--p30 {
+     padding: 0;
+}
+
+.table-data3 thead tr th {
+    font-size: 12px;
+    color: #fff;
+    font-weight: 400;
+    text-transform: capitalize;
+    padding: 18px 20px;
+     padding-right: 0;
+}
+
+.table-data3 tbody td {
+    font-size: 14px;
+    text-align: center;
+}
+
+.table-data3 tbody td {
+    padding: 5px;
+}
+
+.form-control{
+    font-size: 14px;
+}
+
+button{
+    font-size: 12px!important;
+}
+
+a[type=reset]{
+    font-size: 12px!important;
+}
+
+.image img{
+    width: 100px;
+}
+
+.table-data3 thead tr th{
+    text-align: center;
+}
+
+.pagination{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination a{
+    display: block;
+    padding: 5px 10px;
+    border-radius:5px!important;
+    background: #dc3545;
+    margin: 5px;
+    color: #ffffff;
+
+}
+
+.current{
+    display: block;
+    padding: 5px 10px;
+    border-radius:5px!important;
+    background: #00aced;
+    margin: 5px;
+    color: #ffffff;
+}
+
+/* Removes the clear button from date inputs */
+input[type="date"]::-webkit-clear-button {
+    display: none;
+}
+
+/* Removes the spin button */
+input[type="date"]::-webkit-inner-spin-button {
+    display: none;
+}
+
+/* Always display the drop down caret */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    color: #2c3e50;
+}
+
+/* A few custom styles for date inputs */
+input[type="date"]{
+    appearance: none;
+    -webkit-appearance: none;
+    color: #95a5a6;
+    font-family: "Helvetica", arial, sans-serif;
+    font-size: 18px;
+    border:1px solid #ecf0f1;
+    background:#ecf0f1;
+    padding:7px;
+    display: inline-block !important;
+    visibility: visible !important;
+    margin-right: 10px;
+}
+
+input[type="date"], focus {
+    color: #95a5a6;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+}
+
+.searchInput {
+    color: #95a5a6;
+    font-family: "Helvetica", arial, sans-serif;
+    font-size: 18px;
+    border:1px solid #ecf0f1;
+    background:#ecf0f1;
+    padding:7px;
+    display: inline-block !important;
+    visibility: visible !important;
+    margin-right: 10px;
 }
