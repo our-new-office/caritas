@@ -15,5 +15,7 @@ public interface UserDiscussionWorkingGroupRepository extends JpaRepository<User
 
     List<UserDiscussionWorkingGroup> findAllByWorkingGroupId(Long id);
 
+    UserDiscussionWorkingGroup findByUserId(Long id);
+
     Boolean existsByUserId(Long id);
 }

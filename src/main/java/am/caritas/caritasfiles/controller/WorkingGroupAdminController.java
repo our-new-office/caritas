@@ -47,8 +47,9 @@ public class WorkingGroupAdminController {
     private final WorkingGroupRepository workingGroupRepository;
     private final UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository;
     private final ChatRepository chatRepository;
+    private final UserDiscussionFilesRepository userDiscussionFilesRepository;
 
-    public WorkingGroupAdminController(LogRepository logRepository, DiscussionService discussionService, UserService userService, FileRepository fileRepository, DiscussionRepository discussionRepository, LinkRepository linkRepository, WorkingGroupService workingGroupService, WorkingGroupRepository workingGroupRepository, UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository, ChatRepository chatRepository) {
+    public WorkingGroupAdminController(LogRepository logRepository, DiscussionService discussionService, UserService userService, FileRepository fileRepository, DiscussionRepository discussionRepository, LinkRepository linkRepository, WorkingGroupService workingGroupService, WorkingGroupRepository workingGroupRepository, UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository, ChatRepository chatRepository, UserDiscussionFilesRepository userDiscussionFilesRepository) {
         this.logRepository = logRepository;
         this.discussionService = discussionService;
         this.userService = userService;
@@ -59,6 +60,7 @@ public class WorkingGroupAdminController {
         this.workingGroupRepository = workingGroupRepository;
         this.userDiscussionWorkingGroupRepository = userDiscussionWorkingGroupRepository;
         this.chatRepository = chatRepository;
+        this.userDiscussionFilesRepository = userDiscussionFilesRepository;
     }
 
     @GetMapping("/create_discussion")
@@ -267,7 +269,7 @@ public class WorkingGroupAdminController {
                     Log log = Log.builder()
                             .user(currentUser.getUser().getName())
                             .date(new Date())
-                            .action("Մուտք "+ byId.get().getTitle() +" զրույցի փոփոխման էջ")
+                            .action("Մուտք " + byId.get().getTitle() + " զրույցի փոփոխման էջ")
                             .build();
                     logRepository.save(log);
                 }
@@ -375,7 +377,7 @@ public class WorkingGroupAdminController {
                         String url = link.getUrl();
                         url = url.trim();
 
-                        if (!url.equals("") && link!=null) {
+                        if (!url.equals("") && link != null) {
                             Link newLink = Link.builder()
                                     .url(url)
                                     .build();
@@ -461,8 +463,6 @@ public class WorkingGroupAdminController {
             discussionRepository.save(discussionFromRepo);
 
 
-
-
             discussionFromRepo.setDocuments(changedDocuments);
             discussionRepository.save(discussionFromRepo);
 
@@ -536,7 +536,7 @@ public class WorkingGroupAdminController {
         Log log = Log.builder()
                 .user(currentUser.getUser().getName())
                 .date(new Date())
-                .action(discussion.getTitle() +" զրույցի փոփոխում")
+                .action(discussion.getTitle() + " զրույցի փոփոխում")
                 .build();
         logRepository.save(log);
         return "redirect:/";
@@ -544,10 +544,10 @@ public class WorkingGroupAdminController {
 
     @GetMapping("/delete/{id}")
     @Transactional
-    public String deleteDiscussion(@PathVariable Long id, @AuthenticationPrincipal CurrentUser currentUser){
+    public String deleteDiscussion(@PathVariable Long id, @AuthenticationPrincipal CurrentUser currentUser) {
 
         Optional<Discussion> byId = discussionRepository.findById(id);
-        if(byId.isPresent()){
+        if (byId.isPresent()) {
             Discussion discussion = byId.get();
             List<Document> documents = discussion.getDocuments();
             String name = byId.get().getTitle();
@@ -561,12 +561,10 @@ public class WorkingGroupAdminController {
             discussion.setLinks(null);
             discussion.setChats(null);
             discussion.setWorkingGroup(null);
-            discussionRepository.delete(discussion);
 
             for (Link link : links) {
                 linkRepository.delete(link);
             }
-
 
             for (Chat chat : chats) {
                 chatRepository.delete(chat);
@@ -579,14 +577,29 @@ public class WorkingGroupAdminController {
             }
 
             String thumbnail = discussion.getThumbnail();
-            File file = new File(discussionThumbUrl+thumbnail);
-            if(!thumbnail.equals("1.jpg")){
+            File file = new File(discussionThumbUrl + thumbnail);
+            if (!thumbnail.equals("1.jpg")) {
                 file.delete();
             }
+
+            List<Chat> allByDiscussionIdOrderByIdDesc = chatRepository.findAllByDiscussionIdOrderByIdDesc(discussion.getId());
+            allByDiscussionIdOrderByIdDesc.forEach(chat -> {
+                chat.setDiscussion(null);
+                chatRepository.save(chat);
+                chatRepository.delete(chat);
+            });
+            userDiscussionFilesRepository.findAllByDiscussionId(discussion.getId()).forEach(userDiscussionFiles -> {
+                userDiscussionFiles.setDiscussion(null);
+                userDiscussionFilesRepository.save(userDiscussionFiles);
+                userDiscussionFilesRepository.delete(userDiscussionFiles);
+            });
+            discussionRepository.save(discussion);
+            discussionRepository.delete(discussion);
+
             Log log = Log.builder()
                     .user(currentUser.getUser().getName())
                     .date(new Date())
-                    .action(name +" վերնագրով զրույցի ջնջում")
+                    .action(name + " վերնագրով զրույցի ջնջում")
                     .build();
             logRepository.save(log);
 

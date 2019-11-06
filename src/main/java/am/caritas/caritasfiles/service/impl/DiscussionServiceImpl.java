@@ -1,9 +1,9 @@
 package am.caritas.caritasfiles.service.impl;
 
-import am.caritas.caritasfiles.model.Discussion;
-import am.caritas.caritasfiles.model.User;
-import am.caritas.caritasfiles.model.UserDiscussionWorkingGroup;
+import am.caritas.caritasfiles.model.*;
+import am.caritas.caritasfiles.repository.ChatRepository;
 import am.caritas.caritasfiles.repository.DiscussionRepository;
+import am.caritas.caritasfiles.repository.UserDiscussionFilesRepository;
 import am.caritas.caritasfiles.repository.UserDiscussionWorkingGroupRepository;
 import am.caritas.caritasfiles.service.DiscussionService;
 import org.springframework.stereotype.Service;
@@ -16,10 +16,17 @@ public class DiscussionServiceImpl implements DiscussionService {
 
     private final DiscussionRepository discussionRepository;
     private final UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository;
+    private final ChatRepository chatRepository;
+    private final UserDiscussionFilesRepository userDiscussionFilesRepository;
 
-    public DiscussionServiceImpl(DiscussionRepository discussionRepository, UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository) {
+    public DiscussionServiceImpl(DiscussionRepository discussionRepository,
+                                 UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository,
+                                 ChatRepository chatRepository,
+                                 UserDiscussionFilesRepository userDiscussionFilesRepository) {
         this.discussionRepository = discussionRepository;
         this.userDiscussionWorkingGroupRepository = userDiscussionWorkingGroupRepository;
+        this.chatRepository = chatRepository;
+        this.userDiscussionFilesRepository = userDiscussionFilesRepository;
     }
 
     @Override
@@ -56,5 +63,15 @@ public class DiscussionServiceImpl implements DiscussionService {
         }
         return allForDiscussion;
 
+    }
+
+    @Override
+    public void save(Discussion discussion) {
+        discussionRepository.save(discussion);
+    }
+
+    @Override
+    public void delete(Discussion discussion) {
+        discussionRepository.delete(discussion);
     }
 }

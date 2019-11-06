@@ -1,12 +1,13 @@
 package am.caritas.caritasfiles.service.impl;
 
 import am.caritas.caritasfiles.dto.WorkingGroupDto;
+import am.caritas.caritasfiles.model.Discussion;
 import am.caritas.caritasfiles.model.User;
-import am.caritas.caritasfiles.model.UserDiscussionWorkingGroup;
 import am.caritas.caritasfiles.model.WorkingGroup;
-import am.caritas.caritasfiles.repository.UserDiscussionWorkingGroupRepository;
+import am.caritas.caritasfiles.repository.ChatRepository;
 import am.caritas.caritasfiles.repository.UserRepository;
 import am.caritas.caritasfiles.repository.WorkingGroupRepository;
+import am.caritas.caritasfiles.service.DiscussionService;
 import am.caritas.caritasfiles.service.WorkingGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,11 +20,18 @@ import java.util.Optional;
 public class WorkingGroupServiceImpl implements WorkingGroupService {
     private final WorkingGroupRepository workingGroupRepository;
     private final UserRepository userRepository;
+    private final DiscussionService discussionService;
+    private final ChatRepository chatRepository;
 
     @Autowired
-    public WorkingGroupServiceImpl(WorkingGroupRepository workingGroupRepository, UserRepository userRepository) {
+    public WorkingGroupServiceImpl(WorkingGroupRepository workingGroupRepository,
+                                   UserRepository userRepository,
+                                   DiscussionService discussionService,
+                                   ChatRepository chatRepository) {
         this.workingGroupRepository = workingGroupRepository;
         this.userRepository = userRepository;
+        this.discussionService = discussionService;
+        this.chatRepository = chatRepository;
     }
 
     @Override
@@ -40,7 +48,7 @@ public class WorkingGroupServiceImpl implements WorkingGroupService {
     public void saveWorkingGroup(WorkingGroupDto workingGroupDto) {
         Long workingGroupAdminId = workingGroupDto.getUserId();
         Optional<User> workingGroupAdminById = userRepository.findById(workingGroupAdminId);
-        if(workingGroupAdminById.isPresent()){
+        if (workingGroupAdminById.isPresent()) {
             WorkingGroup workingGroup = WorkingGroup.builder()
                     .title(workingGroupDto.getTitle())
                     .description(workingGroupDto.getDescription())
@@ -59,6 +67,17 @@ public class WorkingGroupServiceImpl implements WorkingGroupService {
 
     @Override
     public void deleteById(Long id) {
+        List<Discussion> allByWorkingGroupId = discussionService.findAllByWorkingGroupId(id);
+        for (Discussion discussion : allByWorkingGroupId) {
+            discussion.setWorkingGroup(null);
+            discussionService.save(discussion);
+            chatRepository.findAllByDiscussionIdOrderByIdDesc(discussion.getId()).forEach(chat -> {
+                chat.setDiscussion(null);
+                chat.setUser(null);
+                chatRepository.delete(chat);
+            });
+            discussionService.delete(discussion);
+        }
         workingGroupRepository.deleteById(id);
     }
 

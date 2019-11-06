@@ -1,10 +1,9 @@
 package am.caritas.caritasfiles.controller;
 
-import am.caritas.caritasfiles.model.Log;
-import am.caritas.caritasfiles.model.User;
+import am.caritas.caritasfiles.model.*;
 import am.caritas.caritasfiles.model.enums.Role;
 import am.caritas.caritasfiles.model.enums.Status;
-import am.caritas.caritasfiles.repository.LogRepository;
+import am.caritas.caritasfiles.repository.*;
 import am.caritas.caritasfiles.security.CurrentUser;
 import am.caritas.caritasfiles.service.UserService;
 import org.apache.commons.io.IOUtils;
@@ -29,15 +28,42 @@ import java.util.*;
 public class UserController {
 
     private final UserService userService;
+    private final DiscussionRepository discussionRepository;
+    private final UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository;
+    private final ChatRepository chatRepository;
+    private final LinkRepository linkRepository;
+    private final FileRepository fileRepository;
+    private final UserDiscussionFilesRepository userDiscussionFilesRepository;
+    private final WorkingGroupRepository workingGroupRepository;
 
     @Value("${user.pic.url}")
     private String userPicUrl;
 
+    @Value("${discussion.pic.url}")
+    private String discussionThumbUrl;
+
+    @Value("${discussion.file.url}")
+    private String discussionFilesUrl;
+
     private final UUID uuid = UUID.randomUUID();
 
     @Autowired
-    public UserController(UserService userService, LogRepository logRepository) {
+    public UserController(UserService userService,
+                          DiscussionRepository discussionRepository,
+                          UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository,
+                          ChatRepository chatRepository,
+                          LinkRepository linkRepository,
+                          FileRepository fileRepository,
+                          UserDiscussionFilesRepository userDiscussionFilesRepository,
+                          WorkingGroupRepository workingGroupRepository, LogRepository logRepository) {
         this.userService = userService;
+        this.discussionRepository = discussionRepository;
+        this.userDiscussionWorkingGroupRepository = userDiscussionWorkingGroupRepository;
+        this.chatRepository = chatRepository;
+        this.linkRepository = linkRepository;
+        this.fileRepository = fileRepository;
+        this.userDiscussionFilesRepository = userDiscussionFilesRepository;
+        this.workingGroupRepository = workingGroupRepository;
         this.logRepository = logRepository;
     }
 
@@ -194,7 +220,7 @@ public class UserController {
     }
 
     @PostMapping("/user/update")
-    public String ubdateUser(@Valid User user, BindingResult result, ModelMap modelMap,
+    public String updateUser(@Valid User user, BindingResult result, ModelMap modelMap,
                              @AuthenticationPrincipal CurrentUser currentUser,
                              @RequestParam("thumbnail") MultipartFile multipartFile) {
         modelMap.addAttribute("currentUser", currentUser.getUser());
@@ -258,6 +284,70 @@ public class UserController {
             User userForSave = optionalUser.get();
             userForSave.setEmail(user.getEmail());
             userForSave.setName(user.getName());
+            if (userForSave.getRole().equals(Role.WORKING_GROUP_ADMIN)) {
+
+                Optional<WorkingGroup> byWorkingGroupAdminId = workingGroupRepository.findByWorkingGroupAdminId(userForSave.getId());
+                if (byWorkingGroupAdminId.isPresent()) {
+                    List<Discussion> allByWorkingGroupId = discussionRepository.findAllByWorkingGroupId(byWorkingGroupAdminId.get().getId());
+
+                    for (Discussion discussion : allByWorkingGroupId) {
+
+                        List<Document> documents = discussion.getDocuments();
+                        List<Link> links = discussion.getLinks();
+                        List<User> users = discussion.getUsers();
+                        List<Chat> chats = discussion.getChats();
+
+
+
+
+
+
+
+                        String thumbnail = discussion.getThumbnail();
+                        File file = new File(discussionThumbUrl + thumbnail);
+                        if (!thumbnail.equals("1.jpg")) {
+                            file.delete();
+                        }
+
+                        List<Chat> allByDiscussionIdOrderByIdDesc = chatRepository.findAllByDiscussionIdOrderByIdDesc(discussion.getId());
+                        allByDiscussionIdOrderByIdDesc.forEach(chat -> {
+                            chat.setDiscussion(null);
+                            chatRepository.save(chat);
+                            chatRepository.delete(chat);
+                        });
+                        userDiscussionFilesRepository.findAllByDiscussionId(discussion.getId()).forEach(userDiscussionFiles -> {
+                            userDiscussionFiles.setDiscussion(null);
+                            userDiscussionFilesRepository.save(userDiscussionFiles);
+                            userDiscussionFilesRepository.delete(userDiscussionFiles);
+                        });
+                        discussionRepository.save(discussion);
+                        discussionRepository.delete(discussion);
+
+                        discussion.setDocuments(null);
+                        discussion.setLinks(null);
+                        discussion.setWorkingGroup(null);
+                        discussion.setUsers(null);
+                        discussion.setChats(null);
+                        discussion.setDocuments(null);
+                        discussionRepository.save(discussion);
+                        discussionRepository.delete(discussion);
+
+                        for (Link link : links) {
+                            linkRepository.delete(link);
+                        }
+
+                        for (Document document : documents) {
+                            File fileDel = new File(discussionFilesUrl + document.getUrl());
+                            fileDel.delete();
+                            fileRepository.delete(document);
+                        }
+                    }
+
+                }
+
+
+            }
+
             userForSave.setRole(user.getRole());
             userForSave.setStatus(user.getStatus());
             userService.updateUser(userForSave);
