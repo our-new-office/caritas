@@ -12,7 +12,7 @@ public interface LogRepository extends JpaRepository<Log, Long> {
 
     Page<Log> findAll(Pageable pageable);
 
-    List<Log> findAllByDateAfterAndDateBeforeOrderByIdDesc(Date startDate, Date date);
+    List<Log> findAllByDateBetween(Date startDate, Date date);
 
     List<Log> findAllByUserIgnoreCaseContainingOrderByIdDesc(String user);
 

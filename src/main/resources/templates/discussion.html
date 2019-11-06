@@ -98,16 +98,16 @@
                     <!--</li>-->
                 </ul>
 
-                <ul class="list-unstyled navbar__list">
+                <!--<ul class="list-unstyled navbar__list">-->
 
-                    <hr>
-                    <h4 th:if="${discussions.size()>0}">Ձեր զրուցարանները</h4>
-                    <li class="has-sub" th:each="discussion:${discussions}">
-                        <a th:href="@{'/user_discussion/discussion/'+${discussion.getId()}}" th:text="${discussion.getTitle()}">
-                            <i class="fas fa-user"></i>Գլխավոր</a>
-                    </li>
+                    <!--<hr>-->
+                    <!--<h4 th:if="${discussions.size()>0}">Ձեր զրուցարանները</h4>-->
+                    <!--<li class="has-sub" th:each="discussion:${discussions}">-->
+                        <!--<a th:href="@{'/user_discussion/discussion/'+${discussion.getId()}}" th:text="${discussion.getTitle()}">-->
+                            <!--<i class="fas fa-user"></i>Գլխավոր</a>-->
+                    <!--</li>-->
 
-                </ul>
+                <!--</ul>-->
             </nav>
         </div>
     </aside>

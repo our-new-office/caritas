@@ -2,10 +2,8 @@ package am.caritas.caritasfiles.controller;
 
 import am.caritas.caritasfiles.model.Discussion;
 import am.caritas.caritasfiles.model.Log;
-import am.caritas.caritasfiles.model.WorkingGroup;
 import am.caritas.caritasfiles.repository.DiscussionRepository;
 import am.caritas.caritasfiles.repository.LogRepository;
-import am.caritas.caritasfiles.repository.WorkingGroupRepository;
 import am.caritas.caritasfiles.security.CurrentUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,7 +20,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -31,13 +32,11 @@ import java.util.stream.IntStream;
 public class LogController {
 
     private final LogRepository logRepository;
-    private final WorkingGroupRepository workingGroupRepository;
     private final DiscussionRepository discussionRepository;
 
 
-    public LogController(LogRepository logRepository, WorkingGroupRepository workingGroupRepository, DiscussionRepository discussionRepository) {
+    public LogController(LogRepository logRepository, DiscussionRepository discussionRepository) {
         this.logRepository = logRepository;
-        this.workingGroupRepository = workingGroupRepository;
         this.discussionRepository = discussionRepository;
     }
 
@@ -115,7 +114,7 @@ public class LogController {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        List<Log> allByDateAfterAndDateBefore = logRepository.findAllByDateAfterAndDateBeforeOrderByIdDesc(datee, dtDate);
+        List<Log> allByDateAfterAndDateBefore = logRepository.findAllByDateBetween(datee, dtDate);
         modelMap.addAttribute("logs", allByDateAfterAndDateBefore);
         return "search";
 
