@@ -22,15 +22,24 @@ public class Discussion {
     @Column
     private String title;
 
-    @Column
+    @Column(length = 4096)
     private String description;
 
     @Column
     private String thumbnail;
 
     @ManyToMany
-    private List<File> files;
+    private List<Document> documents;
+
+    @ManyToMany
+    private List<Link> links;
 
     @ManyToMany
     private List<Chat> chats;
+
+    @ManyToMany
+    private List<User> users;
+
+    @ManyToOne
+    private WorkingGroup workingGroup;
 }

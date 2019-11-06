@@ -19,11 +19,11 @@ public class Chat {
     private Long id;
 
     @ManyToOne
-    private User userFrom;
+    private User user;
 
     @ManyToOne
-    private User userTo;
+    private Discussion discussion;
 
-    @Column
+    @Column(length = 4069)
     private String content;
 }

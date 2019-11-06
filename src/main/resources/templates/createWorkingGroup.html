@@ -35,7 +35,7 @@
 
 </head>
 
-<body class="animsition">
+<body>
 <div class="page-wrapper">
     <!-- HEADER MOBILE-->
     <header class="header-mobile d-block d-lg-none">
@@ -44,7 +44,7 @@
                 <div class="header-mobile-inner">
                     <div class="logo">
                         <a href="/">
-                            <img src="/img/karitaslogo.png" alt="" style="width: 60px">
+                            <img src="/img/karitaslogo.jpg" alt="" style="width: 60px">
                         </a>
                         <a href="/" style="color: #dc3545; margin-left: 10px">
                             Caritas Application
@@ -62,7 +62,7 @@
             <div class="container-fluid">
                 <ul class="navbar-mobile__list list-unstyled">
                     <li class="has-sub">
-                        <a class="js-arrow" href="/users/user_page">
+                        <a href="/users/user_page">
                             <i class="fas fa-user"></i>Ստեղծել օգտատեր</a>
                     </li>
                     <li>
@@ -79,7 +79,7 @@
     <aside class="menu-sidebar d-none d-lg-block">
         <div class="logo">
             <a href="/">
-                <img src="/img/karitaslogo.png" alt="" style="width: 60px">
+                <img src="/img/karitaslogo.jpg" alt="" style="width: 60px">
             </a>
             <a href="/" style="color: #dc3545; margin-left: 10px">
                 Caritas Application
@@ -88,8 +88,8 @@
         <div class="menu-sidebar__content js-scrollbar1">
             <nav class="navbar-sidebar">
                 <ul class="list-unstyled navbar__list">
-                    <li class="has-sub">
-                        <a class="js-arrow" href="/users/user_page">
+                    <li>
+                        <a href="/users/user_page">
                             <i class="fas fa-user"></i>Ստեղծել օգտատեր</a>
                     </li>
                     <li>
@@ -97,6 +97,19 @@
                             <i class="fas fa-chart-bar"></i>Ստեղծել խումբ</a>
                     </li>
                 </ul>
+
+                <ul class="list-unstyled navbar__list">
+
+                    <hr>
+                    <h4 th:if="${discussions!=null && discussions.size()>0}">Ձեր զրուցարանները</h4>
+                    <li class="has-sub" th:each="discussion:${discussions}">
+                        <a th:href="@{'/user_discussion/discussion/'+${discussion.getId()}}"
+                           th:text="${discussion.getTitle()}">
+                            <i class="fas fa-user"></i>Գլխավոր</a>
+                    </li>
+
+                </ul>
+
             </nav>
         </div>
     </aside>
@@ -108,29 +121,26 @@
         <header class="header-desktop">
             <div class="section__content section__content--p30">
                 <div class="container-fluid">
-                    <div class="header-wrap">
-                        <form class="form-header" action="" method="POST">
-                            <input class="au-input au-input--xl" type="text" name="search"
-                                   placeholder="Search for datas &amp; reports..."/>
-                            <button class="au-btn--submit" type="submit">
-                                <i class="zmdi zmdi-search"></i>
-                            </button>
-                        </form>
+                    <div class="header-wrap" style="display: flex; justify-content: flex-end">
+
                         <div class="header-button">
                             <div class="account-wrap">
                                 <div class="account-item clearfix js-item-menu">
                                     <div class="image">
-                                        <img src="/img/no_image_user_profile.png" alt="John Doe"/>
+                                        <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}"
+                                             th:alt="${currentUser.getName()}"/>
                                     </div>
                                     <div class="content">
-                                        <a class="js-acc-btn" href="#" th:text="'Բարի գալուստ ' + ${currentUser.getName()}">john
+                                        <a class="js-acc-btn" href="#"
+                                           th:text="'Բարի գալուստ ' + ${currentUser.getName()}">john
                                             doe</a>
                                     </div>
                                     <div class="account-dropdown js-dropdown">
                                         <div class="info clearfix">
                                             <div class="image">
                                                 <a href="#">
-                                                    <img src="/img/no_image_user_profile.png" alt="John Doe"/>
+                                                    <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}"
+                                                         th:alt="${currentUser.getName()}"/>
                                                 </a>
                                             </div>
                                             <div class="content">
@@ -169,17 +179,20 @@
                                     <h4>Խմբի ստեղծման ինֆորմացիա</h4>
                                 </div>
                                 <div class="card-body">
-                                    <p class="text-muted m-b-15">Խումբ ստեղծելու համար բավական է մուտքագրել վերնագիր և նկարագրություն</p>
+                                    <p class="text-muted m-b-15">Խումբ ստեղծելու համար բավական է մուտքագրել վերնագիր և
+                                        նկարագրություն</p>
 
 
                                     <div style="font-weight: bold" th:if="${bindingError!=null}"
                                          class="alert alert-success" th:text="${bindingError}">
                                     </div>
 
-                                    <div style="font-weight: bold" th:if="${titleError!=null}" class="alert alert-danger"
+                                    <div style="font-weight: bold" th:if="${titleError!=null}"
+                                         class="alert alert-danger"
                                          th:text="${titleError}">
                                     </div>
-                                    <div style="font-weight: bold" th:if="${descriptionError!=null}" class="alert alert-danger"
+                                    <div style="font-weight: bold" th:if="${descriptionError!=null}"
+                                         class="alert alert-danger"
                                          th:text="${descriptionError}">
                                     </div>
 
@@ -193,7 +206,8 @@
                                     <strong>Խմբի դետալներ</strong>
                                 </div>
                                 <div class="card-body card-block">
-                                    <form action="/working_groups/working_group" method="post" enctype="multipart/form-data"
+                                    <form action="/working_groups/working_group" method="post"
+                                          enctype="multipart/form-data"
                                           class="form-horizontal">
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
@@ -206,10 +220,12 @@
                                         </div>
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
-                                                <input type="text" id="text-input" name="description" placeholder="Նկարագրություն"
+                                                <input type="text" id="text-input" name="description"
+                                                       placeholder="Նկարագրություն"
                                                        class="form-control" th:if="${oldWorkingGroup!=null}"
                                                        th:value="${oldWorkingGroup.getDescription()}">
-                                                <input type="text" id="text-input" name="description" placeholder="Նկարագրություն"
+                                                <input type="text" id="text-input" name="description"
+                                                       placeholder="Նկարագրություն"
                                                        class="form-control" th:unless="${oldWorkingGroup!=null}">
                                             </div>
                                         </div>
@@ -223,17 +239,18 @@
                                                 </select>
                                             </div>
                                         </div>
-
-
-
-
+                                        <div class="row form-group">
+                                            <div class="col-12 col-md-12">
+                                                <input type="file" name="thumbnailWorkingGroup" class="form-control">
+                                            </div>
+                                        </div>
                                         <div class="card-footer">
                                             <button type="submit" class="btn btn-primary btn-sm">
-                                                <i class="fa fa-dot-circle-o"></i> Submit
+                                                <i class="fa fa-dot-circle-o"></i> Հաստատել
                                             </button>
 
                                             <a href="/" type="reset" class="btn btn-danger btn-sm">
-                                                <i class="fa fa-ban"></i> Reset
+                                                <i class="fa fa-ban"></i> Հրաժարվել
                                             </a>
                                         </div>
                                     </form>

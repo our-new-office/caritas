@@ -35,7 +35,7 @@
 
 </head>
 
-<body class="animsition">
+<body>
 <div class="page-wrapper">
     <!-- HEADER MOBILE-->
     <header class="header-mobile d-block d-lg-none">
@@ -44,7 +44,7 @@
                 <div class="header-mobile-inner">
                     <div class="logo">
                         <a href="/">
-                            <img src="/img/karitaslogo.png" alt="" style="width: 60px">
+                            <img src="/img/karitaslogo.jpg" alt="" style="width: 60px">
                         </a>
                         <a href="/" style="color: #dc3545; margin-left: 10px">
                             Caritas Application
@@ -62,7 +62,7 @@
             <div class="container-fluid">
                 <ul class="navbar-mobile__list list-unstyled">
                     <li class="has-sub">
-                        <a class="js-arrow" href="/users/user_page">
+                        <a href="/users/user_page">
                             <i class="fas fa-user"></i>Ստեղծել օգտատեր</a>
                     </li>
                     <li>
@@ -79,7 +79,7 @@
     <aside class="menu-sidebar d-none d-lg-block">
         <div class="logo">
             <a href="/">
-                <img src="/img/karitaslogo.png" alt="" style="width: 60px">
+                <img src="/img/karitaslogo.jpg" alt="" style="width: 60px">
             </a>
             <a href="/" style="color: #dc3545; margin-left: 10px">
                 Caritas Application
@@ -89,13 +89,24 @@
             <nav class="navbar-sidebar">
                 <ul class="list-unstyled navbar__list">
                     <li class="has-sub">
-                        <a class="js-arrow" href="/users/user_page">
+                        <a href="/users/user_page">
                             <i class="fas fa-user"></i>Ստեղծել օգտատեր</a>
                     </li>
                     <li>
                         <a href="/working_groups/working_group_page">
                             <i class="fas fa-chart-bar"></i>Ստեղծել խումբ</a>
                     </li>
+                </ul>
+
+                <ul class="list-unstyled navbar__list">
+
+                    <hr>
+                    <h4 th:if="${discussions.size()>0}">Ձեր զրուցարանները</h4>
+                    <li class="has-sub" th:each="discussion:${discussions}">
+                        <a th:href="@{'/user_discussion/discussion/'+${discussion.getId()}}" th:text="${discussion.getTitle()}">
+                            <i class="fas fa-user"></i>Գլխավոր</a>
+                    </li>
+
                 </ul>
             </nav>
         </div>
@@ -108,19 +119,12 @@
         <header class="header-desktop">
             <div class="section__content section__content--p30">
                 <div class="container-fluid">
-                    <div class="header-wrap">
-                        <form class="form-header" action="" method="POST">
-                            <input class="au-input au-input--xl" type="text" name="search"
-                                   placeholder="Search for datas &amp; reports..."/>
-                            <button class="au-btn--submit" type="submit">
-                                <i class="zmdi zmdi-search"></i>
-                            </button>
-                        </form>
+                    <div class="header-wrap" style="display: flex; justify-content: flex-end;">
                         <div class="header-button">
                             <div class="account-wrap">
                                 <div class="account-item clearfix js-item-menu">
                                     <div class="image">
-                                        <img src="/img/no_image_user_profile.png" alt="John Doe"/>
+                                        <img th:src="@{'/users/userImage?&userImage='+ ${currentUser.getAvatar()}}" alt="John Doe"/>
                                     </div>
                                     <div class="content">
                                         <a class="js-acc-btn" href="#"
@@ -130,9 +134,8 @@
                                     <div class="account-dropdown js-dropdown">
                                         <div class="info clearfix">
                                             <div class="image">
-                                                <a href="#">
-                                                    <img src="/img/no_image_user_profile.png" alt="John Doe"/>
-                                                </a>
+                                                <img th:src="@{'/users/userImage?&userImage='+ ${currentUser.getAvatar()}}" alt="John Doe"/>
+
                                             </div>
                                             <div class="content">
                                                 <h5 class="name">
@@ -199,16 +202,17 @@
                                           enctype="multipart/form-data"
                                           class="form-horizontal">
                                         <input type="hidden" name="id" th:value="${workingGroup.getId()}">
+                                        <input type="hidden" name="thumbnail" th:value="${workingGroup.getThumbnail()}">
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
                                                 <input type="text" id="text-input" name="title" placeholder="Վերնագիր"
-                                                       class="form-control" th:value="${workingGroup.getTitle()}">
+                                                       class="form-control" th:value="${workingGroup.getTitle()}" required>
                                             </div>
                                         </div>
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
                                                 <input type="text" id="text-input1" name="description" placeholder="Նկարագրություն"
-                                                       class="form-control" th:value="${workingGroup.getDescription()}">
+                                                       class="form-control" th:value="${workingGroup.getDescription()}" required>
                                             </div>
                                         </div>
 
@@ -221,15 +225,26 @@
 
                                                 </select>
                                             </div>
+
+                                        </div>
+
+                                        <div class="row form-group">
+                                            <div class="col-12 col-md-12">
+                                                <input type="file" name="thumbnailWorkingGroup"  class="form-control">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 col-md-12">
+                                            <img th:src="@{'/working_groups/workingGroupImage?wGImage='+${workingGroup.getThumbnail()}}" alt="">
                                         </div>
 
                                         <div class="card-footer">
                                             <button type="submit" class="btn btn-primary btn-sm">
-                                                <i class="fa fa-dot-circle-o"></i> Submit
+                                                <i class="fa fa-dot-circle-o"></i> Հաստատել
                                             </button>
 
                                             <a href="/" type="reset" class="btn btn-danger btn-sm">
-                                                <i class="fa fa-ban"></i> Reset
+                                                <i class="fa fa-ban"></i> Հրաժարվել
                                             </a>
                                         </div>
                                     </form>

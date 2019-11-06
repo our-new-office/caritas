@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=SQLyog - 64 bit
+Exec=env WINEPREFIX="/home/ara/.wine" wine C:\\\\windows\\\\command\\\\start.exe /Unix /home/ara/.wine/dosdevices/c:/users/Public/Desktop/SQLyog\\ -\\ 64\\ bit.lnk
+Type=Application
+StartupNotify=true
+Path=/home/ara/.wine/dosdevices/c:/Program Files/SQLyog
+Icon=7005_SQLyog.0
+StartupWMClass=sqlyog.exe

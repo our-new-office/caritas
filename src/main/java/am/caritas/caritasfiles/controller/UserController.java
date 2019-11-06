@@ -1,10 +1,11 @@
 package am.caritas.caritasfiles.controller;
 
-import am.caritas.caritasfiles.model.User;
+import am.caritas.caritasfiles.model.*;
 import am.caritas.caritasfiles.model.enums.Role;
+import am.caritas.caritasfiles.model.enums.Status;
+import am.caritas.caritasfiles.repository.*;
 import am.caritas.caritasfiles.security.CurrentUser;
 import am.caritas.caritasfiles.service.UserService;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,24 +21,53 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-@Slf4j
 @Controller
 @RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
+    private final DiscussionRepository discussionRepository;
+    private final UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository;
+    private final ChatRepository chatRepository;
+    private final LinkRepository linkRepository;
+    private final FileRepository fileRepository;
+    private final UserDiscussionFilesRepository userDiscussionFilesRepository;
+    private final WorkingGroupRepository workingGroupRepository;
 
     @Value("${user.pic.url}")
     private String userPicUrl;
 
+    @Value("${discussion.pic.url}")
+    private String discussionThumbUrl;
+
+    @Value("${discussion.file.url}")
+    private String discussionFilesUrl;
+
+    private final UUID uuid = UUID.randomUUID();
+
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService,
+                          DiscussionRepository discussionRepository,
+                          UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository,
+                          ChatRepository chatRepository,
+                          LinkRepository linkRepository,
+                          FileRepository fileRepository,
+                          UserDiscussionFilesRepository userDiscussionFilesRepository,
+                          WorkingGroupRepository workingGroupRepository, LogRepository logRepository) {
         this.userService = userService;
+        this.discussionRepository = discussionRepository;
+        this.userDiscussionWorkingGroupRepository = userDiscussionWorkingGroupRepository;
+        this.chatRepository = chatRepository;
+        this.linkRepository = linkRepository;
+        this.fileRepository = fileRepository;
+        this.userDiscussionFilesRepository = userDiscussionFilesRepository;
+        this.workingGroupRepository = workingGroupRepository;
+        this.logRepository = logRepository;
     }
+
+    private final LogRepository logRepository;
 
     /**
      * Returns createUser page
@@ -53,11 +83,22 @@ public class UserController {
             if (currentUser.getUser().getRole().equals(Role.ADMIN)) {
                 List<Role> roles = Arrays.asList(Role.values());
                 modelMap.addAttribute("roles", roles);
-                log.info("Create User page loaded");
+                Log log = Log.builder()
+                        .user(currentUser.getUser().getName())
+                        .date(new Date())
+                        .action("Մուտք օգտագործող սարքելու էջ")
+                        .build();
+                logRepository.save(log);
                 return "createUser";
             }
         }
-        log.error("Unauthorized user, redirect login page");
+        Log log = Log.builder()
+                .user("Մուտք չգործած օգտատեր")
+                .date(new Date())
+                .action("Վերադարձ մուտքի էջ")
+                .build();
+        logRepository.save(log);
+
         return "redirect:/login?error=unauthorized";
     }
 
@@ -75,19 +116,29 @@ public class UserController {
             modelMap.addAttribute("currentUser", currentUser.getUser());
             if (currentUser.getUser().getRole().equals(Role.ADMIN)) {
                 List<Role> roles = Arrays.asList(Role.values());
+                List<Status> statuses = Arrays.asList(Status.values());
                 Optional<User> byId = userService.findById(id);
                 if (byId.isPresent()) {
                     User user = byId.get();
                     modelMap.addAttribute("user", user);
-                } else {
-                    log.warn("No such user to edit");
                 }
                 modelMap.addAttribute("roles", roles);
-                log.info("Update User page loaded");
+                modelMap.addAttribute("statuses", statuses);
+                Log log = Log.builder()
+                        .user(currentUser.getUser().getName())
+                        .date(new Date())
+                        .action("Մուտք Օգտագերծողի տվյալների փոփոխման էջ")
+                        .build();
+                logRepository.save(log);
                 return "editUser";
             }
         }
-        log.error("Unauthorized user, redirect login page");
+        Log log = Log.builder()
+                .user("Մուտք չգործած օգտատեր")
+                .date(new Date())
+                .action("Վերադարձ մուտքի էջ")
+                .build();
+        logRepository.save(log);
         return "redirect:/login?error=unauthorized";
     }
 
@@ -107,6 +158,7 @@ public class UserController {
                              @RequestParam("thumbnail") MultipartFile multipartFile) {
         modelMap.addAttribute("currentUser", currentUser.getUser());
         List<Role> roles = Arrays.asList(Role.values());
+        List<Status> statuses = Arrays.asList(Status.values());
         boolean error = false;
         String bindingError = null;
         String nameError = null;
@@ -136,7 +188,13 @@ public class UserController {
             modelMap.addAttribute("oldUser", user);
             modelMap.addAttribute("notUnique", notUnique);
             modelMap.addAttribute("roles", roles);
-            log.info("Something went wrong, returning to user registration page again");
+            modelMap.addAttribute("statuses", statuses);
+            Log log = Log.builder()
+                    .user(currentUser.getUser().getName())
+                    .date(new Date())
+                    .action("Սխալ տվյալներ, վարադարձ օգտագործող ստեղծելու էջ")
+                    .build();
+            logRepository.save(log);
             return "createUser";
         }
         File dir = new File(userPicUrl);
@@ -144,6 +202,7 @@ public class UserController {
             dir.mkdirs();
         }
         String userImage = multipartFile.getOriginalFilename();
+        userImage = uuid + userImage;
         try {
             multipartFile.transferTo(new File(dir, userImage));
         } catch (IOException e) {
@@ -151,15 +210,22 @@ public class UserController {
         }
         user.setAvatar(userImage);
         userService.saveUser(user);
-
+        Log log = Log.builder()
+                .user(currentUser.getUser().getName())
+                .date(new Date())
+                .action(user.getName() + " անունով օգտագործողը ստեղծված է")
+                .build();
+        logRepository.save(log);
         return "redirect:/";
     }
 
     @PostMapping("/user/update")
-    public String ubdateUser(@Valid User user, BindingResult result, ModelMap modelMap,
-                             @AuthenticationPrincipal CurrentUser currentUser) {
+    public String updateUser(@Valid User user, BindingResult result, ModelMap modelMap,
+                             @AuthenticationPrincipal CurrentUser currentUser,
+                             @RequestParam("thumbnail") MultipartFile multipartFile) {
         modelMap.addAttribute("currentUser", currentUser.getUser());
         List<Role> roles = Arrays.asList(Role.values());
+        List<Status> statuses = Arrays.asList(Status.values());
         boolean error = false;
         String bindingError = null;
         String nameError = null;
@@ -189,17 +255,109 @@ public class UserController {
             modelMap.addAttribute("oldUser", user);
             modelMap.addAttribute("notUnique", notUnique);
             modelMap.addAttribute("roles", roles);
-            log.info("Something went wrong, returning to user registration page again");
+            modelMap.addAttribute("statuses", statuses);
+            Log log = Log.builder()
+                    .user(currentUser.getUser().getName())
+                    .date(new Date())
+                    .action("Սխալ տվյալներ, վերադարձ օգտագերծողի փոփոխման էջ")
+                    .build();
+            logRepository.save(log);
             return "editUser";
         }
+
         Optional<User> optionalUser = userService.findById(user.getId());
         if (optionalUser.isPresent()) {
+            File dir = new File(userPicUrl);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            if (!multipartFile.isEmpty()) {
+                String userImage = multipartFile.getOriginalFilename();
+                userImage = uuid + userImage;
+                try {
+                    multipartFile.transferTo(new File(dir, userImage));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                optionalUser.get().setAvatar(userImage);
+            }
             User userForSave = optionalUser.get();
             userForSave.setEmail(user.getEmail());
             userForSave.setName(user.getName());
+            if (userForSave.getRole().equals(Role.WORKING_GROUP_ADMIN)) {
+
+                Optional<WorkingGroup> byWorkingGroupAdminId = workingGroupRepository.findByWorkingGroupAdminId(userForSave.getId());
+                if (byWorkingGroupAdminId.isPresent()) {
+                    List<Discussion> allByWorkingGroupId = discussionRepository.findAllByWorkingGroupId(byWorkingGroupAdminId.get().getId());
+
+                    for (Discussion discussion : allByWorkingGroupId) {
+
+                        List<Document> documents = discussion.getDocuments();
+                        List<Link> links = discussion.getLinks();
+                        List<User> users = discussion.getUsers();
+                        List<Chat> chats = discussion.getChats();
+
+
+
+
+
+
+
+                        String thumbnail = discussion.getThumbnail();
+                        File file = new File(discussionThumbUrl + thumbnail);
+                        if (!thumbnail.equals("1.jpg")) {
+                            file.delete();
+                        }
+
+                        List<Chat> allByDiscussionIdOrderByIdDesc = chatRepository.findAllByDiscussionIdOrderByIdDesc(discussion.getId());
+                        allByDiscussionIdOrderByIdDesc.forEach(chat -> {
+                            chat.setDiscussion(null);
+                            chatRepository.save(chat);
+                            chatRepository.delete(chat);
+                        });
+                        userDiscussionFilesRepository.findAllByDiscussionId(discussion.getId()).forEach(userDiscussionFiles -> {
+                            userDiscussionFiles.setDiscussion(null);
+                            userDiscussionFilesRepository.save(userDiscussionFiles);
+                            userDiscussionFilesRepository.delete(userDiscussionFiles);
+                        });
+                        discussionRepository.save(discussion);
+                        discussionRepository.delete(discussion);
+
+                        discussion.setDocuments(null);
+                        discussion.setLinks(null);
+                        discussion.setWorkingGroup(null);
+                        discussion.setUsers(null);
+                        discussion.setChats(null);
+                        discussion.setDocuments(null);
+                        discussionRepository.save(discussion);
+                        discussionRepository.delete(discussion);
+
+                        for (Link link : links) {
+                            linkRepository.delete(link);
+                        }
+
+                        for (Document document : documents) {
+                            File fileDel = new File(discussionFilesUrl + document.getUrl());
+                            fileDel.delete();
+                            fileRepository.delete(document);
+                        }
+                    }
+
+                }
+
+
+            }
+
             userForSave.setRole(user.getRole());
+            userForSave.setStatus(user.getStatus());
             userService.updateUser(userForSave);
         }
+        Log log = Log.builder()
+                .user(currentUser.getUser().getName())
+                .date(new Date())
+                .action(user.getName() + " օգտագերծողը փոփոխված է")
+                .build();
+        logRepository.save(log);
         return "redirect:/";
     }
 
@@ -221,11 +379,25 @@ public class UserController {
         Optional<User> byId = userService.findById(id);
         if (byId.isPresent()) {
             if (!byId.get().getRole().equals(Role.ADMIN)) {
-                if (userService.userIsNotBusy(id)){
+                String name = byId.get().getName();
+                if (userService.userIsNotBusy(id)) {
                     userService.deleteById(id);
-                }else{
+                    File file = new File(userPicUrl + byId.get().getAvatar());
+                    file.delete();
+                } else {
+                    Log log = Log.builder()
+                            .user(currentUser.getUser().getName())
+                            .date(new Date())
+                            .action(name + " անունով օգտագերծողը զբաղված է, չի կարող ջնջվել")
+                            .build();
+                    logRepository.save(log);
                     return "redirect:/?userIsBusy=true";
                 }
+                Log log = Log.builder()
+                        .user(currentUser.getUser().getName())
+                        .date(new Date())
+                        .action(name + " անունով օգտագործողը ջնջված է")
+                        .build();
             }
             return "redirect:/";
         }
@@ -240,5 +412,4 @@ public class UserController {
         InputStream in = new FileInputStream(userPicUrl + userImage);
         return IOUtils.toByteArray(in);
     }
-
 }

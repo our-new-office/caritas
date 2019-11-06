@@ -35,7 +35,7 @@
 
 </head>
 
-<body class="animsition">
+<body>
 <div class="page-wrapper">
     <!-- HEADER MOBILE-->
     <header class="header-mobile d-block d-lg-none">
@@ -44,8 +44,8 @@
                 <div class="container-fluid">
                     <div class="header-mobile-inner">
                         <a class="logo" href="/">
-                            <!--                            <img src="/images/icon/logo.png" alt="CoolAdmin" />-->
-                            <img src="img/karitaslogo.png" alt="">
+                                                        <img src="/images/icon/logo.png" alt="CoolAdmin" />
+                            <img src="img/karitaslogo.jpg" alt="">
                         </a>
                         <a href="/" style="color: #dc3545; margin-left: 10px">
                             Caritas Application
@@ -62,7 +62,7 @@
                 <div class="container-fluid">
                     <ul class="navbar-mobile__list list-unstyled">
                         <li class="has-sub">
-                            <a class="js-arrow" href="/users/user_page">
+                            <a href="/users/user_page">
                                 <i class="fas fa-user"></i>Ստեղծել օգտատեր</a>
                         </li>
                         <li>
@@ -72,6 +72,7 @@
                     </ul>
                 </div>
             </nav>
+        </div>
     </header>
     <!-- END HEADER MOBILE-->
 
@@ -79,7 +80,7 @@
     <aside class="menu-sidebar d-none d-lg-block">
         <div class="logo">
             <a href="/">
-                <img src="img/karitaslogo.png" alt="" style="width: 60px">
+                <img src="img/karitaslogo.jpg" alt="" style="width: 60px">
             </a>
             <a href="/" style="color: #dc3545; margin-left: 10px">
                 Caritas Application
@@ -89,7 +90,7 @@
             <nav class="navbar-sidebar">
                 <ul class="list-unstyled navbar__list">
                     <li class="has-sub">
-                        <a class="js-arrow" href="/users/user_page">
+                        <a href="/users/user_page">
                             <i class="fas fa-user"></i>Ստեղծել օգտատեր</a>
                     </li>
                     <li>
@@ -108,20 +109,15 @@
         <header class="header-desktop">
             <div class="section__content section__content--p30">
                 <div class="container-fluid">
-                    <div class="header-wrap">
-                        <form class="form-header" action="" method="POST">
-                            <input class="au-input au-input--xl" type="text" name="search"
-                                   placeholder="Search for datas &amp; reports..."/>
-                            <button class="au-btn--submit" type="submit">
-                                <i class="zmdi zmdi-search"></i>
-                            </button>
-                        </form>
+                    <div class="header-wrap" style="display: flex; justify-content: flex-end">
+
                         <div class="header-button">
 
                             <div class="account-wrap">
                                 <div class="account-item clearfix js-item-menu">
                                     <div class="image">
-                                        <img src="img/no_image_user_profile.png" alt="John Doe"/>
+                                        <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}"
+                                             th:alt="${currentUser.getName()}"/>
                                     </div>
                                     <div class="content">
                                         <a class="js-acc-btn" href="#"
@@ -132,7 +128,8 @@
                                         <div class="info clearfix">
                                             <div class="image">
                                                 <a href="#">
-                                                    <img src="img/no_image_user_profile.png" alt="John Doe"/>
+                                                    <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}"
+                                                         th:alt="${currentUser.getName()}"/>
                                                 </a>
                                             </div>
                                             <div class="content">
@@ -177,8 +174,8 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Վերնագիր</th>
-                                        <th>Նկարագրություն</th>
                                         <th>Նկար</th>
+                                        <th>Նկարագրություն</th>
                                         <th>Գործողություն</th>
                                     </tr>
                                     </thead>
@@ -186,11 +183,13 @@
                                     <tr class="tr-shadow" th:each="workingGroup: ${workingGroups}">
                                         <td th:text="${workingGroup.getId()}"></td>
                                         <td th:text="${workingGroup.getTitle()}"></td>
-                                        <td th:text="${workingGroup.getDescription()}"></td>
                                         <td>
-                                            <div class="image"><img style="width: 60px; height:auto"
-                                                                    src="images/icon/avatar-02.jpg" alt=""></div>
+                                            <div class="image">
+                                                <img style="width: 60px; height:auto"
+                                                     th:src="@{'/working_groups/workingGroupImage?'(wGImage=${workingGroup.getThumbnail()})}"
+                                                ></div>
                                         </td>
+                                        <td th:text="${workingGroup.getDescription()}"></td>
                                         <td>
                                             <div class="table-data-feature">
                                                 <a class="item" data-toggle="tooltip" data-placement="top"
@@ -234,7 +233,8 @@
                             <div th:if="${userNotExists!=null}" class="alert alert-danger" role="alert">
                                 Օգտատերը չի գտնվել․․․
                             </div>
-                            <div th:if="${#request.getParameter('userIsBusy')=='true'}" class="alert alert-danger" role="alert">
+                            <div th:if="${#request.getParameter('userIsBusy')=='true'}" class="alert alert-danger"
+                                 role="alert">
                                 Օգտատերը կապված է ինչ որ օբյեկտի հետ և չի կարող ջնջվել
                             </div>
 
@@ -244,6 +244,7 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Անուն</th>
+                                        <th>Նկար</th>
                                         <th>Email</th>
                                         <th>Ստեղծման ամսաթիվ</th>
                                         <th>Դեր</th>
@@ -255,6 +256,12 @@
                                     <tr class="tr-shadow" th:each="user: ${users}">
                                         <td th:text="${user.getId()}"></td>
                                         <td th:text="${user.getName()}"></td>
+                                        <td>
+                                            <div class="image">
+                                                <img style="width: 60px; height:auto"
+                                                     th:src="@{'/users/userImage?'(userImage=${user.getAvatar()})}"
+                                                     alt=""></div>
+                                        </td>
                                         <td>
                                             <span class="block-email" th:text="${user.getEmail()}"></span>
                                         </td>

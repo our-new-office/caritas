@@ -1664,3 +1664,32 @@
     }
 
 })(jQuery);
+
+function addInput() {
+    var counter = 0;
+    var label = document.getElementById("label");
+    var btn = document.getElementById('more');
+    var form = document.getElementById('discuss');
+    var links = document.getElementById("links");
+    counter++;
+    let div = document.createElement("div");
+    div.classList.add("form-group");
+    div.classList.add("row");
+    var input = document.createElement("input");
+    input.type = 'text';
+    input.classList.add("form-control");
+    input.name = 'hrefs';
+    input.placeholder = 'Հղում ';
+    input.style.marginTop='5px';
+    input.style.marginBottom='5px';
+
+    label.parentNode.insertBefore( input, label.nextSibling );
+
+
+
+}
+
+function deleteLink(e) {
+
+  return e.remove();
+}
