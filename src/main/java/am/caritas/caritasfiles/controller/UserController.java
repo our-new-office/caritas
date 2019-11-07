@@ -298,11 +298,6 @@ public class UserController {
                         List<Chat> chats = discussion.getChats();
 
 
-
-
-
-
-
                         String thumbnail = discussion.getThumbnail();
                         File file = new File(discussionThumbUrl + thumbnail);
                         if (!thumbnail.equals("1.jpg")) {
@@ -321,6 +316,20 @@ public class UserController {
                             userDiscussionFilesRepository.delete(userDiscussionFiles);
                         });
                         discussionRepository.save(discussion);
+
+                        if (links.size() > 0) {
+                            for (Link link : links) {
+                                linkRepository.delete(link);
+                            }
+                        }
+
+                        if (documents.size() > 0) {
+                            for (Document document : documents) {
+                                File fileDel = new File(discussionFilesUrl + document.getUrl());
+                                fileDel.delete();
+                                fileRepository.delete(document);
+                            }
+                        }
                         discussionRepository.delete(discussion);
 
                         discussion.setDocuments(null);
@@ -332,15 +341,8 @@ public class UserController {
                         discussionRepository.save(discussion);
                         discussionRepository.delete(discussion);
 
-                        for (Link link : links) {
-                            linkRepository.delete(link);
-                        }
 
-                        for (Document document : documents) {
-                            File fileDel = new File(discussionFilesUrl + document.getUrl());
-                            fileDel.delete();
-                            fileRepository.delete(document);
-                        }
+
                     }
 
                 }

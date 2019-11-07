@@ -185,7 +185,7 @@ public class WorkingGroupAdminController {
                 String originalFilename = document.getOriginalFilename();
                 originalFilename = uuid + originalFilename;
                 try {
-                    multipartFile.transferTo(new File(filesdir, originalFilename));
+                    document.transferTo(new File(filesdir, originalFilename));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
