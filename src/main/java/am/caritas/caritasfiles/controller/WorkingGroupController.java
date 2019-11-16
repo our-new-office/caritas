@@ -59,7 +59,7 @@ public class WorkingGroupController {
         if (currentUser != null) {
 
             List<Discussion> allByUsersContains = discussionRepository.findAllByUsersContains(currentUser.getUser());
-            modelMap.addAttribute("discussions", allByUsersContains);
+            modelMap.addAttribute("your.discussions", allByUsersContains);
 
             modelMap.addAttribute("currentUser", currentUser.getUser());
             if (currentUser.getUser().getRole().equals(Role.ADMIN)) {
@@ -90,7 +90,7 @@ public class WorkingGroupController {
         if (currentUser != null) {
 
             List<Discussion> allByUsersContains = discussionRepository.findAllByUsersContains(currentUser.getUser());
-            modelMap.addAttribute("discussions", allByUsersContains);
+            modelMap.addAttribute("your.discussions", allByUsersContains);
 
             modelMap.addAttribute("currentUser", currentUser.getUser());
             if (currentUser.getUser().getRole().equals(Role.ADMIN)) {

@@ -75,7 +75,7 @@ public class WorkingGroupAdminController {
                 List<User> users = userService.allUsersForDiscussion(currentUser.getUser());
                 List<Discussion> allByUserId = discussionService.findAllByUserId(currentUser.getUser().getId());
                 modelMap.addAttribute("currentUser", currentUser.getUser());
-                modelMap.addAttribute("discussions", allByUserId);
+                modelMap.addAttribute("your.discussions", allByUserId);
                 modelMap.addAttribute("users", users);
                 modelMap.addAttribute("workingGroup", byAdminId.get());
                 Log log = Log.builder()
@@ -276,7 +276,7 @@ public class WorkingGroupAdminController {
                 List<User> users = userService.allUsersForDiscussion(currentUser.getUser());
                 List<Discussion> allByUserId = discussionService.findAllByUserId(currentUser.getUser().getId());
                 modelMap.addAttribute("currentUser", currentUser.getUser());
-                modelMap.addAttribute("discussions", allByUserId);
+                modelMap.addAttribute("your.discussions", allByUserId);
                 modelMap.addAttribute("users", users);
                 modelMap.addAttribute("workingGroup", byAdminId.get());
 
