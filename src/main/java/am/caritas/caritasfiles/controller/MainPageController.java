@@ -68,7 +68,7 @@ public class MainPageController {
                 return "adminPanel";
             } else if (currentUser.getUser().getRole().equals(Role.USER)) {
                 List<Discussion> allForUser = discussionService.findAllForUser(currentUser.getUser());
-                modelMap.addAttribute("discussions", allForUser);
+                modelMap.addAttribute("your.discussions", allForUser);
                 Log log = Log.builder()
                         .user(currentUser.getUser().getName())
                         .date(new Date())
@@ -83,7 +83,7 @@ public class MainPageController {
                 if (byAdminId.isPresent()) {
                     WorkingGroup workingGroup = byAdminId.get();
                     List<Discussion> allByWorkingGroupId = discussionService.findAllByWorkingGroupId(workingGroup.getId());
-                    modelMap.addAttribute("discussions", allByWorkingGroupId);
+                    modelMap.addAttribute("your.discussions", allByWorkingGroupId);
                     modelMap.addAttribute("currentUser", currentUser.getUser());
                 }
                 Log log = Log.builder()

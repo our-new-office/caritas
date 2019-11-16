@@ -61,7 +61,7 @@
                 <ul class="list-unstyled navbar__list">
 
                     <hr>
-                    <h4 th:if="${discussionsForGroupAdmin.size()>0}" th:text="#{discussions}">Ձեր զրուցարանները</h4>
+                    <h4 th:if="${discussionsForGroupAdmin.size()>0}" th:text="#{your.discussions}">Ձեր զրուցարանները</h4>
                     <li class="has-sub" th:each="discussion:${discussionsForGroupAdmin}">
                         <a th:href="@{'/user_discussion/discussion/'+${discussion.getId()}}" th:text="${discussion.getTitle()}">
                             <i class="fas fa-user"></i><span th:text="#{chat.main}"></span></a>
