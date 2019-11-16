@@ -32,49 +32,13 @@
 
     <!-- Main CSS-->
     <link href="/css/theme.css" rel="stylesheet" media="all">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
 
 </head>
 
 <body>
 <div class="page-wrapper">
-    <!-- HEADER MOBILE-->
-    <header class="header-mobile d-block d-lg-none">
-        <div class="header-mobile__bar">
-            <div class="header-mobile__bar">
-                <div class="container-fluid">
-                    <div class="header-mobile-inner">
-                        <a class="logo" href="/">
-                                                        <img src="/images/icon/logo.png" alt="CoolAdmin" />
-                            <img src="img/karitaslogo.jpg" alt="">
-                        </a>
-                        <a href="/" style="color: #dc3545; margin-left: 10px">
-                            Caritas Application
-                        </a>
-                        <button class="hamburger hamburger--slider" type="button">
-                            <span class="hamburger-box">
-                                <span class="hamburger-inner"></span>
-                            </span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <nav class="navbar-mobile">
-                <div class="container-fluid">
-                    <ul class="navbar-mobile__list list-unstyled">
-                        <li class="has-sub">
-                            <a href="/users/user_page">
-                                <i class="fas fa-user"></i>Ստեղծել օգտատեր</a>
-                        </li>
-                        <li>
-                            <a href="/working_groups/working_group_page">
-                                <i class="fas fa-chart-bar"></i>Ստեղծել խումբ</a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-        </div>
-    </header>
-    <!-- END HEADER MOBILE-->
 
     <!-- MENU SIDEBAR-->
     <aside class="menu-sidebar d-none d-lg-block">
@@ -91,11 +55,11 @@
                 <ul class="list-unstyled navbar__list">
                     <li class="has-sub">
                         <a href="/users/user_page">
-                            <i class="fas fa-user"></i>Ստեղծել օգտատեր</a>
+                            <i class="fas fa-user"></i><span th:text="#{create.user}"></span></a>
                     </li>
                     <li>
                         <a href="/working_groups/working_group_page">
-                            <i class="fas fa-chart-bar"></i>Ստեղծել խումբ</a>
+                            <i class="fas fa-chart-bar"></i><span th:text="#{create.group}"></span></a>
                     </li>
                 </ul>
             </nav>
@@ -113,17 +77,44 @@
 
                         <div class="header-button">
 
-                            <div class="account-wrap">
+                            <div class="account-wrap" style="display: flex;align-items: center;height: 75px;">
+
+                                <div>
+                                    <div style="width:100%; display: flex;justify-content: center;margin-left: 20px;margin-right: 50px">
+                                        <select id="language" class="form-control" style="width: 215px; background-color: #dc3545; color: #fff">
+                                            <option th:text="#{language}" style="background-color: #fff; color: #495057"></option>
+                                            <option value="?lang=hy" style="background-color: #fff; color: #495057">Հայերեն</option>
+                                            <option value="?lang=en" style="background-color: #fff; color: #495057">English</option>
+                                        </select>
+
+                                    </div>
+                                    <script>
+                                        $(function(){
+                                            $('#language').on('change', function () {
+                                                var url = $(this).val();
+                                                console.log(url);
+                                                if (url) {
+                                                    window.location = url;
+                                                }
+                                                return false;
+                                            });
+                                        });
+                                    </script>
+                                </div>
+
                                 <div class="account-item clearfix js-item-menu">
                                     <div class="image">
                                         <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}"
                                              th:alt="${currentUser.getName()}"/>
                                     </div>
                                     <div class="content">
+
                                         <a class="js-acc-btn" href="#"
-                                           th:text="'Բարի գալուստ ' + ${currentUser.getName()}">john
+                                           th:text="#{welcome} + ' ' + ${currentUser.getName()}">john
                                             doe</a>
+
                                     </div>
+
                                     <div class="account-dropdown js-dropdown">
                                         <div class="info clearfix">
                                             <div class="image">
@@ -142,10 +133,11 @@
 
                                         <div class="account-dropdown__footer">
                                             <a href="/logout">
-                                                <i class="zmdi zmdi-power"></i>Ելք</a>
+                                                <i class="zmdi zmdi-power"></i><span th:text="#{exit}"></span></a>
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -163,9 +155,9 @@
                     </div>
                     <div class="row m-t-30">
                         <div class="col-md-12">
-                            <h3 class="title-5 m-b-35">Աշխատանքային խմբեր</h3>
+                            <h3 class="title-5 m-b-35" th:text="#{working.groups}">Աշխատանքային խմբեր</h3>
                             <!-- DATA TABLE-->
-                            <div th:if="${workingGroupNotExists!=null}" class="alert alert-danger" role="alert">
+                            <div th:if="${workingGroupNotExists!=null}" class="alert alert-danger" role="alert" th:text="#{working.group.not.found}">
                                 Խումբը չի գտնվել․․․
                             </div>
                             <div class="table-responsive m-b-40">
@@ -173,10 +165,10 @@
                                     <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Վերնագիր</th>
-                                        <th>Նկար</th>
-                                        <th>Նկարագրություն</th>
-                                        <th>Գործողություն</th>
+                                        <th th:text="#{working.group.table.title}">Վերնագիր</th>
+                                        <th th:text="#{working.group.table.img}">Նկար</th>
+                                        <th th:text="#{working.group.table.desc}">Նկարագրություն</th>
+                                        <th th:text="#{working.group.table.action}">Գործողություն</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -193,12 +185,12 @@
                                         <td>
                                             <div class="table-data-feature">
                                                 <a class="item" data-toggle="tooltip" data-placement="top"
-                                                   title="Ջնջել"
+                                                   th:title="#{icon.delete}"
                                                    th:href="@{'/working_groups/working_group/delete/'+${workingGroup.getId()}}">
                                                     <i class="zmdi zmdi-delete"></i>
                                                 </a>
                                                 <a class="item" data-toggle="tooltip" data-placement="top"
-                                                   title="Փոփոխել"
+                                                   th:title="#{icon.edit}"
                                                    th:href="@{'/working_groups/working_group_page/'+${workingGroup.getId()}}">
                                                     <i class="zmdi zmdi-edit"></i>
                                                 </a>
@@ -228,13 +220,13 @@
                     <div class="row">
                         <div class="col-md-12">
                             <!-- DATA TABLE -->
-                            <h3 class="title-5 m-b-35">Օգտատերեր</h3>
+                            <h3 class="title-5 m-b-35" th:text="#{users}">Օգտատերեր</h3>
 
-                            <div th:if="${userNotExists!=null}" class="alert alert-danger" role="alert">
+                            <div th:if="${userNotExists!=null}" class="alert alert-danger" role="alert" th:text="#{users.not.found}">
                                 Օգտատերը չի գտնվել․․․
                             </div>
                             <div th:if="${#request.getParameter('userIsBusy')=='true'}" class="alert alert-danger"
-                                 role="alert">
+                                 role="alert" th:text="#{users.is.busy}">
                                 Օգտատերը կապված է ինչ որ օբյեկտի հետ և չի կարող ջնջվել
                             </div>
 
@@ -243,13 +235,13 @@
                                     <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Անուն</th>
-                                        <th>Նկար</th>
-                                        <th>Email</th>
-                                        <th>Ստեղծման ամսաթիվ</th>
-                                        <th>Դեր</th>
-                                        <th>Կարգավիճակ</th>
-                                        <th>Գործողություն</th>
+                                        <th th:text="#{table.user.name}">Անուն</th>
+                                        <th th:text="#{working.group.table.img}">Նկար</th>
+                                        <th th:text="#{table.user.email}">Email</th>
+                                        <th th:text="#{table.user.created}">Ստեղծման ամսաթիվ</th>
+                                        <th th:text="#{table.user.role}">Դեր</th>
+                                        <th th:text="#{table.user.status}">Կարգավիճակ</th>
+                                        <th th:text="#{working.group.table.action}">Գործողություն</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -269,17 +261,17 @@
                                             th:text="${#strings.substring(user.getCreatedDate(),0,16)}"></td>
                                         <td th:text="${user.getRole().name()}"></td>
                                         <td>
-                                            <span th:if="${user.getStatus().name()=='ACTIVE'}" class="status--process">Ակտիվ</span>
-                                            <span th:if="${user.getStatus().name()=='INACTIVE'}" class="status--denied">Ոչ ակտիվ</span>
+                                            <span th:if="${user.getStatus().name()=='ACTIVE'}" class="status--process"  th:text="#{status.active}">Ակտիվ</span>
+                                            <span th:if="${user.getStatus().name()=='INACTIVE'}" class="status--denied" th:text="#{status.inactive}">Ոչ ակտիվ</span>
                                         </td>
                                         <td>
                                             <div class="table-data-feature">
                                                 <a class="item" data-toggle="tooltip" data-placement="top"
-                                                   title="Ջնջել" th:href="@{'/users/user/delete/' + ${user.id}}">
+                                                   th:title="#{icon.delete}" th:href="@{'/users/user/delete/' + ${user.id}}">
                                                     <i class="zmdi zmdi-delete"></i>
                                                 </a>
                                                 <a class="item" data-toggle="tooltip" data-placement="top"
-                                                   title="Փոփոխել"
+                                                   th:title="#{icon.edit}"
                                                    th:href="@{'/users/edit_user_page/' + ${user.id}}">
                                                     <i class="zmdi zmdi-edit"></i>
                                                 </a>
@@ -297,7 +289,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="copyright">
-                                <p>2018 © Caritas. Բոլոր իրավունքները պաշտպանված են։</p>
+                                <p th:text="#{copyrights}">2018 © Caritas. Բոլոր իրավունքները պաշտպանված են։</p>
                             </div>
                         </div>
                     </div>

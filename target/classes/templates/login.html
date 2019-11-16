@@ -7,9 +7,12 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Caritas - մուտք</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
     <!------ Include the above in your HEAD tag ---------->
 </head>
 <body>
+
 <div class="container" style="margin-top: 150px">
     <form class="form-horizontal" role="form" method="POST" action="/login">
         <div class="row">
@@ -18,15 +21,16 @@
                      th:text="${activationSuccess}">
                 </div>
             </div>
-<!--            <div class="col-12 d-flex justify-content-center">-->
-<!--                <h3 style="text-align: center; margin-top: 20px;color: #dc3545"-->
-<!--                    th:if="${#request.getParameter('error')=='unauthorized'}"-->
-<!--                    th:text="'Access denied for unauthorized users, Please Login'"></h3>-->
-<!--            </div>-->
+            <!--            <div class="col-12 d-flex justify-content-center">-->
+            <!--                <h3 style="text-align: center; margin-top: 20px;color: #dc3545"-->
+            <!--                    th:if="${#request.getParameter('error')=='unauthorized'}"-->
+            <!--                    th:text="'Access denied for unauthorized users, Please Login'"></h3>-->
+            <!--            </div>-->
 
             <hr>
             <div class="col col-12 d-flex justify-content-center">
-                <img src="img/karitaslogo.jpg" alt="Caritas" style="display: flex;justify-content: center; width: 250px; height: 250px">
+                <img src="img/karitaslogo.jpg" alt="Caritas"
+                     style="display: flex;justify-content: center; width: 250px; height: 250px">
             </div>
 
         </div>
@@ -77,10 +81,10 @@
             </div>
         </div>
 
-
         <div class="row">
             <div class="col-md-12 d-flex justify-content-center">
-                <button type="submit" class="btn btn-danger btn-lg" id="submit"><i class="fa fa-user-plus"></i> Մուտք</button>
+                <button type="submit" class="btn btn-danger btn-lg" id="submit" style="margin-left: 45px"><i class="fa fa-sign-in" aria-hidden="true" style="padding: 0 78px;"></i><span
+                        style="margin:0 3px"></span></button>
             </div>
         </div>
     </form>
@@ -91,39 +95,40 @@
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 <script>
-    $(document).ready(function() {
-        $('#submit').click(function(){
+    $(document).ready(function () {
+        $('#submit').click(function () {
             var password = $('#password').val();
             var email = $('#email').val();
             var error;
 
-            if(email== ''){
+            if (email == '') {
                 $("#email").css("border", "#dc3545 solid 2px");
                 $("#email_error").text("Email դաշտը չի կարող լինել դատարկ")
                 error = true
             }
-            if(IsEmail(email)==false){
+            if (IsEmail(email) == false) {
                 $("#email").css("border", "#dc3545 solid 2px");
                 $("#email_error").text("Դատարկ Email կամ Սխալ Email  ֆորմատ")
                 error = true;
             }
 
-            if(password == ''){
-               $("#password").css("border", "#dc3545 solid 2px");
-               $("#password_error").text("Գաղտնաբառը չի կարող լինել դատարկ")
+            if (password == '') {
+                $("#password").css("border", "#dc3545 solid 2px");
+                $("#password_error").text("Գաղտնաբառը չի կարող լինել դատարկ")
                 error = true
             }
 
-            if(error){
+            if (error) {
                 return false;
             }
         });
     });
+
     function IsEmail(email) {
         var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
-        if(!regex.test(email)) {
+        if (!regex.test(email)) {
             return false;
-        }else{
+        } else {
             return true;
         }
     }
