@@ -103,7 +103,7 @@
                                 </div>
 
                                 <div class="account-item clearfix js-item-menu">
-                                    <div class="image">
+                                    <div class="imageHeader">
                                         <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}"
                                              th:alt="${currentUser.getName()}"/>
                                     </div>
@@ -250,7 +250,7 @@
                                         <td th:text="${user.getName()}"></td>
                                         <td>
                                             <div class="image">
-                                                <img style="width: 60px; height:auto"
+                                                <img style="width: 60px; height: 60px; border-radius:50%"
                                                      th:src="@{'/users/userImage?'(userImage=${user.getAvatar()})}"
                                                      alt=""></div>
                                         </td>

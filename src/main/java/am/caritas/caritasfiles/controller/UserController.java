@@ -201,14 +201,19 @@ public class UserController {
         if (!dir.exists()) {
             dir.mkdirs();
         }
-        String userImage = multipartFile.getOriginalFilename();
-        userImage = uuid + userImage;
-        try {
-            multipartFile.transferTo(new File(dir, userImage));
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(!multipartFile.isEmpty()){
+            String userImage = multipartFile.getOriginalFilename();
+            userImage = uuid + userImage;
+            try {
+                multipartFile.transferTo(new File(dir, userImage));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            user.setAvatar(userImage);
+        }else{
+            user.setAvatar("no_image_user_profile.png");
         }
-        user.setAvatar(userImage);
+
         userService.saveUser(user);
         Log log = Log.builder()
                 .user(currentUser.getUser().getName())
@@ -304,7 +309,7 @@ public class UserController {
                             file.delete();
                         }
 
-                        List<Chat> allByDiscussionIdOrderByIdDesc = chatRepository.findAllByDiscussionIdOrderByIdDesc(discussion.getId());
+                        List<Chat> allByDiscussionIdOrderByIdDesc = chatRepository.findAllByDiscussionId(discussion.getId());
                         allByDiscussionIdOrderByIdDesc.forEach(chat -> {
                             chat.setDiscussion(null);
                             chatRepository.save(chat);
@@ -340,9 +345,6 @@ public class UserController {
                         discussion.setDocuments(null);
                         discussionRepository.save(discussion);
                         discussionRepository.delete(discussion);
-
-
-
                     }
 
                 }

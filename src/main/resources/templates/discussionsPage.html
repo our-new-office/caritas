@@ -61,7 +61,7 @@
                 <ul class="list-unstyled navbar__list">
 
                     <hr>
-                    <h4 th:if="${discussionsForGroupAdmin.size()>0}" th:text="#{your.discussions}">Ձեր զրուցարանները</h4>
+                    <h4 th:if="${discussionsForGroupAdmin!=null && discussionsForGroupAdmin.size()>0}" th:text="#{your.discussions}">Ձեր զրուցարանները</h4>
                     <li class="has-sub" th:each="discussion:${discussionsForGroupAdmin}">
                         <a th:href="@{'/user_discussion/discussion/'+${discussion.getId()}}" th:text="${discussion.getTitle()}">
                             <i class="fas fa-user"></i><span th:text="#{chat.main}"></span></a>
@@ -91,10 +91,10 @@
                                                 style="width: 215px; background-color: #dc3545; color: #fff">
                                             <option th:text="#{language}"
                                                     style="background-color: #fff; color: #495057"></option>
-                                            <option value="/discussions/create_discussion?lang=hy"
+                                            <option value="?lang=hy"
                                                     style="background-color: #fff; color: #495057">Հայերեն
                                             </option>
-                                            <option value="/discussions/create_discussion?lang=en"
+                                            <option value="?lang=en"
                                                     style="background-color: #fff; color: #495057">English
                                             </option>
                                         </select>
@@ -103,8 +103,8 @@
                                     <script>
                                         $(function () {
                                             $('#language').on('change', function () {
-                                                var url = $(this).val();
-                                                console.log(url);
+                                                url = window.location.pathname;
+                                                var url = url + $(this).val();                                                console.log(url);
                                                 if (url) {
                                                     window.location = url;
                                                 }
@@ -115,7 +115,7 @@
                                 </div>
 
                                 <div class="account-item clearfix js-item-menu">
-                                    <div class="image">
+                                    <div class="imageHeader">
                                         <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}"
                                              th:alt="${currentUser.getName()}"/>
                                     </div>
@@ -198,15 +198,15 @@
                                             <div class="col-12 col-md-12">
                                                 <input type="text" id="text-input0" name="title" th:placeholder="#{create.discussion.title}"
                                                        class="form-control" th:if="${oldDiscussion!=null}"
-                                                       th:value="${oldDiscussion.getTitle()}">
-                                                <input type="text" id="text-input" name="title" th:placeholder="#{create.discussion.title}"
-                                                       class="form-control" th:if="${oldDiscussion==null}">
+                                                       th:value="${oldDiscussion.getTitle()}" required>
+                                                <input type="text" id="text-input" name="title" th:placeholder="#{discussion.title}"
+                                                       class="form-control" th:if="${oldDiscussion==null}" required>
                                             </div>
                                         </div>
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
-                                                <textarea th:if="${oldDiscussion!=null}" name="description" id="disc" class="form-control" cols="30" rows="10" th:value="${oldDiscussion.getDescription()}"></textarea>
-                                                <textarea th:if="${oldDiscussion==null}" name="description" id="disc1" class="form-control" cols="30" rows="10" th:placeholder="#{working.group.table.desc}"></textarea>
+                                                <textarea th:if="${oldDiscussion!=null}" name="description" id="disc" class="form-control" cols="30" rows="10" th:value="${oldDiscussion.getDescription()}" required></textarea>
+                                                <textarea th:if="${oldDiscussion==null}" name="description" id="disc1" class="form-control" cols="30" rows="10" th:placeholder="#{working.group.table.desc}" required></textarea>
 
                                             </div>
                                         </div>

@@ -71,7 +71,7 @@ public class WorkingGroupServiceImpl implements WorkingGroupService {
         for (Discussion discussion : allByWorkingGroupId) {
             discussion.setWorkingGroup(null);
             discussionService.save(discussion);
-            chatRepository.findAllByDiscussionIdOrderByIdDesc(discussion.getId()).forEach(chat -> {
+            chatRepository.findAllByDiscussionId(discussion.getId()).forEach(chat -> {
                 chat.setDiscussion(null);
                 chat.setUser(null);
                 chatRepository.delete(chat);

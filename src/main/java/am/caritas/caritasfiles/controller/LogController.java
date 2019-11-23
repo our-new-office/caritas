@@ -44,7 +44,7 @@ public class LogController {
     public String allLogs(ModelMap modelMap, Pageable pageable, @RequestParam("page") Optional<Integer> page, @AuthenticationPrincipal CurrentUser currentUser) {
 
         List<Discussion> allByUsersContains = discussionRepository.findAllByUsersContains(currentUser.getUser());
-        modelMap.addAttribute("your.discussions", allByUsersContains);
+        modelMap.addAttribute("discussions", allByUsersContains);
 
 
         int currentPage = page.orElse(1);
@@ -81,7 +81,7 @@ public class LogController {
                                @AuthenticationPrincipal CurrentUser currentUser) throws ParseException {
 
         List<Discussion> discussionList = discussionRepository.findAllByUsersContains(currentUser.getUser());
-        modelMap.addAttribute("your.discussions", discussionList);
+        modelMap.addAttribute("discussions", discussionList);
         Sort sort = Sort.by("id").descending();
         modelMap.addAttribute("currentUser", currentUser.getUser());
         if (date == null || date.equals("")) {
@@ -125,7 +125,7 @@ public class LogController {
                                ModelMap modelMap,
                                @AuthenticationPrincipal CurrentUser currentUser) {
         List<Discussion> discs = discussionRepository.findAllByUsersContains(currentUser.getUser());
-        modelMap.addAttribute("your.discussions", discs);
+        modelMap.addAttribute("discussions", discs);
         modelMap.addAttribute("currentUser", currentUser.getUser());
 
         Sort sort = Sort.by("id").descending();
@@ -145,7 +145,7 @@ public class LogController {
                                  @AuthenticationPrincipal CurrentUser currentUser) {
         modelMap.addAttribute("currentUser", currentUser.getUser());
         List<Discussion> discussionList = discussionRepository.findAllByUsersContains(currentUser.getUser());
-        modelMap.addAttribute("your.discussions", discussionList);
+        modelMap.addAttribute("discussions", discussionList);
 
         Sort sort = Sort.by("id").descending();
         if (action == null || action.equals("")) {

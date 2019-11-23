@@ -1394,18 +1394,17 @@ section {
     cursor: pointer;
 }
 
-.account-item .image {
+.account-item .imageHeader {
     width: 45px;
     height: 45px;
+    border-radius: 50%;
     float: left;
     overflow: hidden;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
 }
 
-.account-item .image > img {
-    width: 100%;
+.account-item .imageHeader > img {
+    width: 45px;
+    height: 45px;
 }
 
 .account-item > .content {
@@ -14835,4 +14834,19 @@ input[type="date"], focus {
     display: inline-block !important;
     visibility: visible !important;
     margin-right: 10px;
+}
+
+.image img{
+    width: 60px!important;
+    height: 60px!important;
+    border-radius:50%!important;
+}
+
+.thumb{
+    display: flex;
+}
+
+.thumb img{
+    max-width: 30%;
+    margin: 15px auto;
 }

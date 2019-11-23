@@ -582,7 +582,7 @@ public class WorkingGroupAdminController {
                 file.delete();
             }
 
-            List<Chat> allByDiscussionIdOrderByIdDesc = chatRepository.findAllByDiscussionIdOrderByIdDesc(discussion.getId());
+            List<Chat> allByDiscussionIdOrderByIdDesc = chatRepository.findAllByDiscussionId(discussion.getId());
             allByDiscussionIdOrderByIdDesc.forEach(chat -> {
                 chat.setDiscussion(null);
                 chatRepository.save(chat);

@@ -167,7 +167,7 @@ public class DiscussionController {
     public @ResponseBody
     ResponseEntity getChatList(@RequestParam("discId") long discId) {
         List<ChatDto> allChats = new ArrayList<>();
-        List<Chat> allByOrderByCreateDateDesc = chatRepository.findAllByDiscussionIdOrderByIdDesc(discId);
+        List<Chat> allByOrderByCreateDateDesc = chatRepository.findAllByDiscussionId(discId);
         for (Chat chat : allByOrderByCreateDateDesc) {
             ChatDto chatDto = ChatDto.builder()
                     .id(chat.getId())
@@ -194,7 +194,7 @@ public class DiscussionController {
     @GetMapping("/count")
     public @ResponseBody
     ResponseEntity getChatCount(@RequestParam("discId") Long id) {
-        List<Chat> allByDiscussionIdOrderByIdDesc = chatRepository.findAllByDiscussionIdOrderByIdDesc(id);
+        List<Chat> allByDiscussionIdOrderByIdDesc = chatRepository.findAllByDiscussionId(id);
         int count = allByDiscussionIdOrderByIdDesc.size();
         return ResponseEntity.status(HttpStatus.OK).body(count);
     }

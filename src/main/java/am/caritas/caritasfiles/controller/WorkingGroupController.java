@@ -9,7 +9,6 @@ import am.caritas.caritasfiles.model.enums.Role;
 import am.caritas.caritasfiles.repository.DiscussionRepository;
 import am.caritas.caritasfiles.repository.LogRepository;
 import am.caritas.caritasfiles.security.CurrentUser;
-//import am.caritas.caritasfiles.service.UserDiscussionWorkingGroupService;
 import am.caritas.caritasfiles.service.UserService;
 import am.caritas.caritasfiles.service.WorkingGroupService;
 import org.apache.commons.io.IOUtils;
@@ -31,6 +30,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+//import am.caritas.caritasfiles.service.UserDiscussionWorkingGroupService;
 
 @Controller
 @RequestMapping("/working_groups")
@@ -90,7 +91,7 @@ public class WorkingGroupController {
         if (currentUser != null) {
 
             List<Discussion> allByUsersContains = discussionRepository.findAllByUsersContains(currentUser.getUser());
-            modelMap.addAttribute("your.discussions", allByUsersContains);
+            modelMap.addAttribute("discussions", allByUsersContains);
 
             modelMap.addAttribute("currentUser", currentUser.getUser());
             if (currentUser.getUser().getRole().equals(Role.ADMIN)) {
@@ -168,7 +169,7 @@ public class WorkingGroupController {
         if (!dir.exists()) {
             dir.mkdirs();
         }
-        if(!multipartFile.isEmpty()){
+        if (!multipartFile.isEmpty()) {
             workingGroupImage = multipartFile.getOriginalFilename();
             try {
                 multipartFile.transferTo(new File(dir, workingGroupImage));
@@ -230,7 +231,7 @@ public class WorkingGroupController {
             if (!dir.exists()) {
                 dir.mkdirs();
             }
-            if(!multipartFile.isEmpty()){
+            if (!multipartFile.isEmpty()) {
                 String workingGroupImage = multipartFile.getOriginalFilename();
                 try {
                     multipartFile.transferTo(new File(dir, workingGroupImage));
@@ -262,8 +263,8 @@ public class WorkingGroupController {
         if (byId.isPresent()) {
             String title = byId.get().getTitle();
             workingGroupService.deleteById(id);
-            File file = new File(workingGroupPicUrl+byId.get().getThumbnail());
-            if(!byId.get().getThumbnail().equals("1.jpg")){
+            File file = new File(workingGroupPicUrl + byId.get().getThumbnail());
+            if (!byId.get().getThumbnail().equals("1.jpg")) {
                 file.delete();
             }
             Log log = Log.builder()

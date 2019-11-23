@@ -61,7 +61,7 @@
                 <ul class="list-unstyled navbar__list">
 
                     <hr>
-                    <h4 th:if="${discussions.size()>0}" th:text="#{your.discussions}">Ձեր զրուցարանները</h4>
+                    <h4 th:if="${discussions != null && discussions.size()>0}" th:text="#{your.discussions}">Ձեր զրուցարանները</h4>
                     <li class="has-sub" th:each="discussion:${discussions}">
                         <a th:href="@{'/user_discussion/discussion/'+${discussion.getId()}}" th:text="${discussion.getTitle()}">
                             <i class="fas fa-user"></i><span th:text="#{chat.main}"></span></a>
@@ -118,7 +118,7 @@
                                 </div>
 
                                 <div class="account-item clearfix js-item-menu">
-                                    <div class="image">
+                                    <div class="imageHeader">
                                         <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}"
                                              th:alt="${currentUser.getName()}"/>
                                     </div>
@@ -170,17 +170,17 @@
 
                             <form action="/log_managment/search_by_date" method="post">
                                 <input type="date" name="date">
-                                <input type="submit" class="btn btn-danger" value="Որոնել" onsubmit="this.form.reset()">
+                                <input type="submit" class="btn btn-danger" th:value="#{search}" onsubmit="this.form.reset()">
                             </form>
 
                             <form action="/log_managment/search_by_name" method="post">
                                 <input type="text" class="searchInput" name="userName" th:placeholder="#{write.name}" >
-                                <input type="submit" class="btn btn-danger" value="Որոնել" onsubmit="this.form.reset()">
+                                <input type="submit" class="btn btn-danger" th:value="#{search}"  onsubmit="this.form.reset()">
                             </form>
 
                             <form action="/log_managment/search_by_action" method="post">
                                 <input class="searchInput" type="text" name="action" th:placeholder="#{write.action}">
-                                <input type="submit" class="btn btn-danger" value="Որոնել" onsubmit="this.form.reset()">
+                                <input type="submit" class="btn btn-danger" th:value="#{search}"  onsubmit="this.form.reset()">
                             </form>
 
 

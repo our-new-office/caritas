@@ -40,6 +40,7 @@
 
 <body>
 <div class="page-wrapper">
+    <a href="#scr" style="display: none" id="forScroll"></a>
     <!-- MENU SIDEBAR-->
     <aside class="menu-sidebar d-none d-lg-block">
         <div class="logo">
@@ -78,15 +79,21 @@
 
                                 <div>
                                     <div style="width:100%; display: flex;justify-content: center;margin-left: 20px;margin-right: 50px">
-                                        <select id="language" class="form-control" style="width: 215px; background-color: #dc3545; color: #fff">
-                                            <option th:text="#{language}" style="background-color: #fff; color: #495057"></option>
-                                            <option value="?lang=hy" style="background-color: #fff; color: #495057">Հայերեն</option>
-                                            <option value="?lang=en" style="background-color: #fff; color: #495057">English</option>
+                                        <select id="language" class="form-control"
+                                                style="width: 215px; background-color: #dc3545; color: #fff">
+                                            <option th:text="#{language}"
+                                                    style="background-color: #fff; color: #495057"></option>
+                                            <option value="?lang=hy" style="background-color: #fff; color: #495057">
+                                                Հայերեն
+                                            </option>
+                                            <option value="?lang=en" style="background-color: #fff; color: #495057">
+                                                English
+                                            </option>
                                         </select>
 
                                     </div>
                                     <script>
-                                        $(function(){
+                                        $(function () {
                                             $('#language').on('change', function () {
                                                 var url = $(this).val();
                                                 console.log(url);
@@ -100,7 +107,7 @@
                                 </div>
 
                                 <div class="account-item clearfix js-item-menu">
-                                    <div class="image">
+                                    <div class="imageHeader">
                                         <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}"
                                              th:alt="${currentUser.getName()}"/>
                                     </div>
@@ -159,7 +166,8 @@
                                       th:src="@{'/user_discussion/user_discussion_image?discImage='+${discussion.getThumbnail()}}"
                                       alt=""></div>
 
-                            <h4 style="text-align: center" th:if="${discussion.getLinks()!=null}" th:text="#{chat.links}">Հղումներ</h4>
+                            <h4 style="text-align: center" th:if="${discussion.getLinks()!=null}"
+                                th:text="#{chat.links}">Հղումներ</h4>
                             <div th:each="link: ${discussion.getLinks()}">
                                 <a th:href="@{${link.getUrl()}}" th:text="${link.getUrl()}" target="_blank"
                                    style="display: flex;justify-content: center; padding: 5px"></a>
@@ -176,7 +184,8 @@
 
                             </div>
 
-                            <h3 style="text-align: center; margin: 20px auto" th:text="#{chat.uploaded.files}">Խմբակիցների վերբեռնած փաստաթղթեր</h3>
+                            <h3 style="text-align: center; margin: 20px auto" th:text="#{chat.uploaded.files}">
+                                Խմբակիցների վերբեռնած փաստաթղթեր</h3>
                             <ul class="list-unstyled navbar__list" id="hrefs" style="text-align: center">
                             </ul>
 
@@ -187,7 +196,8 @@
                                     <h3 class="text-center" th:text="#{chat.discussions}">Քննարկումներ</h3>
 
                                     <ul id="chat"
-                                        style="border: 1px solid silver; height: 250px; width: 100%; overflow-y: scroll">
+                                        style="border: 1px solid silver; height: 250px; width: 100%; overflow-y: scroll; scroll-snap-align: end;">
+                                        <li id="scr"></li>
                                     </ul>
 
                                     <div style="display: flex">
@@ -209,7 +219,8 @@
                                               enctype="multipart/form-data">
                                             <input type='file' name="img" id='file' multiple="multiple">
                                             <input type="hidden" th:value="${discussion.getId()}" name="discId">
-                                            <button type="submit" class="btn btn-warning" onclick="uplaod();" th:text="#{chat.upload}">Վերբեռնել
+                                            <button type="submit" class="btn btn-warning" onclick="uplaod();"
+                                                    th:text="#{chat.upload}">Վերբեռնել
                                             </button>
                                         </form>
                                     </div>
@@ -217,6 +228,8 @@
                                 </div>
                             </div>
                             <script>
+                                var messageBody = document.querySelector('#chat');
+                                messageBody.scrollHeight =250;
                                 var discId = document.getElementById("discId").value;
                                 var interval = 1000;
                                 var fileInterval = 5000;
@@ -259,7 +272,9 @@
                                                 $('#chat').append("<li style='padding: 10px'>" + "<b>" + row.user + "</b>:  " + row.content + "</li>");
 
                                             });
+                                            $('#chat').append("<li id='scr'></li>");
                                             $("#editor").val("");
+                                                document.getElementById("forScroll").click();
                                         }
                                     });
                                 }
@@ -314,7 +329,6 @@
 
 
                                 $("#send").on("click", function () {
-
                                     var data = $("#myForm").serialize();
 
                                     $.ajax({
@@ -373,7 +387,6 @@
 
 <!-- Main JS-->
 <script src="/js/main.js"></script>
-
 </body>
 
 </html>
