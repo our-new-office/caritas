@@ -35,6 +35,7 @@ public class UserController {
     private final FileRepository fileRepository;
     private final UserDiscussionFilesRepository userDiscussionFilesRepository;
     private final WorkingGroupRepository workingGroupRepository;
+    private final NotificationRepository notificationRepository;
 
     @Value("${user.pic.url}")
     private String userPicUrl;
@@ -47,6 +48,8 @@ public class UserController {
 
     private final UUID uuid = UUID.randomUUID();
 
+    private final AskDiscussionInvitationRepository askDiscussionInvitationRepository;
+
     @Autowired
     public UserController(UserService userService,
                           DiscussionRepository discussionRepository,
@@ -55,7 +58,10 @@ public class UserController {
                           LinkRepository linkRepository,
                           FileRepository fileRepository,
                           UserDiscussionFilesRepository userDiscussionFilesRepository,
-                          WorkingGroupRepository workingGroupRepository, LogRepository logRepository) {
+                          WorkingGroupRepository workingGroupRepository,
+                          NotificationRepository notificationRepository,
+                          AskDiscussionInvitationRepository askDiscussionInvitationRepository,
+                          LogRepository logRepository) {
         this.userService = userService;
         this.discussionRepository = discussionRepository;
         this.userDiscussionWorkingGroupRepository = userDiscussionWorkingGroupRepository;
@@ -64,6 +70,8 @@ public class UserController {
         this.fileRepository = fileRepository;
         this.userDiscussionFilesRepository = userDiscussionFilesRepository;
         this.workingGroupRepository = workingGroupRepository;
+        this.notificationRepository = notificationRepository;
+        this.askDiscussionInvitationRepository = askDiscussionInvitationRepository;
         this.logRepository = logRepository;
     }
 
@@ -201,7 +209,7 @@ public class UserController {
         if (!dir.exists()) {
             dir.mkdirs();
         }
-        if(!multipartFile.isEmpty()){
+        if (!multipartFile.isEmpty()) {
             String userImage = multipartFile.getOriginalFilename();
             userImage = uuid + userImage;
             try {
@@ -210,11 +218,23 @@ public class UserController {
                 e.printStackTrace();
             }
             user.setAvatar(userImage);
-        }else{
+        } else {
             user.setAvatar("no_image_user_profile.png");
         }
 
         userService.saveUser(user);
+
+        List<Discussion> all = discussionRepository.findAll();
+        all.forEach(discussion -> {
+            AskDiscussionInvitation askDiscussionInvitation = AskDiscussionInvitation.builder()
+                    .user(user)
+                    .discussion(discussion)
+                    .hasSent(false)
+                    .build();
+            askDiscussionInvitationRepository.save(askDiscussionInvitation);
+        });
+
+
         Log log = Log.builder()
                 .user(currentUser.getUser().getName())
                 .date(new Date())
@@ -289,68 +309,6 @@ public class UserController {
             User userForSave = optionalUser.get();
             userForSave.setEmail(user.getEmail());
             userForSave.setName(user.getName());
-            if (userForSave.getRole().equals(Role.WORKING_GROUP_ADMIN)) {
-
-                Optional<WorkingGroup> byWorkingGroupAdminId = workingGroupRepository.findByWorkingGroupAdminId(userForSave.getId());
-                if (byWorkingGroupAdminId.isPresent()) {
-                    List<Discussion> allByWorkingGroupId = discussionRepository.findAllByWorkingGroupId(byWorkingGroupAdminId.get().getId());
-
-                    for (Discussion discussion : allByWorkingGroupId) {
-
-                        List<Document> documents = discussion.getDocuments();
-                        List<Link> links = discussion.getLinks();
-                        List<User> users = discussion.getUsers();
-                        List<Chat> chats = discussion.getChats();
-
-
-                        String thumbnail = discussion.getThumbnail();
-                        File file = new File(discussionThumbUrl + thumbnail);
-                        if (!thumbnail.equals("1.jpg")) {
-                            file.delete();
-                        }
-
-                        List<Chat> allByDiscussionIdOrderByIdDesc = chatRepository.findAllByDiscussionId(discussion.getId());
-                        allByDiscussionIdOrderByIdDesc.forEach(chat -> {
-                            chat.setDiscussion(null);
-                            chatRepository.save(chat);
-                            chatRepository.delete(chat);
-                        });
-                        userDiscussionFilesRepository.findAllByDiscussionId(discussion.getId()).forEach(userDiscussionFiles -> {
-                            userDiscussionFiles.setDiscussion(null);
-                            userDiscussionFilesRepository.save(userDiscussionFiles);
-                            userDiscussionFilesRepository.delete(userDiscussionFiles);
-                        });
-                        discussionRepository.save(discussion);
-
-                        if (links.size() > 0) {
-                            for (Link link : links) {
-                                linkRepository.delete(link);
-                            }
-                        }
-
-                        if (documents.size() > 0) {
-                            for (Document document : documents) {
-                                File fileDel = new File(discussionFilesUrl + document.getUrl());
-                                fileDel.delete();
-                                fileRepository.delete(document);
-                            }
-                        }
-                        discussionRepository.delete(discussion);
-
-                        discussion.setDocuments(null);
-                        discussion.setLinks(null);
-                        discussion.setWorkingGroup(null);
-                        discussion.setUsers(null);
-                        discussion.setChats(null);
-                        discussion.setDocuments(null);
-                        discussionRepository.save(discussion);
-                        discussionRepository.delete(discussion);
-                    }
-
-                }
-
-
-            }
 
             userForSave.setRole(user.getRole());
             userForSave.setStatus(user.getStatus());
@@ -384,10 +342,46 @@ public class UserController {
         if (byId.isPresent()) {
             if (!byId.get().getRole().equals(Role.ADMIN)) {
                 String name = byId.get().getName();
-                if (userService.userIsNotBusy(id)) {
-                    userService.deleteById(id);
-                    File file = new File(userPicUrl + byId.get().getAvatar());
+
+                if (!byId.get().getRole().equals(Role.WORKING_GROUP_ADMIN) &&
+                        !byId.get().getRole().equals(Role.LOG_MANAGER)) {
+
+                    List<Discussion> allByUsersContains = discussionRepository.findAllByUsersContains(byId.get());
+                    for (Discussion allByUsersContain : allByUsersContains) {
+                        List<User> users = allByUsersContain.getUsers();
+                        users.remove(byId.get());
+                        discussionRepository.save(allByUsersContain);
+                    }
+
+                    List<Chat> allChats = chatRepository.findAllByUserId(byId.get().getId());
+                    for (Chat allChat : allChats) {
+                        allChat.setUser(null);
+                        allChat.setDiscussion(null);
+                        chatRepository.save(allChat);
+                        chatRepository.delete(allChat);
+                    }
+
+
+                    String avatar = byId.get().getAvatar();
+                    String image = userPicUrl + avatar;
+
+                    File file = new File(image);
                     file.delete();
+
+                    List<AskDiscussionInvitation> allByUserId = askDiscussionInvitationRepository.findAllByUserId(id);
+                    for (AskDiscussionInvitation askDiscussionInvitation : allByUserId) {
+                        askDiscussionInvitation.setDiscussion(null);
+                        askDiscussionInvitation.setUser(null);
+                        askDiscussionInvitationRepository.save(askDiscussionInvitation);
+                        askDiscussionInvitationRepository.delete(askDiscussionInvitation);
+                    }
+
+                    List<Notification> notifications = notificationRepository.findAllByUserId(id);
+                    for (Notification notification : notifications) {
+                        notification.setId(null);
+                        notificationRepository.delete(notification);
+                    }
+                    userService.deleteById(id);
                 } else {
                     Log log = Log.builder()
                             .user(currentUser.getUser().getName())

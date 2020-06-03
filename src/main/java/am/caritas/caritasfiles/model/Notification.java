@@ -4,27 +4,27 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Entity
-@Table
-public class Link {
+@Builder
+public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
-    private String url;
+    @Column(length = 4096)
+    private String message;
+
+    @ManyToOne
+    private User user;
 
     @Column
-    private Date dateCreated;
+    private Boolean hasSeen;
 
 }

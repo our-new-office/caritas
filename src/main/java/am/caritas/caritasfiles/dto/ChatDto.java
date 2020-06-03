@@ -13,6 +13,8 @@ public class ChatDto {
     private Long id;
     private String content;
     private String user;
+    private String userPic;
     private String discussion;
     private String date;
+    private String file;
 }

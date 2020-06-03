@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface UserDiscussionFilesRepository extends JpaRepository<UserDiscussionFiles, Long> {
 
-    List<UserDiscussionFiles> findAllByDiscussionId(Long id);
+    List<UserDiscussionFiles> findAllByDiscussionIdOrderByIdDesc(Long id);
 
 }

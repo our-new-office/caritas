@@ -6,9 +6,11 @@ import am.caritas.caritasfiles.model.Log;
 import am.caritas.caritasfiles.model.User;
 import am.caritas.caritasfiles.model.WorkingGroup;
 import am.caritas.caritasfiles.model.enums.Role;
+import am.caritas.caritasfiles.model.mail.Mail;
 import am.caritas.caritasfiles.repository.DiscussionRepository;
 import am.caritas.caritasfiles.repository.LogRepository;
 import am.caritas.caritasfiles.security.CurrentUser;
+import am.caritas.caritasfiles.service.EmailService;
 import am.caritas.caritasfiles.service.UserService;
 import am.caritas.caritasfiles.service.WorkingGroupService;
 import org.apache.commons.io.IOUtils;
@@ -41,18 +43,23 @@ public class WorkingGroupController {
     private final UserService userService;
     private final LogRepository logRepository;
     private final DiscussionRepository discussionRepository;
+    private final EmailService emailService;
 //    private final UserDiscussionWorkingGroupService userDiscussionWorkingGroupService;
 
     @Value("${working.group.pic.url}")
     private String workingGroupPicUrl;
 
     @Autowired
-    public WorkingGroupController(WorkingGroupService workingGroupService, UserService userService, LogRepository logRepository, DiscussionRepository discussionRepository) {
+    public WorkingGroupController(WorkingGroupService workingGroupService,
+                                  UserService userService,
+                                  LogRepository logRepository,
+                                  DiscussionRepository discussionRepository,
+                                  EmailService emailService) {
         this.workingGroupService = workingGroupService;
         this.userService = userService;
-
         this.logRepository = logRepository;
         this.discussionRepository = discussionRepository;
+        this.emailService = emailService;
     }
 
     @GetMapping("/working_group_page")
@@ -179,6 +186,18 @@ public class WorkingGroupController {
         }
         workingGroupDto.setThumbnail(workingGroupImage);
         workingGroupService.saveWorkingGroup(workingGroupDto);
+
+        Optional<User> byId = userService.findById(workingGroupDto.getUserId());
+        if(byId.isPresent()){
+            Mail mailToAdmin = new Mail();
+            mailToAdmin.setFrom("intranet@caritas.am");
+            mailToAdmin.setTo(byId.get().getEmail());
+            mailToAdmin.setSubject("Congratulations");
+            mailToAdmin.setContent("Dear " +byId.get().getName()+ ": You have been chosen as  "
+                    + workingGroupDto.getTitle() + " working group admin");
+            emailService.sendEmail(mailToAdmin);
+        }
+
         Log log = Log.builder()
                 .user(currentUser.getUser().getName())
                 .date(new Date())

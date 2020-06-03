@@ -1,10 +1,13 @@
 package am.caritas.caritasfiles.controller;
 
+import am.caritas.caritasfiles.model.AskDiscussionInvitation;
 import am.caritas.caritasfiles.model.Discussion;
 import am.caritas.caritasfiles.model.Log;
+import am.caritas.caritasfiles.repository.AskDiscussionInvitationRepository;
 import am.caritas.caritasfiles.repository.DiscussionRepository;
 import am.caritas.caritasfiles.repository.LogRepository;
 import am.caritas.caritasfiles.security.CurrentUser;
+import am.caritas.caritasfiles.service.DiscussionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,10 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -33,11 +33,15 @@ public class LogController {
 
     private final LogRepository logRepository;
     private final DiscussionRepository discussionRepository;
+    private final AskDiscussionInvitationRepository askDiscussionInvitationRepository;
+    private final DiscussionService discussionService;
 
 
-    public LogController(LogRepository logRepository, DiscussionRepository discussionRepository) {
+    public LogController(LogRepository logRepository, DiscussionRepository discussionRepository, AskDiscussionInvitationRepository askDiscussionInvitationRepository, DiscussionService discussionService) {
         this.logRepository = logRepository;
         this.discussionRepository = discussionRepository;
+        this.askDiscussionInvitationRepository = askDiscussionInvitationRepository;
+        this.discussionService = discussionService;
     }
 
     @GetMapping("/list")
@@ -66,6 +70,22 @@ public class LogController {
                     .collect(Collectors.toList());
             modelMap.addAttribute("pageNumbers", pageNumbers);
         }
+
+        List<AskDiscussionInvitation> allByUserAndHasSent =
+                askDiscussionInvitationRepository.findAllByUserAndHasSent(currentUser.getUser(), false);
+        List<AskDiscussionInvitation> allByUserAndHasNotSent =
+                askDiscussionInvitationRepository.findAllByUserAndHasSent(currentUser.getUser(), true);
+        List<Discussion> allForUser = discussionService.findAllForUser(currentUser.getUser());
+        List<Long> collect = allForUser.stream().map(Discussion::getId).collect(Collectors.toList());
+        List<AskDiscussionInvitation> returnableList = new ArrayList<>();
+        for (AskDiscussionInvitation askDiscussionInvitation : allByUserAndHasNotSent) {
+            if(!collect.contains(askDiscussionInvitation.getDiscussion().getId())){
+                returnableList.add(askDiscussionInvitation);
+            }
+        }
+        modelMap.addAttribute("discussions", allForUser);
+        modelMap.addAttribute("allByUserAndHasSent", allByUserAndHasSent);
+        modelMap.addAttribute("allByUserAndHasNotSent", returnableList);
 
         return "log";
     }

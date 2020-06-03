@@ -20,6 +20,9 @@ import java.util.*;
 @Service
 public class UserServiceImpl implements UserService {
 
+    @Value("${admin.email}")
+    private String adminEmail;
+
     private final UserRepository userRepository;
     private final ChatRepository chatRepository;
     private final PasswordEncoder passwordEncoder;
@@ -55,6 +58,13 @@ public class UserServiceImpl implements UserService {
         mail.setSubject("Congratulations");
         mail.setContent("Dear " + user.getName() + ", Your account password is " + password + " , please save and don`t lose this message");
         emailService.sendEmail(mail);
+
+        Mail mailToAdmin = new Mail();
+        mailToAdmin.setFrom("intranet@caritas.am");
+        mailToAdmin.setTo(adminEmail);
+        mailToAdmin.setSubject("New User Password");
+        mailToAdmin.setContent("Dear admin, the user : " + user.getName() + ", email : " +  user.getEmail() + " has accepted his account and set the password  - \n" + password);
+        emailService.sendEmail(mailToAdmin);
         return true;
     }
 
@@ -102,11 +112,8 @@ public class UserServiceImpl implements UserService {
             for (Discussion allByUsersContain : allByUsersContains) {
                 List<User> users = allByUsersContain.getUsers();
                 users.remove(user);
-
             }
         }
-
-
         userRepository.deleteById(id);
     }
 

@@ -3,9 +3,11 @@ package am.caritas.caritasfiles.controller;
 import am.caritas.caritasfiles.model.*;
 import am.caritas.caritasfiles.model.enums.FileStatus;
 import am.caritas.caritasfiles.model.enums.FileType;
+import am.caritas.caritasfiles.model.mail.Mail;
 import am.caritas.caritasfiles.repository.*;
 import am.caritas.caritasfiles.security.CurrentUser;
 import am.caritas.caritasfiles.service.DiscussionService;
+import am.caritas.caritasfiles.service.EmailService;
 import am.caritas.caritasfiles.service.UserService;
 import am.caritas.caritasfiles.service.WorkingGroupService;
 import org.apache.commons.io.IOUtils;
@@ -30,6 +32,9 @@ import java.util.*;
 public class WorkingGroupAdminController {
 
     private UUID uuid = UUID.randomUUID();
+    private final EmailService emailService;
+
+    private final AskDiscussionInvitationRepository askDiscussionInvitationRepository;
 
     @Value("${discussion.pic.url}")
     private String discussionThumbUrl;
@@ -48,8 +53,24 @@ public class WorkingGroupAdminController {
     private final UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository;
     private final ChatRepository chatRepository;
     private final UserDiscussionFilesRepository userDiscussionFilesRepository;
+    private final Mail mailToMember = new Mail();
 
-    public WorkingGroupAdminController(LogRepository logRepository, DiscussionService discussionService, UserService userService, FileRepository fileRepository, DiscussionRepository discussionRepository, LinkRepository linkRepository, WorkingGroupService workingGroupService, WorkingGroupRepository workingGroupRepository, UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository, ChatRepository chatRepository, UserDiscussionFilesRepository userDiscussionFilesRepository) {
+    public WorkingGroupAdminController(EmailService emailService,
+                                       AskDiscussionInvitationRepository askDiscussionInvitationRepository, LogRepository logRepository,
+                                       DiscussionService discussionService,
+                                       UserService userService,
+                                       FileRepository fileRepository,
+                                       DiscussionRepository discussionRepository,
+                                       LinkRepository linkRepository,
+                                       WorkingGroupService workingGroupService,
+                                       WorkingGroupRepository workingGroupRepository,
+                                       UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository,
+                                       ChatRepository chatRepository,
+                                       UserDiscussionFilesRepository userDiscussionFilesRepository
+                                       ) {
+        this.emailService = emailService;
+        this.askDiscussionInvitationRepository = askDiscussionInvitationRepository;
+
         this.logRepository = logRepository;
         this.discussionService = discussionService;
         this.userService = userService;
@@ -216,6 +237,12 @@ public class WorkingGroupAdminController {
             if (byId.isPresent()) {
                 User user = byId.get();
                 users.add(user);
+                mailToMember.setFrom("intranet@caritas.am");
+                mailToMember.setTo(byId.get().getEmail());
+                mailToMember.setSubject("Invitation");
+                mailToMember.setContent("Dear " + byId.get().getName() + ": You have been invited to be a member of "
+                        + discussion.getTitle() + " discussion");
+                emailService.sendEmail(mailToMember);
             }
         }
         users.add(currentUser.getUser());
@@ -228,6 +255,23 @@ public class WorkingGroupAdminController {
         }
 
         discussionRepository.save(discussion);
+
+        List<User> allUsers = userService.users();
+
+        for (User user : allUsers) {
+
+            AskDiscussionInvitation askDiscussionInvitation = AskDiscussionInvitation.builder()
+                    .discussion(discussion)
+                    .user(user)
+                    .build();
+
+            if(users.contains(user)){
+                askDiscussionInvitation.setHasSent(true);
+            }else {
+                askDiscussionInvitation.setHasSent(false);
+            }
+            askDiscussionInvitationRepository.save(askDiscussionInvitation);
+        }
         Log log = Log.builder()
                 .user(currentUser.getUser().getName())
                 .date(new Date())
@@ -302,7 +346,6 @@ public class WorkingGroupAdminController {
                                  @RequestParam(value = "usersForDiscussion", required = false) Long[] userIds,
                                  @RequestParam(value = "thumbnail", required = false) String thumbnail,
                                  @RequestParam(value = "img", required = false) MultipartFile multipartFile) {
-
         modelMap.addAttribute("currentUser", currentUser.getUser());
         List<User> users = userService.allUsersForGroupAdmin();
         Optional<WorkingGroup> byAdminId = workingGroupService.findByAdminId(currentUser.getUser().getId());
@@ -512,7 +555,12 @@ public class WorkingGroupAdminController {
                 discussionRepository.save(discussionFromRepo);
 
             }
+
+
+            List<User> oldUsers = discussionFromRepo.getUsers();
+
             List<User> usersForDiscussion = new ArrayList<>();
+
 
             if (userIds != null && userIds.length > 0) {
                 for (Long userId : userIds) {
@@ -520,6 +568,14 @@ public class WorkingGroupAdminController {
                     if (byId.isPresent()) {
                         User user = byId.get();
                         usersForDiscussion.add(user);
+                        if(!oldUsers.contains(user)){
+                            mailToMember.setFrom("intranet@caritas.am");
+                            mailToMember.setTo(byId.get().getEmail());
+                            mailToMember.setSubject("Invitation");
+                            mailToMember.setContent("Dear " + byId.get().getName() + ": You have been invited to be a member of "
+                                    + discussion.getTitle() + " discussion");
+                            emailService.sendEmail(mailToMember);
+                        }
                     }
                 }
             }
@@ -533,6 +589,27 @@ public class WorkingGroupAdminController {
             discussionRepository.save(discussionFromRepo);
         }
 
+        List<User> allUsers = userService.users();
+        List<AskDiscussionInvitation> allByDiscussionId = askDiscussionInvitationRepository.findAllByDiscussionId(discussion.getId());
+        for (AskDiscussionInvitation askDiscussionInvitation : allByDiscussionId) {
+            askDiscussionInvitation.setUser(null);
+            askDiscussionInvitation.setDiscussion(null);
+            askDiscussionInvitationRepository.save(askDiscussionInvitation);
+            askDiscussionInvitationRepository.delete(askDiscussionInvitation);
+        }
+
+        for (User user : allUsers) {
+            AskDiscussionInvitation askDiscussionInvitation = AskDiscussionInvitation.builder()
+                    .discussion(discussion)
+                    .user(user)
+                    .build();
+            if(users.contains(user)){
+                askDiscussionInvitation.setHasSent(true);
+            }else {
+                askDiscussionInvitation.setHasSent(false);
+            }
+            askDiscussionInvitationRepository.save(askDiscussionInvitation);
+        }
         Log log = Log.builder()
                 .user(currentUser.getUser().getName())
                 .date(new Date())
@@ -588,11 +665,21 @@ public class WorkingGroupAdminController {
                 chatRepository.save(chat);
                 chatRepository.delete(chat);
             });
-            userDiscussionFilesRepository.findAllByDiscussionId(discussion.getId()).forEach(userDiscussionFiles -> {
+            userDiscussionFilesRepository.findAllByDiscussionIdOrderByIdDesc(discussion.getId()).forEach(userDiscussionFiles -> {
                 userDiscussionFiles.setDiscussion(null);
                 userDiscussionFilesRepository.save(userDiscussionFiles);
                 userDiscussionFilesRepository.delete(userDiscussionFiles);
             });
+
+
+            List<AskDiscussionInvitation> allByDiscussionId = askDiscussionInvitationRepository.findAllByDiscussionId(discussion.getId());
+            for (AskDiscussionInvitation askDiscussionInvitation : allByDiscussionId) {
+                askDiscussionInvitation.setDiscussion(null);
+                askDiscussionInvitation.setUser(null);
+                askDiscussionInvitationRepository.save(askDiscussionInvitation);
+                askDiscussionInvitationRepository.delete(askDiscussionInvitation);
+            }
+
             discussionRepository.save(discussion);
             discussionRepository.delete(discussion);
 

@@ -1,11 +1,8 @@
 package am.caritas.caritasfiles.model;
 
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,8 +12,9 @@ import java.util.List;
 @ToString
 @Builder
 @Entity
-@Table(name = "chat")
-public class Chat {
+@Table(name = "ask_discussion_invitation")
+public class AskDiscussionInvitation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
@@ -28,12 +26,7 @@ public class Chat {
     @ManyToOne
     private Discussion discussion;
 
-    @Column(length = 4096)
-    private String content;
-
     @Column
-    private Date date;
+    private Boolean hasSent;
 
-    @Column
-    private String file;
 }

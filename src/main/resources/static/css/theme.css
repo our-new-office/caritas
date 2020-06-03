@@ -14643,84 +14643,86 @@ section {
     display: none !important;
 }
 
-.table-data3 thead{
+.table-data3 thead {
     background-color: #dc3545;
 }
 
-.au-btn--submit{
+.au-btn--submit {
     background: #dc3545;
 }
 
-.table-data3 tbody td{
+.table-data3 tbody td {
     font-size: 12px;
 }
 
-.block-email{
+.block-email {
     font-size: 12px;
 }
 
-.navbar-sidebar .navbar__list li a{
+.navbar-sidebar .navbar__list li a {
     font-size: 14px;
 }
 
-@media (min-width:991px) {
+@media (min-width: 991px) {
 
-    .header-desktop{
+    .header-desktop {
         left: 280px;
     }
 
-    .menu-sidebar{
+    .menu-sidebar {
         width: 280px;
     }
 
-    .section__content--p30{
+    .section__content--p30 {
         left: 30px;
     }
 
 }
 
-.copyright{
-    display: block!important;
+.copyright {
+    display: block !important;
 }
 
 
-td{vertical-align: middle!important;}
+td {
+    vertical-align: middle !important;
+}
 
-.js-item-menu>a{
-    width: 30px!important;
+.js-item-menu > a {
+    width: 30px !important;
     height: auto;
 }
 
-.js-item-menu{
+.js-item-menu {
     display: flex;
     align-items: center;
 }
 
-.image img{
+.image img {
     height: auto;
 }
 
 input[type='checkbox'] {
     /*-webkit-appearance:none;*/
-    width:20px;
-    height:20px;
+    width: 20px;
+    height: 20px;
     /*background:white;*/
-    border-radius:5px;
-    border:2px solid #555;
+    border-radius: 5px;
+    border: 2px solid #555;
 }
 
-.table-data3 tbody td{
+.table-data3 tbody td {
     padding: 5px 20px;
 }
 
-@media (min-width: 991px){
+@media (min-width: 991px) {
     .section__content--p30 {
         left: 0;
     }
 }
 
 .section__content--p30 {
-     padding: 0;
+    padding: 0;
 }
 
 .table-data3 thead tr th {
@@ -14729,7 +14731,7 @@ input[type='checkbox'] {
     font-weight: 400;
     text-transform: capitalize;
     padding: 18px 20px;
-     padding-right: 0;
+    padding-right: 0;
 }
 
 .table-data3 tbody td {
@@ -14741,47 +14743,47 @@ input[type='checkbox'] {
     padding: 5px;
 }
 
-.form-control{
+.form-control {
     font-size: 14px;
 }
 
-button{
-    font-size: 12px!important;
+button {
+    font-size: 12px !important;
 }
 
-a[type=reset]{
-    font-size: 12px!important;
+a[type=reset] {
+    font-size: 12px !important;
 }
 
-.image img{
+.image img {
     width: 100px;
 }
 
-.table-data3 thead tr th{
+.table-data3 thead tr th {
     text-align: center;
 }
 
-.pagination{
+.pagination {
     display: flex;
     justify-content: center;
     align-items: center;
     margin-top: 20px;
 }
 
-.pagination a{
+.pagination a {
     display: block;
     padding: 5px 10px;
-    border-radius:5px!important;
+    border-radius: 5px !important;
     background: #dc3545;
     margin: 5px;
     color: #ffffff;
 
 }
 
-.current{
+.current {
     display: block;
     padding: 5px 10px;
-    border-radius:5px!important;
+    border-radius: 5px !important;
     background: #00aced;
     margin: 5px;
     color: #ffffff;
@@ -14803,15 +14805,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* A few custom styles for date inputs */
-input[type="date"]{
+input[type="date"] {
     appearance: none;
     -webkit-appearance: none;
     color: #95a5a6;
     font-family: "Helvetica", arial, sans-serif;
     font-size: 18px;
-    border:1px solid #ecf0f1;
-    background:#ecf0f1;
-    padding:7px;
+    border: 1px solid #ecf0f1;
+    background: #ecf0f1;
+    padding: 7px;
     display: inline-block !important;
     visibility: visible !important;
     margin-right: 10px;
@@ -14828,25 +14830,38 @@ input[type="date"], focus {
     color: #95a5a6;
     font-family: "Helvetica", arial, sans-serif;
     font-size: 18px;
-    border:1px solid #ecf0f1;
-    background:#ecf0f1;
-    padding:7px;
+    border: 1px solid #ecf0f1;
+    background: #ecf0f1;
+    padding: 7px;
     display: inline-block !important;
     visibility: visible !important;
     margin-right: 10px;
 }
 
-.image img{
-    width: 60px!important;
-    height: 60px!important;
-    border-radius:50%!important;
+.image img {
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 50% !important;
 }
 
-.thumb{
+.thumb {
     display: flex;
 }
 
-.thumb img{
+.thumb img {
     max-width: 30%;
     margin: 15px auto;
+}
+
+.addToGroup {
+    padding: 5px 10px;
+    color: #808080;
+    background-color: #e5e5e5;
+    border: 1px solid rgba(0, 0, 0, .1);
+    border-radius: 3px;
+}
+
+.addToGroup:hover {
+    color: #FFFFFF;
+    background-color: #0b2e13;
 }

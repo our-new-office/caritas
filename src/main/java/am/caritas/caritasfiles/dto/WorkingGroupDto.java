@@ -15,5 +15,4 @@ public class WorkingGroupDto {
     private String description;
     private String thumbnail;
     private Long userId;
-
 }

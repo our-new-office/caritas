@@ -1,11 +1,13 @@
 package am.caritas.caritasfiles.controller;
 
 import am.caritas.caritasfiles.dto.ChatDto;
+import am.caritas.caritasfiles.dto.UserDiscussionFilesDto;
 import am.caritas.caritasfiles.model.*;
 import am.caritas.caritasfiles.repository.*;
 import am.caritas.caritasfiles.security.CurrentUser;
 import am.caritas.caritasfiles.service.DiscussionService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -152,6 +154,7 @@ public class DiscussionController {
         Optional<User> byId = userRepository.findById(id);
         Optional<Discussion> discById = discussionRepository.findById(discussionId);
         byId.ifPresent(chat::setUser);
+        chat.setDate(new Date());
         discById.ifPresent(chat::setDiscussion);
         chatRepository.save(chat);
         Log log = Log.builder()
@@ -174,6 +177,9 @@ public class DiscussionController {
                     .content(chat.getContent())
                     .user(chat.getUser().getName())
                     .discussion(chat.getDiscussion().getTitle())
+                    .file(chat.getFile())
+                    .date(chat.getDate().toString())
+                    .userPic(chat.getUser().getAvatar())
                     .build();
             allChats.add(chatDto);
         }
@@ -184,11 +190,19 @@ public class DiscussionController {
     @GetMapping("/hrefs")
     public @ResponseBody
     ResponseEntity getHrefList(@RequestParam("discId") long discId) {
-        List<UserDiscussionFiles> allFiles = new ArrayList<>();
-        List<UserDiscussionFiles> allByOrderByCreateDateDesc = userDiscussionFilesRepository.findAllByDiscussionId(discId);
-
-
-        return ResponseEntity.status(HttpStatus.OK).body(allByOrderByCreateDateDesc);
+        List<UserDiscussionFilesDto> userDiscussionFilesDtos = new ArrayList<>();
+        List<UserDiscussionFiles> allByOrderByCreateDateDesc = userDiscussionFilesRepository.findAllByDiscussionIdOrderByIdDesc(discId);
+        for (UserDiscussionFiles userDiscussionFiles : allByOrderByCreateDateDesc) {
+            UserDiscussionFilesDto userDiscussionFilesDto = UserDiscussionFilesDto.builder()
+                    .id(userDiscussionFiles.getId())
+                    .date(userDiscussionFiles.getDate().toString())
+                    .username(userDiscussionFiles.getUsername())
+                    .discussion(userDiscussionFiles.getDiscussion())
+                    .url(userDiscussionFiles.getUrl())
+                    .build();
+            userDiscussionFilesDtos.add(userDiscussionFilesDto);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(userDiscussionFilesDtos);
     }
 
     @GetMapping("/count")
@@ -202,7 +216,7 @@ public class DiscussionController {
     @GetMapping("/count_files")
     public @ResponseBody
     ResponseEntity getFileCount(@RequestParam("discId") Long id) {
-        List<UserDiscussionFiles> allByDiscussionId = userDiscussionFilesRepository.findAllByDiscussionId(id);
+        List<UserDiscussionFiles> allByDiscussionId = userDiscussionFilesRepository.findAllByDiscussionIdOrderByIdDesc(id);
         int count = allByDiscussionId.size();
         return ResponseEntity.status(HttpStatus.OK).body(count);
     }
@@ -223,7 +237,8 @@ public class DiscussionController {
         if (!multipartFiles[0].isEmpty()) {
             for (MultipartFile fewFile : multipartFiles) {
                 String originalFilename = fewFile.getOriginalFilename();
-                originalFilename = "file" + uuid + originalFilename;
+                String extension = FilenameUtils.getExtension(originalFilename);
+                originalFilename = uuuId() + "." + extension;
                 try {
                     fewFile.transferTo(new File(filesdir, originalFilename));
                 } catch (IOException e) {
@@ -247,6 +262,18 @@ public class DiscussionController {
                         .action(originalFilename + " Փաստաթղթի վերբեռնում զրուցարանում")
                         .build();
                 logRepository.save(log);
+                Optional<Discussion> optionalDiscussion = discussionRepository.findById(discId);
+                if (optionalDiscussion.isPresent()) {
+                    Discussion discussion = optionalDiscussion.get();
+                    Chat chat = Chat.builder()
+                            .content(null)
+                            .date(new Date())
+                            .user(currentUser.getUser())
+                            .discussion(discussion)
+                            .file(originalFilename)
+                            .build();
+                    chatRepository.save(chat);
+                }
             }
         }
         Log log = Log.builder()
@@ -255,6 +282,18 @@ public class DiscussionController {
                 .action("Վերադարձ զրուցարանի էջ")
                 .build();
         logRepository.save(log);
+
+
         return "redirect:/user_discussion/discussion/" + discId;
+    }
+
+
+    private String uuuId() {
+        return generateRandomStringByUUID();
+    }
+
+
+    private static String generateRandomStringByUUID() {
+        return UUID.randomUUID().toString().replace("-", "");
     }
 }

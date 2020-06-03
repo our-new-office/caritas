@@ -1,10 +1,8 @@
 package am.caritas.caritasfiles.controller;
 
-import am.caritas.caritasfiles.model.Discussion;
-import am.caritas.caritasfiles.model.Log;
-import am.caritas.caritasfiles.model.User;
-import am.caritas.caritasfiles.model.WorkingGroup;
+import am.caritas.caritasfiles.model.*;
 import am.caritas.caritasfiles.model.enums.Role;
+import am.caritas.caritasfiles.repository.AskDiscussionInvitationRepository;
 import am.caritas.caritasfiles.repository.ChatRepository;
 import am.caritas.caritasfiles.repository.LogRepository;
 import am.caritas.caritasfiles.repository.UserDiscussionWorkingGroupRepository;
@@ -22,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/")
@@ -33,14 +32,22 @@ public class MainPageController {
     private final UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository;
     private final LogRepository logRepository;
     private final ChatRepository chatRepository;
+    private final AskDiscussionInvitationRepository askDiscussionInvitationRepository;
 
-    public MainPageController(UserService userService, WorkingGroupService workingGroupService, DiscussionService discussionService, UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository, LogRepository logRepository, ChatRepository chatRepository) {
+    public MainPageController(UserService userService,
+                              WorkingGroupService workingGroupService,
+                              DiscussionService discussionService,
+                              UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository,
+                              LogRepository logRepository,
+                              ChatRepository chatRepository,
+                              AskDiscussionInvitationRepository askDiscussionInvitationRepository) {
         this.userService = userService;
         this.workingGroupService = workingGroupService;
         this.discussionService = discussionService;
         this.userDiscussionWorkingGroupRepository = userDiscussionWorkingGroupRepository;
         this.logRepository = logRepository;
         this.chatRepository = chatRepository;
+        this.askDiscussionInvitationRepository = askDiscussionInvitationRepository;
     }
 
     /**
@@ -67,8 +74,21 @@ public class MainPageController {
                 logRepository.save(log);
                 return "adminPanel";
             } else if (currentUser.getUser().getRole().equals(Role.USER)) {
+                List<AskDiscussionInvitation> allByUserAndHasSent =
+                        askDiscussionInvitationRepository.findAllByUserAndHasSent(currentUser.getUser(), false);
+                List<AskDiscussionInvitation> allByUserAndHasNotSent =
+                        askDiscussionInvitationRepository.findAllByUserAndHasSent(currentUser.getUser(), true);
                 List<Discussion> allForUser = discussionService.findAllForUser(currentUser.getUser());
+                List<Long> collect = allForUser.stream().map(Discussion::getId).collect(Collectors.toList());
+                List<AskDiscussionInvitation> returnableList = new ArrayList<>();
+                for (AskDiscussionInvitation askDiscussionInvitation : allByUserAndHasNotSent) {
+                    if (!collect.contains(askDiscussionInvitation.getDiscussion().getId())) {
+                        returnableList.add(askDiscussionInvitation);
+                    }
+                }
                 modelMap.addAttribute("discussions", allForUser);
+                modelMap.addAttribute("allByUserAndHasSent", allByUserAndHasSent);
+                modelMap.addAttribute("allByUserAndHasNotSent", returnableList);
                 Log log = Log.builder()
                         .user(currentUser.getUser().getName())
                         .date(new Date())
@@ -82,8 +102,21 @@ public class MainPageController {
                 List<Discussion> discussions = new ArrayList<>();
                 if (byAdminId.isPresent()) {
                     WorkingGroup workingGroup = byAdminId.get();
-                    List<Discussion> allByWorkingGroupId = discussionService.findAllByWorkingGroupId(workingGroup.getId());
-                    modelMap.addAttribute("discussions", allByWorkingGroupId);
+                    List<AskDiscussionInvitation> allByUserAndHasSent =
+                            askDiscussionInvitationRepository.findAllByUserAndHasSent(currentUser.getUser(), false);
+                    List<AskDiscussionInvitation> allByUserAndHasNotSent =
+                            askDiscussionInvitationRepository.findAllByUserAndHasSent(currentUser.getUser(), true);
+                    List<Discussion> allForUser = discussionService.findAllByWorkingGroupId(workingGroup.getId());
+                    List<Long> collect = allForUser.stream().map(Discussion::getId).collect(Collectors.toList());
+                    List<AskDiscussionInvitation> returnableList = new ArrayList<>();
+                    for (AskDiscussionInvitation askDiscussionInvitation : allByUserAndHasNotSent) {
+                        if (!collect.contains(askDiscussionInvitation.getDiscussion().getId())) {
+                            returnableList.add(askDiscussionInvitation);
+                        }
+                    }
+                    modelMap.addAttribute("discussions", allForUser);
+                    modelMap.addAttribute("allByUserAndHasSent", allByUserAndHasSent);
+                    modelMap.addAttribute("allByUserAndHasNotSent", returnableList);
                     modelMap.addAttribute("currentUser", currentUser.getUser());
                 }
                 Log log = Log.builder()
@@ -93,7 +126,8 @@ public class MainPageController {
                         .build();
                 logRepository.save(log);
                 return "discussion";
-            }else if(currentUser.getUser().getRole().equals(Role.LOG_MANAGER)){
+            } else if (currentUser.getUser().getRole().equals(Role.LOG_MANAGER)) {
+
 //                Log log = Log.builder()
 //                        .user(currentUser.getUser().getName())
 //                        .date(new Date())

@@ -57,13 +57,13 @@
                             <i class="fas fa-user"></i><span th:text="#{chat.main}"></span></a>
                     </li>
                 </ul>
-
                 <ul class="list-unstyled navbar__list">
-
                     <hr>
-                    <h4 th:if="${discussionsForGroupAdmin!=null && discussionsForGroupAdmin.size()>0}" th:text="#{your.discussions}">Ձեր զրուցարանները</h4>
+                    <h4 th:if="${discussionsForGroupAdmin!=null && discussionsForGroupAdmin.size()>0}"
+                        th:text="#{your.discussions}">Ձեր զրուցարանները</h4>
                     <li class="has-sub" th:each="discussion:${discussionsForGroupAdmin}">
-                        <a th:href="@{'/user_discussion/discussion/'+${discussion.getId()}}" th:text="${discussion.getTitle()}">
+                        <a th:href="@{'/user_discussion/discussion/'+${discussion.getId()}}"
+                           th:text="${discussion.getTitle()}">
                             <i class="fas fa-user"></i><span th:text="#{chat.main}"></span></a>
                     </li>
 
@@ -84,6 +84,17 @@
                         <div class="header-button">
 
                             <div class="account-wrap" style="display: flex;align-items: center;height: 75px;">
+                                <div style="position: relative; cursor: pointer" id="bells">
+                                    <span id="counterPlace"
+                                          style="display:flex; justify-content:center; align-items:center; padding: 7px; background-color:#dc3545; color: #fff; width: 50px; height: 50px; border-radius: 50%"></span>
+                                    <ul id="bellDropDown"
+                                        style="width:300px; position: absolute; z-index: 2000; border: 1px solid rgba(0,0,0,.1); background-color: #FFFFFF; padding: 10px 20px; border-radius: 5px; display: none">
+                                        <!--                                        <li style="list-style: none; border-bottom:1px solid rgba(0,0,0,.5) "><a href="#">Notification....1 </a></li>-->
+                                        <!--                                        <li style="list-style: none; border-bottom:1px solid rgba(0,0,0,.5)"><a href="#">Notification....1 </a></li>-->
+                                        <!--                                        <li style="list-style: none; border-bottom:1px solid rgba(0,0,0,.5)"><a href="#">Notification....1 </a></li>-->
+                                        <!--                                        <li style="list-style: none; border-bottom:1px solid rgba(0,0,0,.5)"><a href="#">Notification....1 </a></li>-->
+                                    </ul>
+                                </div>
 
                                 <div>
                                     <div style="width:100%; display: flex;justify-content: center;margin-left: 20px;margin-right: 50px">
@@ -104,7 +115,8 @@
                                         $(function () {
                                             $('#language').on('change', function () {
                                                 url = window.location.pathname;
-                                                var url = url + $(this).val();                                                console.log(url);
+                                                var url = url + $(this).val();
+                                                console.log(url);
                                                 if (url) {
                                                     window.location = url;
                                                 }
@@ -165,6 +177,18 @@
 
                     <div class="row">
                         <div class="col-md-12">
+                            <div style="display: none; overflow: hidden; justify-content: space-between" id="closeWrap"
+                                 class="alert alert-warning">
+                                <div id="notificationArea">
+
+                                </div>
+                                <label for="close" style="display: none; cursor: pointer; font-weight: bold"
+                                       id="labelClose">X</label>
+                                <input style="display: none" id="close" type="button" value="X"/>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
                             <h3 class="title-5 m-b-35" th:text="#{discussion.creation}">Զրույցի ստեղծում</h3>
 
                             <div class="card">
@@ -172,7 +196,8 @@
                                     <h4 th:text="#{discussion.creation.information}">Զրույցի ստեղծման ինֆորմացիա</h4>
                                 </div>
                                 <div class="card-body">
-                                    <p class="text-muted m-b-15" th:text="#{discussion.creation.hint}">Զրույց ստեղծելու համար բավական է մուտքագրել ստորև նշված դաշտերը</p>
+                                    <p class="text-muted m-b-15" th:text="#{discussion.creation.hint}">Զրույց ստեղծելու
+                                        համար բավական է մուտքագրել ստորև նշված դաշտերը</p>
                                     <div style="font-weight: bold" th:if="${bindingError!=null}"
                                          class="alert alert-danger" th:text="${bindingError}">
                                     </div>
@@ -192,36 +217,46 @@
                                 </div>
                                 <div class="card-body card-block">
 
-                                    <form action="/discussions/add_discussion" method="post" enctype="multipart/form-data"
+                                    <form action="/discussions/add_discussion" method="post"
+                                          enctype="multipart/form-data"
                                           class="form-horizontal" id="discuss">
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
-                                                <input type="text" id="text-input0" name="title" th:placeholder="#{create.discussion.title}"
+                                                <input type="text" id="text-input0" name="title"
+                                                       th:placeholder="#{create.discussion.title}"
                                                        class="form-control" th:if="${oldDiscussion!=null}"
                                                        th:value="${oldDiscussion.getTitle()}" required>
-                                                <input type="text" id="text-input" name="title" th:placeholder="#{discussion.title}"
+                                                <input type="text" id="text-input" name="title"
+                                                       th:placeholder="#{discussion.title}"
                                                        class="form-control" th:if="${oldDiscussion==null}" required>
                                             </div>
                                         </div>
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
-                                                <textarea th:if="${oldDiscussion!=null}" name="description" id="disc" class="form-control" cols="30" rows="10" th:value="${oldDiscussion.getDescription()}" required></textarea>
-                                                <textarea th:if="${oldDiscussion==null}" name="description" id="disc1" class="form-control" cols="30" rows="10" th:placeholder="#{working.group.table.desc}" required></textarea>
+                                                <textarea th:if="${oldDiscussion!=null}" name="description" id="disc"
+                                                          class="form-control" cols="30" rows="10"
+                                                          th:value="${oldDiscussion.getDescription()}"
+                                                          required></textarea>
+                                                <textarea th:if="${oldDiscussion==null}" name="description" id="disc1"
+                                                          class="form-control" cols="30" rows="10"
+                                                          th:placeholder="#{working.group.table.desc}"
+                                                          required></textarea>
 
                                             </div>
                                         </div>
 
-                                            <div class="row form-group">
-                                                <div class="col-12 col-md-12">
-                                                    <label for="thumbnail" th:text="#{working.group.table.img}"></label>
-                                                    <input type="file" name="img" id="thumbnail"  class="form-control">
-                                                </div>
+                                        <div class="row form-group">
+                                            <div class="col-12 col-md-12">
+                                                <label for="thumbnail" th:text="#{working.group.table.img}"></label>
+                                                <input type="file" name="img" id="thumbnail" class="form-control">
                                             </div>
+                                        </div>
 
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
                                                 <label for="files" th:text="#{chat.documents}">Փաստաթղթեր</label>
-                                                <input type="file" name="fewfiles" id="files" multiple  class="form-control">
+                                                <input type="file" name="fewfiles" id="files" multiple
+                                                       class="form-control">
                                             </div>
                                         </div>
 
@@ -233,21 +268,25 @@
                                         </div>
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
-                                                <span class="btn badge-info" onclick="addInput()" th:text="#{add}">Ավելացնել <i class="fas fa-plus"></i>․․․</span>
+                                                <span class="btn badge-info" onclick="addInput()" th:text="#{add}">Ավելացնել <i
+                                                        class="fas fa-plus"></i>․․․</span>
                                             </div>
                                         </div>
 
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
-                                                <input type="hidden" name="usersForDiscussion" th:value="${currentUser.getId()}">
+                                                <input type="hidden" name="usersForDiscussion"
+                                                       th:value="${currentUser.getId()}">
                                                 <p th:each="user: ${users}">
-                                                    <input type="checkbox" name="usersForDiscussion" th:value="${user.getId()}" style="padding: 2px">
+                                                    <input type="checkbox" name="usersForDiscussion"
+                                                           th:value="${user.getId()}" style="padding: 2px">
                                                     <span th:text="${user.getName()}"></span>
                                                 </p>
 
                                             </div>
                                         </div>
-                                        <input type="hidden" name="workingGroupForDiscussion" th:value="${workingGroup.getId()}">
+                                        <input type="hidden" name="workingGroupForDiscussion"
+                                               th:value="${workingGroup.getId()}">
 
                                         <div class="card-footer">
                                             <button type="submit" class="btn btn-primary btn-sm">
@@ -306,9 +345,128 @@
 
 <!-- Main JS-->
 <script src="/js/main.js"></script>
+<script>
 
+    $(document).ready(function () {
 
+        $.ajax({
+            type: 'GET',
+            url: '/notification/chats',
+            success: function (data) {
+                let count = data.length;
+                document.getElementById("counterPlace").innerHTML = `<i class="zmdi zmdi-notifications-active"></i>&nbsp;${count}`;
+                let text = '';
+                $.each(data, function (i, row) {
+                    if (data.length > 0) {
+                        text += "<li style='list-style: none;'><a href='javascript:void (0)' onclick='openNotificationModal(" + row.id + ", event)'>" + row.message.substring(0, 20) + "</a></li>"
+                    }
+                });
+                $('#bellDropDown').html(text);
+            },
+        });
+    });
+
+    let isOpen = false;
+    $("#createNotification").on("click", function () {
+        $("#notificationInput").css("display", "block");
+        $("#saveNote").css("display", "block");
+        $("#saveNote").css("margin-top", "15px");
+        $("#saveNote").css("width", "100%");
+    });
+
+    $("#saveNote").on("click", function () {
+        let data = $("#saveNotification").serialize();
+        $.ajax({
+            type: "POST",
+            url: "/notification/chat",
+            data: data,
+            success: function () {
+                $("#notificationInput").css("display", "none");
+                $("#saveNote").css("display", "none");
+                $("#saveNote").css("display", "none");
+            },
+            error: function (error) {
+                window.location = "/error";
+            }
+        });
+    });
+
+    $("#bells").on("click", function () {
+        if (isOpen) {
+            $("#bellDropDown").css("display", "none");
+            isOpen = false;
+        } else {
+            $("#bellDropDown").css("display", "block");
+            isOpen = true;
+        }
+    });
+
+    let interval = 30000;
+
+    function getNotifications() {
+        $.ajax({
+            type: 'GET',
+            url: '/notification/chats',
+            success: function (data) {
+                let count = data.length;
+                document.getElementById("counterPlace").innerHTML = `<i class="zmdi zmdi-notifications-active"></i>&nbsp;${count}`;
+                let text = '';
+                $.each(data, function (i, row) {
+                    if (data.length > 0) {
+                        text += "<li style='list-style: none;'><a href='javascript:void (0)' onclick='openNotificationModal(" + row.id + ", event)'>" + row.message.substring(0, 20) + "</a></li>"
+                    }
+                });
+                $('#bellDropDown').html(text);
+            },
+            complete: function (data) {
+                setTimeout(getNotifications, interval);
+            }
+        });
+    }
+
+    setTimeout(getNotifications, interval);
+
+    function openNotificationModal(id, e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '/notification/read?notificationId=' + id,
+            success: function (data) {
+                document.getElementById("closeWrap").style.display = "flex";
+                document.getElementById("labelClose").style.display = "block";
+                document.getElementById("notificationArea").style.display = "block";
+                document.getElementById("notificationArea").innerHTML = `
+                 <span>${data.message}</span>
+                `;
+            },
+            error: function (error) {
+                window.location = "/error";
+            }
+        });
+    }
+
+    $("#close").on("click", function () {
+        document.getElementById("notificationArea").style.display = "none";
+        document.getElementById("closeWrap").style.display = "none";
+        document.getElementById("labelClose").style.display = "none";
+        document.getElementById("notificationArea").value = '';
+        $.ajax({
+            type: 'GET',
+            url: '/notification/chats',
+            success: function (data) {
+                let count = data.length;
+                document.getElementById("counterPlace").innerHTML = `<i class="zmdi zmdi-notifications-active"></i>&nbsp;${count}`;
+                let text = '';
+                $.each(data, function (i, row) {
+                    if (data.length > 0) {
+                        text += "<li style='list-style: none;'><a href='javascript:void (0)' onclick='openNotificationModal(" + row.id + ", event)'>" + row.message.substring(0, 20) + "</a></li>"
+                    }
+                });
+                $('#bellDropDown').html(text);
+            },
+        });
+    });
+</script>
 </body>
-
 </html>
 <!-- end document-->
