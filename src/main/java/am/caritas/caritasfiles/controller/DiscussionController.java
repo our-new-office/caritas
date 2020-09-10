@@ -6,6 +6,7 @@ import am.caritas.caritasfiles.model.*;
 import am.caritas.caritasfiles.repository.*;
 import am.caritas.caritasfiles.security.CurrentUser;
 import am.caritas.caritasfiles.service.DiscussionService;
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -118,9 +119,11 @@ public class DiscussionController {
                     return "redirect:/";
                 }
 
-
-                modelMap.addAttribute("currentUser", currentUser.getUser());
+                List<Chat> allByDiscussionId = chatRepository.findAllByDiscussionId(id);
+                modelMap.addAttribute("user", currentUser.getUser());
                 modelMap.addAttribute("discussion", discussion);
+                modelMap.addAttribute("discussionId", discussion.getId());
+                modelMap.addAttribute("chats", allByDiscussionId);
                 Log log = Log.builder()
                         .date(new Date())
                         .user(currentUser.getUser().getName())
@@ -128,6 +131,7 @@ public class DiscussionController {
                         .build();
                 logRepository.save(log);
                 return "chat";
+//                return "socketCHat";
             }
             Log log = Log.builder()
                     .date(new Date())
@@ -155,7 +159,7 @@ public class DiscussionController {
         Optional<Discussion> discById = discussionRepository.findById(discussionId);
         byId.ifPresent(chat::setUser);
         chat.setDate(new Date());
-        discById.ifPresent(chat::setDiscussion);
+        chat.setDiscussionId(discussionId);
         chatRepository.save(chat);
         Log log = Log.builder()
                 .date(new Date())
@@ -176,7 +180,7 @@ public class DiscussionController {
                     .id(chat.getId())
                     .content(chat.getContent())
                     .user(chat.getUser().getName())
-                    .discussion(chat.getDiscussion().getTitle())
+                    .discussion("Discussion")
                     .file(chat.getFile())
                     .date(chat.getDate().toString())
                     .userPic(chat.getUser().getAvatar())
@@ -222,7 +226,7 @@ public class DiscussionController {
     }
 
     @PostMapping("/fileUpload")
-    public String fileUpload(@Valid UserDiscussionFiles userDiscussionFiles,
+    public ResponseEntity<?> fileUpload(@Valid UserDiscussionFiles userDiscussionFiles,
                              @AuthenticationPrincipal CurrentUser currentUser,
                              @RequestParam("discId") Long discId,
                              @RequestParam("img") MultipartFile[] multipartFiles) {
@@ -232,6 +236,8 @@ public class DiscussionController {
         if (!filesdir.exists()) {
             filesdir.mkdirs();
         }
+
+        String responce = null;
 
 
         if (!multipartFiles[0].isEmpty()) {
@@ -252,6 +258,8 @@ public class DiscussionController {
                         .url(originalFilename)
                         .build();
 
+                responce = originalFilename;
+
                 Optional<Discussion> byId = discussionRepository.findById(discId);
                 byId.ifPresent(userDiscussionFilesForSave::setDiscussion);
                 userDiscussionFilesRepository.save(userDiscussionFilesForSave);
@@ -263,17 +271,17 @@ public class DiscussionController {
                         .build();
                 logRepository.save(log);
                 Optional<Discussion> optionalDiscussion = discussionRepository.findById(discId);
-                if (optionalDiscussion.isPresent()) {
-                    Discussion discussion = optionalDiscussion.get();
-                    Chat chat = Chat.builder()
-                            .content(null)
-                            .date(new Date())
-                            .user(currentUser.getUser())
-                            .discussion(discussion)
-                            .file(originalFilename)
-                            .build();
-                    chatRepository.save(chat);
-                }
+//                if (optionalDiscussion.isPresent()) {
+//                    Discussion discussion = optionalDiscussion.get();
+//                    Chat chat = Chat.builder()
+//                            .content(null)
+//                            .date(new Date())
+//                            .user(currentUser.getUser())
+//                            .discussionId(discussion.getId())
+//                            .file(originalFilename)
+//                            .build();
+//                    chatRepository.save(chat);
+//                }
             }
         }
         Log log = Log.builder()
@@ -284,7 +292,20 @@ public class DiscussionController {
         logRepository.save(log);
 
 
-        return "redirect:/user_discussion/discussion/" + discId;
+        return ResponseEntity.status(HttpStatus.OK).body(new Gson().toJson(responce));
+    }
+
+
+    @GetMapping("/getHrefs")
+    public ResponseEntity<?> getHrefs(@RequestParam(name = "id") long id){
+        List<Chat> allByDiscussionId = chatRepository.findAllByDiscussionId(id);
+        List<String> discuccionLinks = new ArrayList<>();
+        for (Chat chat : allByDiscussionId) {
+
+            String file = chat.getFile();
+            discuccionLinks.add(file);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(discuccionLinks);
     }
 
 

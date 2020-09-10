@@ -57,7 +57,7 @@ public class DiscussionServiceImpl implements DiscussionService {
         List<Discussion> all = discussionRepository.findAll();
         for (Discussion discussion : all) {
             List<User> users = discussion.getUsers();
-            if(users.contains(user)){
+            if (users.contains(user)) {
                 allForDiscussion.add(discussion);
             }
         }

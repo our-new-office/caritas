@@ -1,6 +1,7 @@
 package am.caritas.caritasfiles.model;
 
 import lombok.*;
+import org.springframework.data.repository.cdi.Eager;
 
 import javax.persistence.*;
 import java.util.List;
@@ -33,9 +34,6 @@ public class Discussion {
 
     @ManyToMany
     private List<Link> links;
-
-    @ManyToMany
-    private List<Chat> chats;
 
     @ManyToMany
     private List<User> users;

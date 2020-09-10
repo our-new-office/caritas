@@ -79,7 +79,7 @@ public class LogController {
         List<Long> collect = allForUser.stream().map(Discussion::getId).collect(Collectors.toList());
         List<AskDiscussionInvitation> returnableList = new ArrayList<>();
         for (AskDiscussionInvitation askDiscussionInvitation : allByUserAndHasNotSent) {
-            if(!collect.contains(askDiscussionInvitation.getDiscussion().getId())){
+            if (!collect.contains(askDiscussionInvitation.getDiscussion().getId())) {
                 returnableList.add(askDiscussionInvitation);
             }
         }

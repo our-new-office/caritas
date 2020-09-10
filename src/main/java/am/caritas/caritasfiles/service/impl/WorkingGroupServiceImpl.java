@@ -72,7 +72,7 @@ public class WorkingGroupServiceImpl implements WorkingGroupService {
             discussion.setWorkingGroup(null);
             discussionService.save(discussion);
             chatRepository.findAllByDiscussionId(discussion.getId()).forEach(chat -> {
-                chat.setDiscussion(null);
+//                chat.setDiscussion(null);
                 chat.setUser(null);
                 chatRepository.delete(chat);
             });

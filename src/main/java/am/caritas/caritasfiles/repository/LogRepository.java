@@ -17,8 +17,4 @@ public interface LogRepository extends JpaRepository<Log, Long> {
     List<Log> findAllByUserIgnoreCaseContainingOrderByIdDesc(String user);
 
     List<Log> findAllByActionContainingOrderByIdDesc(String action);
-
-
-
-
 }

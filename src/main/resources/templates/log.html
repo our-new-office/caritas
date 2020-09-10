@@ -61,9 +61,11 @@
                 <ul class="list-unstyled navbar__list">
 
                     <hr>
-                    <h4 th:if="${discussions != null && discussions.size()>0}" th:text="#{your.discussions}">Ձեր զրուցարանները</h4>
+                    <h4 th:if="${discussions != null && discussions.size()>0}" th:text="#{your.discussions}">Ձեր
+                        զրուցարանները</h4>
                     <li class="has-sub" th:each="discussion:${discussions}">
-                        <a th:href="@{'/user_discussion/discussion/'+${discussion.getId()}}" th:text="${discussion.getTitle()}">
+                        <a th:href="@{'/user_discussion/discussion/'+${discussion.getId()}}"
+                           th:text="${discussion.getTitle()}">
                             <i class="fas fa-user"></i><span th:text="#{chat.main}"></span></a>
                     </li>
 
@@ -73,8 +75,10 @@
                     <li class="has-sub" th:each="allOtherTopics: ${allByUserAndHasSent}"
                         th:if="${allOtherTopics.getDiscussion()!=null}" style="display: flex; align-items: center "
                     >
-                        <span  th:text="${allOtherTopics.getDiscussion().getTitle()}" style="margin-right: 15px;"></span>
-                        <a style="width: 100px;" th:href="@{'/groupRequest/add?discussionId='+${allOtherTopics.getDiscussion().getId()}}"><i class="zmdi zmdi-accounts-add addToGroup" title="Request for joining the group"></i></a>
+                        <span th:text="${allOtherTopics.getDiscussion().getTitle()}" style="margin-right: 15px;"></span>
+                        <a style="width: 100px;"
+                           th:href="@{'/groupRequest/add?discussionId='+${allOtherTopics.getDiscussion().getId()}}"><i
+                                class="zmdi zmdi-accounts-add addToGroup" title="Request for joining the group"></i></a>
 
 
                     </li>
@@ -82,9 +86,10 @@
                 <ul class="list-unstyled navbar__list" th:if="${allByUserAndHasNotSent.size()>0}">
                     <li style="margin-bottom: 20px;"><h3 th:text="#{joinedOrRequested.topics}">Other topics</h3></li>
                     <li class="has-sub" th:each="allOtherTopics: ${allByUserAndHasNotSent}"
-                        th:if="${allOtherTopics.getDiscussion()!=null}" style="display: flex; align-items: center; justify-content: space-between"
+                        th:if="${allOtherTopics.getDiscussion()!=null}"
+                        style="display: flex; align-items: center; justify-content: space-between"
                     >
-                        <span  th:text="${allOtherTopics.getDiscussion().getTitle()}" style="margin-right: 15px;"></span>
+                        <span th:text="${allOtherTopics.getDiscussion().getTitle()}" style="margin-right: 15px;"></span>
 
                     </li>
                 </ul>
@@ -213,17 +218,20 @@
 
                             <form action="/log_managment/search_by_date" method="post">
                                 <input type="date" name="date">
-                                <input type="submit" class="btn btn-danger" th:value="#{search}" onsubmit="this.form.reset()">
+                                <input type="submit" class="btn btn-danger" th:value="#{search}"
+                                       onsubmit="this.form.reset()">
                             </form>
 
                             <form action="/log_managment/search_by_name" method="post">
-                                <input type="text" class="searchInput" name="userName" th:placeholder="#{write.name}" >
-                                <input type="submit" class="btn btn-danger" th:value="#{search}"  onsubmit="this.form.reset()">
+                                <input type="text" class="searchInput" name="userName" th:placeholder="#{write.name}">
+                                <input type="submit" class="btn btn-danger" th:value="#{search}"
+                                       onsubmit="this.form.reset()">
                             </form>
 
                             <form action="/log_managment/search_by_action" method="post">
                                 <input class="searchInput" type="text" name="action" th:placeholder="#{write.action}">
-                                <input type="submit" class="btn btn-danger" th:value="#{search}"  onsubmit="this.form.reset()">
+                                <input type="submit" class="btn btn-danger" th:value="#{search}"
+                                       onsubmit="this.form.reset()">
                             </form>
 
 
@@ -234,49 +242,60 @@
                     <div class="row m-t-30">
                         <div class="col-md-12">
                             <div class="table-responsive m-b-40">
-        <h3 style="text-align: center" th:text="#{log.management}"> Լոգ մենեջմենթ</h3>
+                                <h3 style="text-align: center" th:text="#{log.management}"> Լոգ մենեջմենթ</h3>
                                 <div class="pagination">
-                                    <a th:if="${logs.number +1 > 1}" th:href="@{'/log_managment/list'}" class="end"><span th:text="#{start}"></span></a>
-                                    <a th:if="${logs.hasPrevious()}" th:href="@{'/log_managment/list?page=' + ${logs.number}}" th:text="${logs.number}"><span th:text="#{previous}"></span></a>
-                                    <span class = "current" th:if="${logs.number<1}" th:text="1"></span>
-                                    <span class ="current" th:if="${logs.number >= 1}" th:text="${logs.number+1}"></span>
-                                    <a th:if="${logs.hasNext()}" th:href="@{'/log_managment/list?page=' + ${logs.number+2}}" th:text="${logs.number + 2}"><span th:text="#{next}"></span></a>
-                                    <a th:if="${logs.number +1 < logs.totalPages}" th:href="@{'/log_managment/list?page=' + ${logs.totalPages}}" class="end"><span th:text="#{last}"></span></a>
+                                    <a th:if="${logs.number +1 > 1}" th:href="@{'/log_managment/list'}"
+                                       class="end"><span th:text="#{start}"></span></a>
+                                    <a th:if="${logs.hasPrevious()}"
+                                       th:href="@{'/log_managment/list?page=' + ${logs.number}}"
+                                       th:text="${logs.number}"><span th:text="#{previous}"></span></a>
+                                    <span class="current" th:if="${logs.number<1}" th:text="1"></span>
+                                    <span class="current" th:if="${logs.number >= 1}" th:text="${logs.number+1}"></span>
+                                    <a th:if="${logs.hasNext()}"
+                                       th:href="@{'/log_managment/list?page=' + ${logs.number+2}}"
+                                       th:text="${logs.number + 2}"><span th:text="#{next}"></span></a>
+                                    <a th:if="${logs.number +1 < logs.totalPages}"
+                                       th:href="@{'/log_managment/list?page=' + ${logs.totalPages}}" class="end"><span
+                                            th:text="#{last}"></span></a>
 
                                 </div>
-        <table id="dtBasicExample" class="table table-striped table-bordered" cellspacing="0" width="100%">
-            <thead>
-            <tr>
-                <th class="th-sm" th:text="#{date}">Ամսաթիվ
-                </th>
-                <th class="th-sm" th:text="#{table.user.name}">Անուն
-                </th>
-                <th class="th-sm" th:text="#{action}">Գործողություն
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="log: ${logs}">
-                <td th:text="${#strings.substring((log.getDate().toString()), 0,log.getDate().toString().length()-2)}">Tiger Nixon</td>
-                <td th:text="${log.getUser()}">System Architect</td>
-                <td th:text="${log.getAction()}">Edinburgh</td>
+                                <table id="dtBasicExample" class="table table-striped table-bordered" cellspacing="0"
+                                       width="100%">
+                                    <thead>
+                                    <tr>
+                                        <th class="th-sm" th:text="#{date}">Ամսաթիվ
+                                        </th>
+                                        <th class="th-sm" th:text="#{table.user.name}">Անուն
+                                        </th>
+                                        <th class="th-sm" th:text="#{action}">Գործողություն
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="log: ${logs}">
+                                        <td th:text="${#strings.substring((log.getDate().toString()), 0,log.getDate().toString().length()-2)}">
+                                            Tiger Nixon
+                                        </td>
+                                        <td th:text="${log.getUser()}">System Architect</td>
+                                        <td th:text="${log.getAction()}">Edinburgh</td>
 
-            </tr>
+                                    </tr>
 
-            </tbody>
-            <tfoot>
-            <tr>
-                <th th:text="#{date}">Անմսաթիվ
-                </th>
-                <th  th:text="#{table.user.name}">Անուն
-                </th>
-                <th th:text="#{action}">Գործողություն
-                </th>
-            </tr>
-            </tfoot>
-        </table>
+                                    </tbody>
+                                    <tfoot>
+                                    <tr>
+                                        <th th:text="#{date}">Անմսաթիվ
+                                        </th>
+                                        <th th:text="#{table.user.name}">Անուն
+                                        </th>
+                                        <th th:text="#{action}">Գործողություն
+                                        </th>
+                                    </tr>
+                                    </tfoot>
+                                </table>
                                 <div class="pagination">
-                                    <a th:if="${logs.number +1 > 1}" th:href="@{'/log_managment/list'}" class="end"><span th:text="#{start}"></span></a>
+                                    <a th:if="${logs.number +1 > 1}" th:href="@{'/log_managment/list'}"
+                                       class="end"><span th:text="#{start}"></span></a>
                                     <a th:if="${logs.hasPrevious()}"
                                        th:href="@{'/log_managment/list?page=' + ${logs.number}}"
                                        th:text="${logs.number}"><span th:text="#{previous}"></span></a>
@@ -333,9 +352,9 @@
 <!-- Main JS-->
 <script src="/js/main.js"></script>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('#example').DataTable();
-    } );
+    });
 </script>
 <script>
 

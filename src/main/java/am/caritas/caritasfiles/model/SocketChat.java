@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -12,25 +11,28 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Entity
-@Table
-public class Log {
+@Builder
+public class SocketChat {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
-    private Long id;
+    private int id;
 
+    @Column(columnDefinition = "TEXT")
+    private String text;
+
+    @ManyToOne
+    private User sender;
+
+    @ManyToOne
+    private Discussion discussion;
 
     @Column
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
     private Date date;
 
     @Column
-    private String user;
-
-    @Column
-    private String action;
+    private String file;
 
 }
+

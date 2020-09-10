@@ -245,10 +245,12 @@
                                           class="form-horizontal">
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
-                                                <input type="text" id="text-input" name="title" th:placeholder="#{create.working.group.title}"
+                                                <input type="text" id="text-input" name="title"
+                                                       th:placeholder="#{create.working.group.title}"
                                                        class="form-control" th:if="${oldWorkingGroup!=null}"
                                                        th:value="${oldWorkingGroup.getTitle()}">
-                                                <input type="text" id="text-input" name="title" th:placeholder="#{create.working.group.title}"
+                                                <input type="text" id="text-input" name="title"
+                                                       th:placeholder="#{create.working.group.title}"
                                                        class="form-control" th:unless="${oldWorkingGroup!=null}">
                                             </div>
                                         </div>
@@ -279,7 +281,8 @@
                                             </div>
                                         </div>
                                         <div class="card-footer">
-                                            <button type="submit" class="btn btn-primary btn-sm"><span th:text="#{accept}"></span>
+                                            <button type="submit" class="btn btn-primary btn-sm"><span
+                                                    th:text="#{accept}"></span>
                                             </button>
 
                                             <a href="/" type="reset" class="btn btn-danger btn-sm">

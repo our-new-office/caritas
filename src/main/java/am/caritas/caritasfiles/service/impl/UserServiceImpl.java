@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
         mailToAdmin.setFrom("intranet@caritas.am");
         mailToAdmin.setTo(adminEmail);
         mailToAdmin.setSubject("New User Password");
-        mailToAdmin.setContent("Dear admin, the user : " + user.getName() + ", email : " +  user.getEmail() + " has accepted his account and set the password  - \n" + password);
+        mailToAdmin.setContent("Dear admin, the user : " + user.getName() + ", email : " + user.getEmail() + " has accepted his account and set the password  - \n" + password);
         emailService.sendEmail(mailToAdmin);
         return true;
     }
@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteById(Long id) {
         Optional<WorkingGroup> byWorkingGroupAdminId = workingGroupRepository.findByWorkingGroupAdminId(id);
-        if(byWorkingGroupAdminId.isPresent()){
+        if (byWorkingGroupAdminId.isPresent()) {
             WorkingGroup workingGroup = byWorkingGroupAdminId.get();
             workingGroup.setWorkingGroupAdmin(null);
             workingGroupRepository.save(workingGroup);
@@ -106,7 +106,7 @@ public class UserServiceImpl implements UserService {
         List<Chat> allByUserId = chatRepository.findAllByUserId(id);
         chatRepository.deleteAll(allByUserId);
         Optional<User> byId = userRepository.findById(id);
-        if(byId.isPresent()){
+        if (byId.isPresent()) {
             User user = byId.get();
             List<Discussion> allByUsersContains = discussionRepository.findAllByUsersContains(user);
             for (Discussion allByUsersContain : allByUsersContains) {

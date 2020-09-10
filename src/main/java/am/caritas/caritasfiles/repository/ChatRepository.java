@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface ChatRepository extends JpaRepository<Chat, Long> {
     List<Chat> findAllByOrderByIdDesc();
+
     List<Chat> findAllByDiscussionId(Long id);
+
     List<Chat> findAllByUserId(Long id);
 }

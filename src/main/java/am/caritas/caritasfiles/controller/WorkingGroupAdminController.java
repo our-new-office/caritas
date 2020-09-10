@@ -67,7 +67,7 @@ public class WorkingGroupAdminController {
                                        UserDiscussionWorkingGroupRepository userDiscussionWorkingGroupRepository,
                                        ChatRepository chatRepository,
                                        UserDiscussionFilesRepository userDiscussionFilesRepository
-                                       ) {
+    ) {
         this.emailService = emailService;
         this.askDiscussionInvitationRepository = askDiscussionInvitationRepository;
 
@@ -265,9 +265,9 @@ public class WorkingGroupAdminController {
                     .user(user)
                     .build();
 
-            if(users.contains(user)){
+            if (users.contains(user)) {
                 askDiscussionInvitation.setHasSent(true);
-            }else {
+            } else {
                 askDiscussionInvitation.setHasSent(false);
             }
             askDiscussionInvitationRepository.save(askDiscussionInvitation);
@@ -568,7 +568,7 @@ public class WorkingGroupAdminController {
                     if (byId.isPresent()) {
                         User user = byId.get();
                         usersForDiscussion.add(user);
-                        if(!oldUsers.contains(user)){
+                        if (!oldUsers.contains(user)) {
                             mailToMember.setFrom("intranet@caritas.am");
                             mailToMember.setTo(byId.get().getEmail());
                             mailToMember.setSubject("Invitation");
@@ -603,9 +603,9 @@ public class WorkingGroupAdminController {
                     .discussion(discussion)
                     .user(user)
                     .build();
-            if(users.contains(user)){
+            if (users.contains(user)) {
                 askDiscussionInvitation.setHasSent(true);
-            }else {
+            } else {
                 askDiscussionInvitation.setHasSent(false);
             }
             askDiscussionInvitationRepository.save(askDiscussionInvitation);
@@ -630,22 +630,18 @@ public class WorkingGroupAdminController {
             String name = byId.get().getTitle();
             List<Link> links = discussion.getLinks();
             List<User> users = discussion.getUsers();
-            List<Chat> chats = discussion.getChats();
 
 
             discussion.setDocuments(null);
             discussion.setUsers(null);
             discussion.setLinks(null);
-            discussion.setChats(null);
             discussion.setWorkingGroup(null);
 
             for (Link link : links) {
                 linkRepository.delete(link);
             }
 
-            for (Chat chat : chats) {
-                chatRepository.delete(chat);
-            }
+
 
             for (Document document : documents) {
                 File file = new File(discussionFilesUrl + document.getUrl());
@@ -661,7 +657,7 @@ public class WorkingGroupAdminController {
 
             List<Chat> allByDiscussionIdOrderByIdDesc = chatRepository.findAllByDiscussionId(discussion.getId());
             allByDiscussionIdOrderByIdDesc.forEach(chat -> {
-                chat.setDiscussion(null);
+//                chat.setDiscussion(null);
                 chatRepository.save(chat);
                 chatRepository.delete(chat);
             });

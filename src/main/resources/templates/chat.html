@@ -10,8 +10,7 @@
     <meta name="keywords" content="au theme template">
 
     <!-- Title Page-->
-    <title>Admin Panel - Caritas</title>
-
+    <title>Chat - Caritas</title>
     <!-- Fontfaces CSS-->
     <link href="/css/font-face.css" rel="stylesheet" media="all">
     <link href="/vendor/font-awesome-4.7/css/font-awesome.min.css" rel="stylesheet" media="all">
@@ -32,9 +31,14 @@
     <link href="/vendor/slick/slick.css" rel="stylesheet" media="all">
     <link href="/vendor/select2/select2.min.css" rel="stylesheet" media="all">
     <link href="/vendor/perfect-scrollbar/perfect-scrollbar.css" rel="stylesheet" media="all">
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <!-- Main CSS-->
     <link href="/css/theme.css" rel="stylesheet" media="all">
+        <script th:inline="javascript">
+            let discussion = [[${discussion}]];
+            console.log(discussion);
+        </script>
 
 </head>
 
@@ -99,10 +103,6 @@
                                           style="display:flex; justify-content:center; align-items:center; padding: 7px; background-color:#dc3545; color: #fff; width: 50px; height: 50px; border-radius: 50%"></span>
                                     <ul id="bellDropDown"
                                         style="width:300px; position: absolute; z-index: 2000; border: 1px solid rgba(0,0,0,.1); background-color: #FFFFFF; padding: 10px 20px; border-radius: 5px; display: none">
-                                        <!--                                        <li style="list-style: none; border-bottom:1px solid rgba(0,0,0,.5) "><a href="#">Notification....1 </a></li>-->
-                                        <!--                                        <li style="list-style: none; border-bottom:1px solid rgba(0,0,0,.5)"><a href="#">Notification....1 </a></li>-->
-                                        <!--                                        <li style="list-style: none; border-bottom:1px solid rgba(0,0,0,.5)"><a href="#">Notification....1 </a></li>-->
-                                        <!--                                        <li style="list-style: none; border-bottom:1px solid rgba(0,0,0,.5)"><a href="#">Notification....1 </a></li>-->
                                     </ul>
                                 </div>
                                 <div>
@@ -136,13 +136,13 @@
 
                                 <div class="account-item clearfix js-item-menu">
                                     <div class="imageHeader">
-                                        <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}"
-                                             th:alt="${currentUser.getName()}"/>
+                                        <img th:src="@{'/users/userImage?'(userImage=${user.getAvatar()})}"
+                                             th:alt="${user.getName()}"/>
                                     </div>
                                     <div class="content">
 
                                         <a class="js-acc-btn" href="#"
-                                           th:text="#{welcome} + ' ' + ${currentUser.getName()}">john
+                                           th:text="#{welcome} + ' ' + ${user.getName()}">john
                                             doe</a>
 
                                     </div>
@@ -151,15 +151,15 @@
                                         <div class="info clearfix">
                                             <div class="image">
                                                 <a href="#">
-                                                    <img th:src="@{'/users/userImage?'(userImage=${currentUser.getAvatar()})}"
-                                                         th:alt="${currentUser.getName()}"/>
+                                                    <img th:src="@{'/users/userImage?'(userImage=${user.getAvatar()})}"
+                                                         th:alt="${user.getName()}"/>
                                                 </a>
                                             </div>
                                             <div class="content">
                                                 <h5 class="name">
-                                                    <a href="#" th:text="${currentUser.getName()}">john doe</a>
+                                                    <a href="#" th:text="${user.getName()}">john doe</a>
                                                 </h5>
-                                                <span class="email" th:text="${currentUser.getEmail()}">johndoe@example.com</span>
+                                                <span class="email" th:text="${user.getEmail()}">johndoe@example.com</span>
                                             </div>
                                         </div>
 
@@ -225,22 +225,35 @@
 
                                         </div>
 
-                                        <ul id="chat"
+                                        <ul id="displayScreen"
                                             style="height: 300px; width: 100%; overflow-y: scroll; scroll-snap-align: end;">
                                             <li id="scr"></li>
+                                            <li th:each="chat: ${chats}">
+                                                <img th:src="@{'/users/userImage?'(userImage=${chat.user.getAvatar()})}"
+                                                     th:alt="${user.getName()}"/>
+                                                <div style='display: flex; flex-direction: column'>
+                                                    <p th:text="${#strings.substring(chat.date.toString(), 0, 19)}"></p>
+                                                    <p th:if="${chat.content!=null}" th:text ="${chat.user.name}"></p>
+                                                </div>
+                                                <div th:if="${chat.content !=null}" th:text="${chat.content}" style="overflow-anchor: auto; margin-left: 20px"></div>
+                                                <div style="margin-left: 20px" th:if="${chat.content == null}">
+                                                    <a th:href="@{'/user_discussion/discussionFile?file=' + ${chat.file}}" th:download="${chat.file}"><span th:text="${chat.file}"></span></a>
+                                                </div>
+                                            </li>
+
                                         </ul>
 
-                                        <div style="padding: 20px;position: relative">
+                                        <div style="padding: 20px; position: relative">
                                             <form id="myForm" style="width: 100%; margin-top: 10px">
-                                            <textarea name="content" id="editor"
+                                            <textarea name="content" id="text"
                                                       style="border: 1px solid silver; background: #fdfdfe; width: 100%; height: 60px; padding: 10px"
                                                       maxlength="1000"></textarea>
                                                 <input type="hidden" name="currentUser"
-                                                       th:value="${currentUser.getId()}">
+                                                       th:value="${user.getId()}">
                                                 <input id="discId" type="hidden" name="discussionId"
                                                        th:value="${discussion.getId()}">
                                                 <br>
-                                                <button type="button" id="send" class="btn btn-info"
+                                                <button type="button" id="sendMessage" class="btn btn-info"
                                                         style="margin-bottom: 50px" th:text="#{chat.send}">Ուղարկել
                                                 </button>
 
@@ -256,11 +269,11 @@
                                                            multiple="multiple">
                                                     Select file
                                                 </label>
-                                                <button type="submit" class="btn btn-warning btn-sm" onclick="upload();"
-                                                        th:text="#{chat.upload}" style="margin-top: -6px; padding: 6px">
-                                                    Վերբեռնել
-                                                </button>
+
                                             </form>
+                                            <button class="btn btn-warning btn-sm" id="fileUploadButton" th:text="#{chat.upload}" style="margin-top: -6px; padding: 6px">
+                                                Վերբեռնել
+                                            </button>
 
                                         </div>
                                     </div>
@@ -272,137 +285,141 @@
                                         Խմբակիցների վերբեռնած փաստաթղթեր</h3>
                                     <ul class="list-unstyled navbar__list" id="hrefs"
                                         style="text-align: center; height: 300px; overflow-y: scroll">
+
+
+
+
                                     </ul>
                                 </div>
 
                             </div>
                         </div>
-                        <script>
-                            var messageBody = document.querySelector('#chat');
-                            messageBody.scrollHeight = 250;
-                            var discId = document.getElementById("discId").value;
-                            var interval = 1000;
-                            var fileInterval = 5000;
+<!--                        <script>-->
+<!--                            var messageBody = document.querySelector('#chat');-->
+<!--                            messageBody.scrollHeight = 250;-->
+<!--                            var discId = document.getElementById("discId").value;-->
+<!--                            var interval = 1000;-->
+<!--                            var fileInterval = 5000;-->
 
-                            function checkForNew() {
-                                $.ajax({
-                                    type: 'GET',
-                                    url: '/user_discussion/count',
-                                    data: $(this).serialize() + "&discId=" + discId,
-                                    dataType: 'json',
-                                    success: function (data) {
-                                        if (data > $("#chat li").length) {
-                                            getChat();
-                                        }
-                                    },
-                                    complete: function (data) {
-                                        setTimeout(checkForNew, interval);
-                                    }
-                                });
-                            }
-
-
-                            function getChat() {
-                                $("#chat").empty();
-                                $.ajax({
-                                    type: 'GET',
-                                    url: '/user_discussion/chat',
-                                    data: $(this).serialize() + "&discId=" + discId,
-                                    dataType: 'json',
-                                    success: function (data) {
-
-                                        $.each(data, function (i, row) {
+<!--                            function checkForNew() {-->
+<!--                                $.ajax({-->
+<!--                                    type: 'GET',-->
+<!--                                    url: '/user_discussion/count',-->
+<!--                                    data: $(this).serialize() + "&discId=" + discId,-->
+<!--                                    dataType: 'json',-->
+<!--                                    success: function (data) {-->
+<!--                                        if (data > $("#chat li").length) {-->
+<!--                                            getChat();-->
+<!--                                        }-->
+<!--                                    },-->
+<!--                                    complete: function (data) {-->
+<!--                                        setTimeout(checkForNew, interval);-->
+<!--                                    }-->
+<!--                                });-->
+<!--                            }-->
 
 
-                                            var obj = JSON.stringify(row.user);
-                                            console.log(row);
+<!--                            function getChat() {-->
+<!--                                $("#chat").empty();-->
+<!--                                $.ajax({-->
+<!--                                    type: 'GET',-->
+<!--                                    url: '/user_discussion/chat',-->
+<!--                                    data: $(this).serialize() + "&discId=" + discId,-->
+<!--                                    dataType: 'json',-->
+<!--                                    success: function (data) {-->
 
-                                            var userObj = JSON.stringify(obj);
-                                            if (row.file === null) {
-                                                $('#chat').append("<li style='padding: 10px;'>" + "<div style='display: flex;'><img style='max-width: 50px; max-height: 50px; height: auto;border-radius: 50%; margin-right: 15px;' src='/users/userImage?&userImage=" + row.userPic + "' alt=''><div></div><div><div><span><b>" + row.user + "</b> &nbsp;</span><span style='color: silver'>" + row.date.substring(0, 16) + "</span></div>" + "<div>" + row.content + "</div></div></li>");
-                                            } else {
-                                                $('#chat').append("<li style='padding: 10px;'>" + "<div style='display: flex;'><img style='max-width: 50px; max-height: 50px; height: auto;border-radius: 50%; margin-right: 15px;' src='/users/userImage?&userImage=" + row.userPic + "' alt=''><div></div><div><div><span><b>" + row.user + "</b> &nbsp;</span><span style='color: silver'>" + row.date.substring(0, 16) + "</span></div>" + "<div>" + "<a href='/user_discussion/user_discussion_file?file=" + row.file + "' download=" + row.file + " >" + row.file + "</a></div></div></li>");
-                                            }
-                                        });
-                                        $('#chat').append("<li id='scr'></li>");
-                                        $("#editor").val("");
-                                        document.getElementById("forScroll").click();
-                                    }
-                                });
-                            }
+<!--                                        $.each(data, function (i, row) {-->
 
 
-                            function getLinks() {
-                                $("#hrefs").empty();
-                                $.ajax({
-                                    type: 'GET',
-                                    url: '/user_discussion/hrefs',
-                                    data: $(this).serialize() + "&discId=" + discId,
-                                    dataType: 'json',
-                                    success: function (data) {
+<!--                                            var obj = JSON.stringify(row.user);-->
+<!--                                            console.log(row);-->
 
-                                        $.each(data, function (i, row) {
-
-
-                                            var obj = JSON.stringify(row.url);
-                                            console.log(obj);
-
-                                            var userObj = JSON.stringify(obj);
-
-                                            $('#hrefs').append("<li style='padding: 10px'>" + "<b>" + row.username + "</b> &nbsp;" + row.date.substring(0, 16) + "&nbsp;<a href='/user_discussion/user_discussion_file?file=" + row.url + "' download=" + row.url + " >" + row.url + "</a> </li>");
-
-                                        });
-                                        $("#editor").val("");
-                                    }
-                                });
-                            }
-
-                            function checkForNewLinks() {
-                                $.ajax({
-                                    type: 'GET',
-                                    url: '/user_discussion/count_files',
-                                    data: $(this).serialize() + "&discId=" + discId,
-                                    dataType: 'json',
-                                    success: function (data) {
-                                        if (data > $("#hrefs li").length) {
-                                            getLinks();
-                                        }
-                                    },
-                                    complete: function (data) {
-                                        // Schedule the next
-                                        setTimeout(checkForNewLinks, fileInterval);
-                                    }
-                                });
-                            }
+<!--                                            var userObj = JSON.stringify(obj);-->
+<!--                                            if (row.file === null) {-->
+<!--                                                $('#chat').append("<li style='padding: 10px;'>" + "<div style='display: flex;'><img style='max-width: 50px; max-height: 50px; height: auto;border-radius: 50%; margin-right: 15px;' src='/users/userImage?&userImage=" + row.userPic + "' alt=''><div></div><div><div><span><b>" + row.user + "</b> &nbsp;</span><span style='color: silver'>" + row.date.substring(0, 16) + "</span></div>" + "<div>" + row.content + "</div></div></li>");-->
+<!--                                            } else {-->
+<!--                                                $('#chat').append("<li style='padding: 10px;'>" + "<div style='display: flex;'><img style='max-width: 50px; max-height: 50px; height: auto;border-radius: 50%; margin-right: 15px;' src='/users/userImage?&userImage=" + row.userPic + "' alt=''><div></div><div><div><span><b>" + row.user + "</b> &nbsp;</span><span style='color: silver'>" + row.date.substring(0, 16) + "</span></div>" + "<div>" + "<a href='/user_discussion/user_discussion_file?file=" + row.file + "' download=" + row.file + " >" + row.file + "</a></div></div></li>");-->
+<!--                                            }-->
+<!--                                        });-->
+<!--                                        $('#chat').append("<li id='scr'></li>");-->
+<!--                                        $("#editor").val("");-->
+<!--                                        document.getElementById("forScroll").click();-->
+<!--                                    }-->
+<!--                                });-->
+<!--                            }-->
 
 
-                            setTimeout(checkForNew, interval);
-                            setTimeout(checkForNewLinks, fileInterval);
+<!--                            function getLinks() {-->
+<!--                                $("#hrefs").empty();-->
+<!--                                $.ajax({-->
+<!--                                    type: 'GET',-->
+<!--                                    url: '/user_discussion/hrefs',-->
+<!--                                    data: $(this).serialize() + "&discId=" + discId,-->
+<!--                                    dataType: 'json',-->
+<!--                                    success: function (data) {-->
+
+<!--                                        $.each(data, function (i, row) {-->
 
 
-                            $("#send").on("click", function () {
-                                var data = $("#myForm").serialize();
-                                var fileName = document.getElementById("file").value;
-                                fileName = fileName.substr(fileName.lastIndexOf('\\') + 1);
-                                $.ajax({
-                                    type: "POST",
-                                    url: "/user_discussion/save",
-                                    data: data,
-                                    success: function () {
-                                        getChat();
-                                    },
-                                    error: function (error) {
-                                        window.location = "/error";
-                                    }
-                                });
+<!--                                            var obj = JSON.stringify(row.url);-->
+<!--                                            console.log(obj);-->
 
-                            });
+<!--                                            var userObj = JSON.stringify(obj);-->
 
-                            function upload() {
+<!--                                            $('#hrefs').append("<li style='padding: 10px'>" + "<b>" + row.username + "</b> &nbsp;" + row.date.substring(0, 16) + "&nbsp;<a href='/user_discussion/user_discussion_file?file=" + row.url + "' download=" + row.url + " >" + row.url + "</a> </li>");-->
 
-                            }
+<!--                                        });-->
+<!--                                        $("#editor").val("");-->
+<!--                                    }-->
+<!--                                });-->
+<!--                            }-->
 
-                        </script>
+<!--                            function checkForNewLinks() {-->
+<!--                                $.ajax({-->
+<!--                                    type: 'GET',-->
+<!--                                    url: '/user_discussion/count_files',-->
+<!--                                    data: $(this).serialize() + "&discId=" + discId,-->
+<!--                                    dataType: 'json',-->
+<!--                                    success: function (data) {-->
+<!--                                        if (data > $("#hrefs li").length) {-->
+<!--                                            getLinks();-->
+<!--                                        }-->
+<!--                                    },-->
+<!--                                    complete: function (data) {-->
+<!--                                        // Schedule the next-->
+<!--                                        setTimeout(checkForNewLinks, fileInterval);-->
+<!--                                    }-->
+<!--                                });-->
+<!--                            }-->
+
+
+<!--                            setTimeout(checkForNew, interval);-->
+<!--                            setTimeout(checkForNewLinks, fileInterval);-->
+
+
+<!--                            $("#send").on("click", function () {-->
+<!--                                var data = $("#myForm").serialize();-->
+<!--                                var fileName = document.getElementById("file").value;-->
+<!--                                fileName = fileName.substr(fileName.lastIndexOf('\\') + 1);-->
+<!--                                $.ajax({-->
+<!--                                    type: "POST",-->
+<!--                                    url: "/user_discussion/save",-->
+<!--                                    data: data,-->
+<!--                                    success: function () {-->
+<!--                                        getChat();-->
+<!--                                    },-->
+<!--                                    error: function (error) {-->
+<!--                                        window.location = "/error";-->
+<!--                                    }-->
+<!--                                });-->
+
+<!--                            });-->
+
+<!--                            function upload() {-->
+
+<!--                            }-->
+
+<!--                        </script>-->
 
                     </div>
                 </div>
@@ -442,9 +459,15 @@
 <script src="/vendor/chartjs/Chart.bundle.min.js"></script>
 <script src="/vendor/select2/select2.min.js">
 </script>
-
+<script th:inline="javascript">
+    let user = [[${user}]];
+    let discussionId = [[${discussionId}]]
+    let chatsDemo = [[${chats}]]
+    console.log(chatsDemo);
+</script>
 <!-- Main JS-->
 <script src="/js/main.js"></script>
+<script src="/js/sock.js"></script>
 <script>
 
     $(document).ready(function () {

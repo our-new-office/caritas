@@ -107,15 +107,21 @@
 
                                 <div>
                                     <div style="width:100%; display: flex;justify-content: center;margin-left: 20px;margin-right: 50px">
-                                        <select id="language" class="form-control" style="width: 215px; background-color: #dc3545; color: #fff">
-                                            <option th:text="#{language}" style="background-color: #fff; color: #495057"></option>
-                                            <option value="/users/user_page?lang=hy" style="background-color: #fff; color: #495057">Հայերեն</option>
-                                            <option value="/users/user_page?lang=en" style="background-color: #fff; color: #495057">English</option>
+                                        <select id="language" class="form-control"
+                                                style="width: 215px; background-color: #dc3545; color: #fff">
+                                            <option th:text="#{language}"
+                                                    style="background-color: #fff; color: #495057"></option>
+                                            <option value="/users/user_page?lang=hy"
+                                                    style="background-color: #fff; color: #495057">Հայերեն
+                                            </option>
+                                            <option value="/users/user_page?lang=en"
+                                                    style="background-color: #fff; color: #495057">English
+                                            </option>
                                         </select>
 
                                     </div>
                                     <script>
-                                        $(function(){
+                                        $(function () {
                                             $('#language').on('change', function () {
                                                 var url = $(this).val();
                                                 console.log(url);
@@ -198,7 +204,8 @@
                                     <h4 th:text="#{create.user.information}">Օգտատերի ստեղծման ինֆորմացիա</h4>
                                 </div>
                                 <div class="card-body">
-                                    <p class="text-muted m-b-15" th:text="#{create.user.hint}">Օգտատեր ստեղծելու համար բավական է մուտքագրել email և անուն</p>
+                                    <p class="text-muted m-b-15" th:text="#{create.user.hint}">Օգտատեր ստեղծելու համար
+                                        բավական է մուտքագրել email և անուն</p>
 
 
                                     <div style="font-weight: bold" th:if="${bindingError!=null}"
@@ -230,10 +237,12 @@
                                           class="form-horizontal">
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
-                                                <input type="text" id="text-input" name="name" th:placeholder="#{create.user.name}"
+                                                <input type="text" id="text-input" name="name"
+                                                       th:placeholder="#{create.user.name}"
                                                        class="form-control" th:if="${oldUser!=null}"
                                                        th:value="${oldUser.getName()}">
-                                                <input type="text" id="text-input" name="name" th:placeholder="#{create.user.name}"
+                                                <input type="text" id="text-input" name="name"
+                                                       th:placeholder="#{create.user.name}"
                                                        class="form-control" th:unless="${oldUser!=null}">
                                             </div>
                                         </div>
@@ -261,7 +270,7 @@
                                         </div>
                                         <div class="row form-group">
                                             <div class="col-12 col-md-12">
-                                                <input type="file" name="thumbnail"  class="form-control">
+                                                <input type="file" name="thumbnail" class="form-control">
                                             </div>
                                         </div>
                                         <div class="card-footer">

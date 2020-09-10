@@ -47,13 +47,13 @@ public class GroupRequest {
                     askDiscussionInvitationRepository.save(byUserAndDiscussionId);
                     mailToMember.setFrom(currentUser.getUser().getEmail());
                     Optional<Discussion> discussionOptional = discussionRepository.findById(discussionId);
-                    if(discussionOptional.isPresent()){
+                    if (discussionOptional.isPresent()) {
                         Discussion discussion = discussionOptional.get();
-                        if(discussion.getWorkingGroup()!=null){
+                        if (discussion.getWorkingGroup() != null) {
                             WorkingGroup workingGroup = discussion.getWorkingGroup();
-                            if(workingGroup.getWorkingGroupAdmin()!=null){
+                            if (workingGroup.getWorkingGroupAdmin() != null) {
                                 User workingGroupAdmin = workingGroup.getWorkingGroupAdmin();
-                                if(workingGroupAdmin.getEmail()!=null){
+                                if (workingGroupAdmin.getEmail() != null) {
                                     mailToMember.setTo(workingGroupAdmin.getEmail());
                                 }
                             }

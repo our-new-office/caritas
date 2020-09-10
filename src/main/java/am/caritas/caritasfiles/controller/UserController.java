@@ -356,7 +356,7 @@ public class UserController {
                     List<Chat> allChats = chatRepository.findAllByUserId(byId.get().getId());
                     for (Chat allChat : allChats) {
                         allChat.setUser(null);
-                        allChat.setDiscussion(null);
+                        allChat.setDiscussionId(null);
                         chatRepository.save(allChat);
                         chatRepository.delete(allChat);
                     }

@@ -188,12 +188,12 @@ public class WorkingGroupController {
         workingGroupService.saveWorkingGroup(workingGroupDto);
 
         Optional<User> byId = userService.findById(workingGroupDto.getUserId());
-        if(byId.isPresent()){
+        if (byId.isPresent()) {
             Mail mailToAdmin = new Mail();
             mailToAdmin.setFrom("intranet@caritas.am");
             mailToAdmin.setTo(byId.get().getEmail());
             mailToAdmin.setSubject("Congratulations");
-            mailToAdmin.setContent("Dear " +byId.get().getName()+ ": You have been chosen as  "
+            mailToAdmin.setContent("Dear " + byId.get().getName() + ": You have been chosen as  "
                     + workingGroupDto.getTitle() + " working group admin");
             emailService.sendEmail(mailToAdmin);
         }

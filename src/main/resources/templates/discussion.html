@@ -64,30 +64,37 @@
                 <ul class="list-unstyled navbar__list">
 
                     <hr>
-                    <h4 th:if="${discussions != null && discussions.size()>0}" th:text="#{your.discussions}">Ձեր զրուցարանները</h4>
+                    <h4 th:if="${discussions != null && discussions.size()>0}" th:text="#{your.discussions}">Ձեր
+                        զրուցարանները</h4>
                     <li class="has-sub" th:each="discussion:${discussions}">
-                        <a th:href="@{'/user_discussion/discussion/'+${discussion.getId()}}" th:text="${discussion.getTitle()}">
+                        <a th:href="@{'/user_discussion/discussion/'+${discussion.getId()}}"
+                           th:text="${discussion.getTitle()}">
                             <i class="fas fa-user"></i><span th:text="#{chat.main}"></span></a>
                     </li>
 
                 </ul>
-                <ul class="list-unstyled navbar__list" th:if="${allByUserAndHasSent!= null && allByUserAndHasSent.size()>0}">
+                <ul class="list-unstyled navbar__list"
+                    th:if="${allByUserAndHasSent!= null && allByUserAndHasSent.size()>0}">
                     <li><h3 th:text="#{notJoined.topics}">Other topics</h3></li>
                     <li class="has-sub" th:each="allOtherTopics: ${allByUserAndHasSent}"
                         th:if="${allOtherTopics.getDiscussion()!=null}" style="display: flex; align-items: center "
                     >
-                        <span  th:text="${allOtherTopics.getDiscussion().getTitle()}" style="margin-right: 15px;"></span>
-                        <a style="width: 100px;" th:href="@{'/groupRequest/add?discussionId='+${allOtherTopics.getDiscussion().getId()}}"><i class="zmdi zmdi-accounts-add addToGroup" title="Request for joining the group"></i></a>
+                        <span th:text="${allOtherTopics.getDiscussion().getTitle()}" style="margin-right: 15px;"></span>
+                        <a style="width: 100px;"
+                           th:href="@{'/groupRequest/add?discussionId='+${allOtherTopics.getDiscussion().getId()}}"><i
+                                class="zmdi zmdi-accounts-add addToGroup" title="Request for joining the group"></i></a>
 
 
                     </li>
                 </ul>
-                <ul class="list-unstyled navbar__list" th:if="${allByUserAndHasNotSent!=null && allByUserAndHasNotSent.size()>0}">
+                <ul class="list-unstyled navbar__list"
+                    th:if="${allByUserAndHasNotSent!=null && allByUserAndHasNotSent.size()>0}">
                     <li style="margin-bottom: 20px;"><h3 th:text="#{joinedOrRequested.topics}">Other topics</h3></li>
                     <li class="has-sub" th:each="allOtherTopics: ${allByUserAndHasNotSent}"
-                        th:if="${allOtherTopics.getDiscussion()!=null}" style="display: flex; align-items: center; justify-content: space-between"
+                        th:if="${allOtherTopics.getDiscussion()!=null}"
+                        style="display: flex; align-items: center; justify-content: space-between"
                     >
-                        <span  th:text="${allOtherTopics.getDiscussion().getTitle()}" style="margin-right: 15px;"></span>
+                        <span th:text="${allOtherTopics.getDiscussion().getTitle()}" style="margin-right: 15px;"></span>
 
                     </li>
                 </ul>
@@ -219,7 +226,9 @@
                                         <th>#</th>
                                         <th th:text="#{working.group.table.title}">Վերնագիր</th>
                                         <th th:text="#{working.group.table.img}">Նկար</th>
-                                        <th th:text="#{working.group.table.desc}" style="max-width: 400px">Նկարագրություն</th>
+                                        <th th:text="#{working.group.table.desc}" style="max-width: 400px">
+                                            Նկարագրություն
+                                        </th>
                                         <th th:text="#{working.group.table.action}">Գործողություն</th>
                                     </tr>
                                     </thead>

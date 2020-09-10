@@ -200,7 +200,8 @@
                                     <h4 th:text="#{user.edition.information}">Օգտատերի փոփոխման ինֆորմացիա</h4>
                                 </div>
                                 <div class="card-body">
-                                    <p class="text-muted m-b-15" th:text="#{user.edition.hint}">Օգտատեր փոփոխելու համար մուտքագրեք email և անուն</p>
+                                    <p class="text-muted m-b-15" th:text="#{user.edition.hint}">Օգտատեր փոփոխելու համար
+                                        մուտքագրեք email և անուն</p>
 
 
                                     <div style="font-weight: bold" th:if="${bindingError!=null}"
@@ -240,7 +241,8 @@
                                         <div class="row form-group">
 
                                             <div class="col-12 col-md-12">
-                                                <input type="text" id="text-input" name="name" th:placeholder="#{create.user.name}"
+                                                <input type="text" id="text-input" name="name"
+                                                       th:placeholder="#{create.user.name}"
                                                        class="form-control" th:value="${user.getName()}">
                                             </div>
                                         </div>

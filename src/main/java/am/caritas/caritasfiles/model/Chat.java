@@ -25,8 +25,8 @@ public class Chat {
     @ManyToOne
     private User user;
 
-    @ManyToOne
-    private Discussion discussion;
+    @Column
+    private Long discussionId;
 
     @Column(length = 4096)
     private String content;

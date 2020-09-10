@@ -43,6 +43,7 @@ public class Main {
 
     /**
      * Return login page
+     *
      * @return login page
      */
     @GetMapping("/login")
@@ -53,6 +54,7 @@ public class Main {
 
     /**
      * Return register page
+     *
      * @return register page
      */
     @GetMapping("/register")
@@ -63,9 +65,10 @@ public class Main {
 
     /**
      * Return login page if registration is correct or return register page again
-     * @param user User
+     *
+     * @param user          User
      * @param bindingResult BindingResult
-     * @param modelMap ModelMap
+     * @param modelMap      ModelMap
      * @return login page if success orElse register
      */
     @PostMapping("/register")
@@ -109,9 +112,10 @@ public class Main {
 
     /**
      * Return activate page
-     * @param token String
-     * @param userId String
-     * @param error String
+     *
+     * @param token    String
+     * @param userId   String
+     * @param error    String
      * @param modelMap ModelMap
      * @return activate page
      */
@@ -126,9 +130,10 @@ public class Main {
 
     /**
      * Return login page if activation is correct or return activate page again
+     *
      * @param passwordRePassword passwordRePasswordError
-     * @param bindingResult BindingResult
-     * @param modelMap ModelMap
+     * @param bindingResult      BindingResult
+     * @param modelMap           ModelMap
      * @return activate page in case of error orElse login page
      */
     @PostMapping("/activate")

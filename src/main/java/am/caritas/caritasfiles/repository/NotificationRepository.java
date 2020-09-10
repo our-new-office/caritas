@@ -9,6 +9,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
 
     List<Notification> findAllByUserIdAndHasSeen(Long id, Boolean hassSeen);
+
     List<Notification> findAllByUserId(Long id);
 
 }

@@ -1680,16 +1680,15 @@ function addInput() {
     input.classList.add("form-control");
     input.name = 'hrefs';
     input.placeholder = 'Հղում ';
-    input.style.marginTop='5px';
-    input.style.marginBottom='5px';
+    input.style.marginTop = '5px';
+    input.style.marginBottom = '5px';
 
-    label.parentNode.insertBefore( input, label.nextSibling );
-
+    label.parentNode.insertBefore(input, label.nextSibling);
 
 
 }
 
 function deleteLink(e) {
 
-  return e.remove();
+    return e.remove();
 }

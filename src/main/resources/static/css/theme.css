@@ -14865,3 +14865,28 @@ input[type="date"], focus {
     color: #FFFFFF;
     background-color: #0b2e13;
 }
+
+#displayScreen img{
+    height: 60px;
+    width: 60px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin: 10px;
+}
+
+#displayScreen li{
+    display: flex;
+    align-items: center;
+    word-break: break-word;
+    padding: 10px;
+}
+
+#displayScreen li p{
+    min-width: 150px;
+}
+
+#fileUploadButton{
+    position: absolute;
+    top: 102px;
+    left: 170px;
+}

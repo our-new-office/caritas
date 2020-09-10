@@ -57,6 +57,7 @@ public interface UserService {
 
     /**
      * Updates user
+     *
      * @param user User
      */
     void updateUser(User user);
